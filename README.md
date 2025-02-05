@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Bike Rental Platform is a web-based application that allows users to rent bikes for various durations, daily, and weekly rentals. The platform provides an intuitive interface for browsing available bikes, making reservations, and  Administrators can manage bike inventory, monitor rentals, and generate reports.
+AIS EBike Rental Platform is introducing an innovative platform that connects individuals seeking short-term e-bike rentals with bike owners and dealers willing to offer their vehicles on a rental basis. This system provides an affordable alternative to purchasing a new bike, allowing users to rent e-bikes for a few days at minimal cost. Simultaneously, it offers bike owners and dealers an opportunity to monetize their assets by renting them out, thereby generating additional income. The platform aims to create a mutually beneficial ecosystem, enhancing accessibility to e-bikes for users while providing a profitable avenue for bike proprietors.
 
 ## Features
 
