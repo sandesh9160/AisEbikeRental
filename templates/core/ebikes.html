@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border-radius: 10px;
+    }
+    .card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    }
+    .card img {
+        height: 200px;
+        object-fit: cover;
+        border-radius: 10px 10px 0 0;
+    }
+</style>
+
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Available EBikes</h1>
+    <div class="row">
+        {% for ebike in ebikes %}
+        <div class="col-md-4 mb-4 d-flex align-items-stretch">
+            <div class="card shadow-lg">
+                <img src="{{ ebike.image.url }}" class="card-img-top" alt="{{ ebike.name }}">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">{{ ebike.name }}</h5>
+                    <p class="card-text">{{ ebike.description }}</p>
+                    <p class="card-text font-weight-bold">{{ ebike.price }}</p>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <p class="text-center">No EBikes available at the moment.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

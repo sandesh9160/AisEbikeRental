@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <h2 class="text-center mb-4">Admin Dashboard</h2>
+    
+    <!-- Dashboard Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 d-flex align-items-stretch">
+            <div class="card text-white bg-primary shadow-lg border-0 w-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Total Riders</h5>
+                    <h2 class="card-text">{{ riders|length }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 d-flex align-items-stretch">
+            <div class="card text-white bg-success shadow-lg border-0 w-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Total Vehicle Providers</h5>
+                    <h2 class="card-text">{{ vehicle_providers|length }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 d-flex align-items-stretch">
+            <div class="card text-white bg-info shadow-lg border-0 w-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Total E-bikes</h5>
+                    <h2 class="card-text">{{ ebikes|length }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 d-flex align-items-stretch">
+            <div class="card text-white bg-dark shadow-lg border-0 w-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Total Bookings</h5>
+                    <h2 class="card-text">{{ bookings|length }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Vehicle Providers Earnings -->
+    <div class="row mb-4">
+        <div class="col-md-12 d-flex align-items-stretch">
+            <div class="card text-white bg-warning shadow-lg border-0 w-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Total Vehicle Providers Earnings</h5>
+                    <h2 class="card-text">₹{{ total_providers_earnings }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Riders Card -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white">
+                    <h4>Riders</h4>
+                </div>
+                <div class="card-body">
+                    <table class="table table-hover">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for rider in riders %}
+                            <tr>
+                                <td>{{ rider.username }}</td>
+                                <td>{{ rider.email }}</td>
+                                <td>
+                                    <a href="{% url 'delete_user' rider.id %}" class="btn btn-danger btn-sm">Delete</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!-- Vehicle Providers Card -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-success text-white">
+                    <h4>Vehicle Providers</h4>
+                </div>
+                <div class="card-body">
+                    <table class="table table-hover">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for provider in vehicle_providers %}
+                            <tr>
+                                <td>{{ provider.username }}</td>
+                                <td>{{ provider.email }}</td>
+                                <td>
+                                    <a href="{% url 'delete_user' provider.id %}" class="btn btn-danger btn-sm">Delete</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Vehicle Providers Earnings Table -->
+        <div class="col-md-12 mb-4">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-info text-white">
+                    <h4>Vehicle Providers Earnings</h4>
+                </div>
+                <div class="card-body">
+                    <table class="table table-hover">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>Provider</th>
+                                <th>Bike Names</th> <!-- Updated column for bike names -->
+                                <th>Total Earnings</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for provider_earnings in providers_earnings %}
+                            <tr>
+                                <!-- Display provider username -->
+                                <td>{{ provider_earnings.username }}</td>
+                                <!-- Display bike names -->
+                                <td>{{ provider_earnings.bike_names }}</td>
+                                <!-- Display total earnings -->
+                                <td>₹{{ provider_earnings.total_earnings }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Bookings Table -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-dark text-white">
+                    <h4>Bookings</h4>
+                </div>
+                <div class="card-body">
+                    <table class="table table-hover">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>Rider</th>
+                                <th>E-bike</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for booking in bookings %}
+                            <tr>
+                                <td>{{ booking.rider.username }}</td>
+                                <td>{{ booking.ebike.name }}</td>
+                                <td>{% if booking.is_approved %}Approved{% else %}Pending{% endif %}</td>
+                                <td>
+                                    {% if not booking.is_approved %}
+                                    <a href="{% url 'approve_booking' booking.id %}" class="btn btn-success btn-sm">Approve</a>
+                                    {% endif %}
+                                </td>
+                                <td><a href="{% url 'delete_user' booking.id %}" class="btn btn-danger btn-sm">Delete</a> </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
