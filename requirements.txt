@@ -60,7 +60,7 @@ plotly==5.20.0
 protobuf==4.25.4
 pycodestyle==2.12.1
 pycparser==2.22
-pygame==2.6.0
+
 Pygments==2.18.0
 PyJWT==2.10.1
 pymy==0.0.8
