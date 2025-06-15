@@ -6,66 +6,97 @@
         👋 Welcome, {{ request.user.username }} — Rider Dashboard
     </h2>
 
-    <div class="row mt-4">
-        <!-- Bookings Section -->
-        <div class="col-md-6">
-            <div class="card border-0 shadow-lg rounded-4 mb-4">
-                <div class="card-header bg-dark text-white rounded-top-4">
-                    <h4 class="mb-0"><i class="fas fa-calendar-check me-2"></i>Your Bookings</h4>
-                </div>
-                <div class="card-body bg-light">
-                    {% for booking in bookings %}
-                    <div class="card mb-4 border-0 shadow-sm animated-card">
-                        <div class="card-body">
-                            <h5 class="card-title text-primary fw-bold"><i class="fas fa-bolt me-2"></i>{{ booking.ebike.name }}</h5>
-                            <p class="card-text mb-1"><i class="fas fa-calendar-alt me-1"></i><strong>From:</strong> {{ booking.start_date }} <strong>To:</strong> {{ booking.end_date }}</p>
-                            <p class="card-text mb-1"><i class="fas fa-rupee-sign me-1"></i><strong>Total Price:</strong> ₹{{ booking.total_price }}</p>
-                            <span class="badge {% if booking.is_approved %}bg-success{% else %}bg-warning text-dark{% endif %} px-3 py-2">
-                                {% if booking.is_approved %}
-                                    <i class="fas fa-check-circle me-1"></i>Approved
-                                {% else %}
-                                    <i class="fas fa-hourglass-half me-1"></i>Pending
-                                {% endif %}
-                            </span>
+         <div class="row mt-4">
+    <!-- Bookings Section -->
+    <div class="col-md-6">
+        <div class="card border-0 shadow-lg rounded-4 mb-4">
+            <div class="card-header bg-dark text-white rounded-top-4">
+                <h4 class="mb-0"><i class="fas fa-calendar-check me-2"></i>Your Bookings</h4>
+            </div>
+            <div class="card-body bg-light">
+                {% for booking in bookings %}
+                <div class="card mb-4 border-0 shadow-sm animated-card">
+                    <div class="card-body">
+                        <!-- Image and title inline -->
+                        <div class="d-flex align-items-center mb-3">
+                            <img
+                                src="{{ booking.ebike.image.url }}"
+                                alt="{{ booking.ebike.name }}"
+                                style="width: 90px; height: 55px; object-fit: cover; border-radius: 8px;"
+                                class="me-3"
+                            />
+                            <h5 class="card-title text-primary fw-bold mb-0">
+                                <i class="fas fa-bolt me-2"></i>{{ booking.ebike.name }}
+                            </h5>
                         </div>
+
+                        <p class="card-text mb-1">
+                            <i class="fas fa-calendar-alt me-1"></i>
+                            <strong>From:</strong> {{ booking.start_date }} <strong>To:</strong> {{ booking.end_date }}
+                        </p>
+                        <p class="card-text mb-1">
+                            <i class="fas fa-rupee-sign me-1"></i>
+                            <strong>Total Price:</strong> ₹{{ booking.total_price }}
+                        </p>
+                        <span class="badge {% if booking.is_approved %}bg-success{% else %}bg-warning text-dark{% endif %} px-3 py-2">
+                            {% if booking.is_approved %}
+                                <i class="fas fa-check-circle me-1"></i>Approved
+                            {% else %}
+                                <i class="fas fa-hourglass-half me-1"></i>Pending
+                            {% endif %}
+                        </span>
                     </div>
-                    {% empty %}
-                    <p class="text-muted"><i class="fas fa-info-circle me-1"></i>You have no bookings yet.</p>
-                    {% endfor %}
                 </div>
+                {% empty %}
+                <p class="text-muted"><i class="fas fa-info-circle me-1"></i>You have no bookings yet.</p>
+                {% endfor %}
             </div>
         </div>
+    </div>
 
         <!-- Available E-Bikes Section -->
         <div class="col-md-6">
             <div class="card border-0 shadow-lg rounded-4 mb-4">
-                <div class="card-header bg-dark text-white rounded-top-4">
-                    <h4 class="mb-0"><i class="fas fa-bicycle me-2"></i>Available E-bikes</h4>
-                </div>
-                <div class="card-body bg-light">
-                    {% for ebike in available_ebikes %}
-                    <div class="card mb-4 border-0 shadow-sm animated-card">
-                        <div class="card-body">
-                            <h5 class="card-title text-primary fw-bold"><i class="fas fa-motorcycle me-2"></i>{{ ebike.name }}</h5>
-                            <p class="card-text text-muted"><i class="fas fa-align-left me-1"></i>{{ ebike.description|truncatewords:18 }}</p>
-                            <div class="d-flex justify-content-between mb-2">
-                                <span><i class="fas fa-calendar-day me-1"></i><strong>Day:</strong> ₹{{ ebike.price_per_day }}</span>
-                                <span><i class="fas fa-calendar-week me-1"></i><strong>Week:</strong> ₹{{ ebike.price_per_week }}</span>
-                            </div>
-                            {% if ebike not in booked_ebikes %}
-                                <a href="{% url 'book_ebike' ebike.id %}" class="btn btn-primary w-100 fw-bold">
-                                    <i class="fas fa-biking me-2"></i>Book Now
-                                </a>
-                            {% else %}
-                                <p class="text-muted fw-semibold"><i class="fas fa-lock me-1"></i>Already Booked</p>
-                            {% endif %}
-                        </div>
-                    </div>
-                    {% empty %}
-                    <p class="text-muted"><i class="fas fa-info-circle me-1"></i>No e-bikes available at the moment.</p>
-                    {% endfor %}
-                </div>
+                  <div class="card-header bg-dark text-white rounded-top-4">
+    <h4 class="mb-0"><i class="fas fa-bicycle me-2"></i>Available E-bikes</h4>
+</div>
+<div class="card-body bg-light">
+    {% for ebike in available_ebikes %}
+    <div class="card mb-4 border-0 shadow-sm animated-card">
+        <div class="card-body">
+            <!-- Compact Inline Image -->
+            <div class="d-flex align-items-center mb-3">
+                        <img
+                            src="{{ ebike.image.url }}"
+                            alt="{{ ebike.name }}"
+                            style="width: 100px; height: 60px; object-fit: cover; border-radius: 8px;"
+                            class="me-3"
+                        />
+                        <h5 class="card-title text-primary fw-bold mb-0">
+                            <i class="fas fa-motorcycle me-2"></i>{{ ebike.name }}
+                        </h5>
             </div>
+            <p class="card-text text-muted">
+                <i class="fas fa-align-left me-1"></i>{{ ebike.description|truncatewords:18 }}
+            </p>
+            <div class="d-flex justify-content-between mb-2">
+                    <span><i class="fas fa-calendar-day me-1"></i><strong>Day:</strong> ₹{{ ebike.price_per_day }}</span>
+                    <span><i class="fas fa-calendar-week me-1"></i><strong>Week:</strong> ₹{{ ebike.price_per_week }}</span>
+            </div>
+            {% if ebike not in booked_ebikes %}
+                <a href="{% url 'book_ebike' ebike.id %}" class="btn btn-primary w-100 fw-bold">
+                    <i class="fas fa-biking me-2"></i>Book Now
+                </a>
+            {% else %}
+                <p class="text-muted fw-semibold"><i class="fas fa-lock me-1"></i>Already Booked</p>
+            {% endif %}
+        </div>
+        </div>
+            {% empty %}
+            <p class="text-muted"><i class="fas fa-info-circle me-1"></i>No e-bikes available at the moment.</p>
+            {% endfor %}
+    </div>
+
         </div>
     </div>
 </div>
