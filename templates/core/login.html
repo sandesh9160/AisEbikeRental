@@ -1,0 +1,113 @@
+{% extends 'core/base.html' %} {% block content %}
+<style>
+  body {
+    background: linear-gradient(to right, #1e3c72, #2a5298);
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  .login-container {
+    max-width: 400px;
+    margin: 60px auto;
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 0.5s ease-in-out;
+  }
+
+  .login-title {
+    background: linear-gradient(to right, #2a5298, #1e3c72);
+    color: white;
+    padding: 16px;
+    border-radius: 12px;
+    text-align: center;
+    font-weight: bold;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .form-label {
+    font-weight: 600;
+    color: #333;
+  }
+
+  .form-control {
+    border-radius: 8px;
+    border: 1px solid #ced4da;
+    padding: 10px;
+    transition: all 0.3s ease;
+  }
+
+  .form-control:focus {
+    border-color: #2a5298;
+    box-shadow: 0 0 8px rgba(42, 82, 152, 0.4);
+  }
+
+  .btn-primary {
+    background: #2a5298;
+    border: none;
+    border-radius: 8px;
+    padding: 10px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .btn-primary:hover {
+    background: #1e3c72;
+    box-shadow: 0 6px 12px rgba(30, 60, 114, 0.3);
+  }
+
+  .text-muted a {
+    text-decoration: none;
+    font-weight: bold;
+  }
+
+  .text-muted a:hover {
+    text-decoration: underline;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>
+
+<div class="container">
+  <div class="login-container">
+    <div class="login-title">Login</div>
+    <form method="post">
+      {% csrf_token %}
+      <div class="mb-3 mt-4">
+        <label for="id_username" class="form-label">Username</label>
+        <input
+          type="text"
+          name="username"
+          class="form-control"
+          id="id_username"
+          required
+        />
+      </div>
+      <div class="mb-4">
+        <label for="id_password" class="form-label">Password</label>
+        <input
+          type="password"
+          name="password"
+          class="form-control"
+          id="id_password"
+          required
+        />
+      </div>
+      <button type="submit" class="btn btn-primary w-100">Login</button>
+    </form>
+    <div class="text-center mt-3 text-muted">
+      Don't have an account?
+      <a href="{% url 'signup' %}">Sign up</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
