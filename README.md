@@ -29,46 +29,46 @@ A powerful, scalable, and user-friendly **e-bike rental system** that connects r
 ## 📸 Screenshots
 
 ### Home Page
-![Home Page](screenshots/homepage.png)
+![Home Page](https://raw.githubusercontent.com/sandesh9160/AisEbikeRental/main/screenshots/homepage.png)
 
 ### Login Page
-![Login Page](screenshots/loginpage.png)
+![Login Page](https://raw.githubusercontent.com/sandesh9160/AisEbikeRental/main/screenshots/loginpage.png)
 
 ### Signup Page
-![Signup Page](screenshots/signuppage.png)
+![Signup Page](https://raw.githubusercontent.com/sandesh9160/AisEbikeRental/main/screenshots/signuppage.png)
 
 ### Available E-Bikes
-![Available E-Bikes](screenshots/available_ebikes.png)
+![Available E-Bikes](https://raw.githubusercontent.com/sandesh9160/AisEbikeRental/main/screenshots/available_ebikes.png)
 
 ### Rider Dashboard
-![Rider Dashboard 1](screenshots/riderdashboard_1.png)
-![Rider Dashboard 2](screenshots/riderdashboard_2.png)
-![Rider Dashboard 3](screenshots/riderdashboard_3.png)
+![Rider Dashboard 1](https://raw.githubusercontent.com/sandesh9160/AisEbikeRental/main/screenshots/riderdashboard_1.png)
+![Rider Dashboard 2](https://raw.githubusercontent.com/sandesh9160/AisEbikeRental/main/screenshots/riderdashboard_2.png)
+![Rider Dashboard 3](https://raw.githubusercontent.com/sandesh9160/AisEbikeRental/main/screenshots/riderdashboard_3.png)
 
 ### Book E-Bike
-![Book E-Bike](screenshots/book_ebike.png)
+![Book E-Bike](https://raw.githubusercontent.com/sandesh9160/AisEbikeRental/main/screenshots/book_ebike.png)
 
 ### Payment Page
-![Payment Page](screenshots/payementpage.png)
+![Payment Page](https://raw.githubusercontent.com/sandesh9160/AisEbikeRental/main/screenshots/payementpage.png)
 
 ### Payment Confirmation
-![Payment Confirmation](screenshots/payement_conformpage.png)
+![Payment Confirmation](https://raw.githubusercontent.com/sandesh9160/AisEbikeRental/main/screenshots/payement_conformpage.png)
 
 ### Receipt
-![Receipt](screenshots/recipt.png)
+![Receipt](https://raw.githubusercontent.com/sandesh9160/AisEbikeRental/main/screenshots/recipt.png)
 
 ### Provider Dashboard
-![Provider Dashboard 1](screenshots/providerdashboard_1.png)
-![Provider Dashboard 2](screenshots/providerdashboard_2.png)
+![Provider Dashboard 1](https://raw.githubusercontent.com/sandesh9160/AisEbikeRental/main/screenshots/providerdashboard_1.png)
+![Provider Dashboard 2](https://raw.githubusercontent.com/sandesh9160/AisEbikeRental/main/screenshots/providerdashboard_2.png)
 
 ### Add E-Bike Page
-![Add E-Bike Page](screenshots/add_ebikepage.png)
+![Add E-Bike Page](https://raw.githubusercontent.com/sandesh9160/AisEbikeRental/main/screenshots/add_ebikepage.png)
 
 ### Admin Dashboard
-![Admin Dashboard 1](screenshots/admin_dashboard1.png)
-![Admin Dashboard 2](screenshots/admin_dashboard2.png)
-![Admin Dashboard 3](screenshots/admin_dashboard3.png)
-![Admin Dashboard 4](screenshots/admin_dashboard4.png)
+![Admin Dashboard 1](https://raw.githubusercontent.com/sandesh9160/AisEbikeRental/main/screenshots/admin_dashboard1.png)
+![Admin Dashboard 2](https://raw.githubusercontent.com/sandesh9160/AisEbikeRental/main/screenshots/admin_dashboard2.png)
+![Admin Dashboard 3](https://raw.githubusercontent.com/sandesh9160/AisEbikeRental/main/screenshots/admin_dashboard3.png)
+![Admin Dashboard 4](https://raw.githubusercontent.com/sandesh9160/AisEbikeRental/main/screenshots/admin_dashboard4.png)
 
 ---
 
@@ -119,8 +119,8 @@ Home → Register/Login → Browse E-Bikes → Book or Upload → Dashboard → 
 ### 📦 Installation
 
 ```bash
-git clone https://github.com/sandesh9160/AIS_EBikes_Rental.git
-cd AIS_EBikes_Rental
+git clone https://github.com/sandesh9160/AisEbikeRental.git
+cd AisEbikeRental
 python -m venv venv
 # On Windows:
 venv\Scripts\activate
@@ -215,4 +215,4 @@ Developed by Sandesh Kenchugundi and contributors.
 
 ---
 
-For more details, see the [GitHub repository](https://github.com/sandesh9160/AIS_EBikes_Rental). 
+For more details, see the [GitHub repository](https://github.com/sandesh9160/AisEbikeRental). 
