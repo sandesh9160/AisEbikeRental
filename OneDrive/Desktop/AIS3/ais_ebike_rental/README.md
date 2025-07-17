@@ -26,6 +26,52 @@ A powerful, scalable, and user-friendly **e-bike rental system** that connects r
 
 ---
 
+## 📸 Screenshots
+
+### Home Page
+![Home Page](screenshots/homepage.png)
+
+### Login Page
+![Login Page](screenshots/loginpage.png)
+
+### Signup Page
+![Signup Page](screenshots/signuppage.png)
+
+### Available E-Bikes
+![Available E-Bikes](screenshots/available_ebikes.png)
+
+### Rider Dashboard
+![Rider Dashboard 1](screenshots/riderdashboard_1.png)
+![Rider Dashboard 2](screenshots/riderdashboard_2.png)
+![Rider Dashboard 3](screenshots/riderdashboard_3.png)
+
+### Book E-Bike
+![Book E-Bike](screenshots/book_ebike.png)
+
+### Payment Page
+![Payment Page](screenshots/payementpage.png)
+
+### Payment Confirmation
+![Payment Confirmation](screenshots/payement_conformpage.png)
+
+### Receipt
+![Receipt](screenshots/recipt.png)
+
+### Provider Dashboard
+![Provider Dashboard 1](screenshots/providerdashboard_1.png)
+![Provider Dashboard 2](screenshots/providerdashboard_2.png)
+
+### Add E-Bike Page
+![Add E-Bike Page](screenshots/add_ebikepage.png)
+
+### Admin Dashboard
+![Admin Dashboard 1](screenshots/admin_dashboard1.png)
+![Admin Dashboard 2](screenshots/admin_dashboard2.png)
+![Admin Dashboard 3](screenshots/admin_dashboard3.png)
+![Admin Dashboard 4](screenshots/admin_dashboard4.png)
+
+---
+
 ## 🧩 Tech Stack
 
 | Layer         | Technology           |
@@ -73,18 +119,13 @@ Home → Register/Login → Browse E-Bikes → Book or Upload → Dashboard → 
 ### 📦 Installation
 
 ```bash
-# Clone the repository
 git clone https://github.com/sandesh9160/AIS_EBikes_Rental.git
 cd AIS_EBikes_Rental
-
-# (Optional) Create virtual environment
 python -m venv venv
 # On Windows:
 venv\Scripts\activate
 # On Mac/Linux:
 source venv/bin/activate
-
-# Install dependencies
 pip install -r requirements.txt
 ```
 
@@ -141,6 +182,7 @@ core/                    # Core app: home, auth, profile, notifications
 riders/                  # Rider-specific features
 vehicle_providers/       # Vehicle provider features
 media/                   # Uploaded images and documents
+screenshots/             # Project screenshots for documentation
 templates/               # HTML templates for all apps
 requirements.txt         # Python dependencies
 manage.py                # Django management script
