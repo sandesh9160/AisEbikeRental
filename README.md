@@ -29,7 +29,7 @@ A powerful, scalable, and user-friendly **e-bike rental system** that connects r
 ## 📸 Screenshots
 
 ### Home Page
-![Home Page](https://raw.githubusercontent.com/sandesh9160/AisEbikeRental/main/screenshots/homepage.png)
+![Home Page](./homepage.png)
 
 ### Login Page
 ![Login Page](https://raw.githubusercontent.com/sandesh9160/AisEbikeRental/main/screenshots/loginpage.png)
