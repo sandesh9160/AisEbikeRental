@@ -145,7 +145,7 @@ FLUSH PRIVILEGES;
 
 ### 🔐 Environment Configuration
 
-Create a `.env` file in the project root with the following content:
+Create a `.env` file in the project root:
 ```
 DEBUG=True
 SECRET_KEY=your_secret_key
@@ -155,7 +155,7 @@ DATABASE_PASSWORD=your_password
 DATABASE_HOST=localhost
 DATABASE_PORT=3306
 ```
-Update `settings.py` to read from `.env` (if not already configured).
+Update `settings.py` to read from `.env`.
 
 ---
 
