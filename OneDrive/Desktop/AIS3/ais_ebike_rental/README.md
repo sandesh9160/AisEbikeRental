@@ -1,60 +1,55 @@
 # 🚲 AIS E-Bikes Rentals Platform
 
-A powerful, scalable, and user-friendly **e-bike rental system** that connects riders with e-bike providers. Built with **Python**, **Django**, and styled using **Bootstrap**, this platform simplifies short-term vehicle rentals and promotes eco-friendly urban mobility.
+A powerful, scalable, and user-friendly **e-bike rental system** that connects riders with e-bike providers. Built with **Python**, **Django**, **MySQL**, and styled using **Bootstrap**, this platform simplifies short-term vehicle rentals and promotes eco-friendly urban mobility.
 
 ---
 
 ## 🎯 Purpose
 
-* 🔓 Simplify short-term access to electric bikes.
-* 👨‍👩‍👧‍👦 Serve solo riders and families alike.
-* 💰 Help vehicle owners earn passive income.
-* 🌱 Promote green, sustainable transportation.
+- 🔓 Simplify short-term access to electric bikes.
+- 👨‍👩‍👧‍👦 Serve solo riders and families alike.
+- 💰 Help vehicle owners earn passive income.
+- 🌱 Promote green, sustainable transportation.
 
 ---
 
 ## 🚀 Features
 
-* 🧑‍💼 User-friendly interfaces for Riders & Providers
-* 🔐 Secure registration and login system
-* 🚴 E-bike listing, booking, and management
-* 📊 Dashboard for Riders, Providers, and Admin
-* ⏱️ Daily rentals & weekly subscription plans
-* 🔍 Booking history & availability tracking
-* 📝 Vehicle registration with document verification
-* 💸 Automated earnings and platform fee tracking
-* 📱 Mobile number and email-based registration
-* 🖼️ Profile image upload for users
-* 🔔 Notification system for bookings and updates
+- 🧑‍💼 User-friendly interfaces for Riders & Providers
+- 🔐 Secure registration and login system
+- 🚴 E-bike listing, booking, and management
+- 📊 Dashboard for Riders, Providers, and Admin
+- ⏱️ Daily rentals & weekly subscription plans
+- 🔍 Booking history & availability tracking
+- 📝 Vehicle registration with document verification
+- 💸 Automated earnings and platform fee tracking
 
 ---
 
 ## 🧩 Tech Stack
 
-| Layer        | Technology           |
-| ------------ | -------------------- |
-| Frontend     | HTML, CSS, Bootstrap |
-| Backend      | Python, Django       |
-| Database     | SQLite (default)     |
-| Auth & Admin | Django Admin Panel   |
+| Layer         | Technology           |
+|---------------|---------------------|
+| Frontend      | HTML, CSS, Bootstrap |
+| Backend       | Python, Django       |
+| Database      | MySQL               |
+| Auth & Admin  | Django Admin Panel  |
 
 ---
 
 ## 🏗️ Project Modules
 
 ### 🔸 `core/`
-* Home, About, Authentication (Login/Signup), Profile Management
+- Home, About, Authentication (Login/Signup), Profile Management, Notifications
 
 ### 🔸 `riders/`
-* Rider registration, login, dashboard, and booking system
-* Booking confirmation and payment
+- Rider registration, login, dashboard, booking system, payment
 
 ### 🔸 `vehicle_providers/`
-* Vehicle owner dashboard, bike upload, earnings tracker
-* Vehicle registration and management
+- Vehicle owner dashboard, bike upload, earnings tracker, vehicle registration
 
 ### 🔸 `admin_dashboard/`
-* Admin dashboard for managing users, bookings, and vehicles
+- Admin dashboard for managing users, bookings, and vehicles
 
 ---
 
@@ -68,9 +63,10 @@ Home → Register/Login → Browse E-Bikes → Book or Upload → Dashboard → 
 
 ### ✅ Prerequisites
 
-* Python 3.8+
-* Git
-* pip (Python package installer)
+- Python 3.8+
+- MySQL 5.7+
+- Git
+- pip (Python package installer)
 
 ---
 
@@ -94,12 +90,41 @@ pip install -r requirements.txt
 
 ---
 
+### 🗃️ Database Setup
+
+In MySQL:
+```sql
+CREATE DATABASE ais_ebikes_db;
+CREATE USER 'ais_ebikes_user'@'localhost' IDENTIFIED BY 'your_password';
+GRANT ALL PRIVILEGES ON ais_ebikes_db.* TO 'ais_ebikes_user'@'localhost';
+FLUSH PRIVILEGES;
+```
+
+---
+
+### 🔐 Environment Configuration
+
+Create a `.env` file in the project root with the following content:
+```
+DEBUG=True
+SECRET_KEY=your_secret_key
+DATABASE_NAME=ais_ebikes_db
+DATABASE_USER=ais_ebikes_user
+DATABASE_PASSWORD=your_password
+DATABASE_HOST=localhost
+DATABASE_PORT=3306
+```
+Update `settings.py` to read from `.env` (if not already configured).
+
+---
+
 ### 🔄 Migrate & Run
 
 ```bash
 python manage.py makemigrations
 python manage.py migrate
 python manage.py createsuperuser  # Create admin account
+python manage.py collectstatic    # Collect static files
 python manage.py runserver
 ```
 
@@ -119,7 +144,7 @@ media/                   # Uploaded images and documents
 templates/               # HTML templates for all apps
 requirements.txt         # Python dependencies
 manage.py                # Django management script
-db.sqlite3               # SQLite database (default)
+db.sqlite3               # SQLite database (default, for development)
 ```
 
 ---
