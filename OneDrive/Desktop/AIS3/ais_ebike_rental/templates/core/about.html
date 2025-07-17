@@ -1,0 +1,228 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<style>
+    body {
+        font-family: 'Segoe UI', sans-serif;
+        margin: 0;
+        background: linear-gradient(to right, #f0f4ff, #e6f0ff);
+    }
+
+    .container {
+        margin-top: 50px;
+        padding: 20px;
+    }
+
+    h1, h2 {
+        color: #1e3c72;
+        font-weight: 700;
+    }
+
+    h1 {
+        margin-bottom: 15px;
+        text-align: center;
+    }
+
+    h2 {
+        margin: 30px 0 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.8rem;
+    }
+
+    p {
+        font-size: 18px;
+        color: #333;
+        text-align: center;
+    }
+
+    ul.service-list {
+        list-style: none;
+        padding-left: 0;
+    }
+
+    .service-list li {
+        font-size: 16px;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #444;
+    }
+
+    .service-list li i {
+        color: #2a5298;
+    }
+
+    .subscribe-section,
+    .why-choose-us,
+    .how-it-works,
+    .customer-support,
+    .office-addresses {
+        border-radius: 12px;
+        background: linear-gradient(to bottom right, #ffffff, #f0f4ff);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        padding: 30px;
+        margin-top: 40px;
+        text-align: center;
+    }
+
+    .subscribe-button {
+        background: #9d40f5;
+        color: white;
+        font-weight: bold;
+        border-radius: 8px;
+        padding: 10px 25px;
+        border: none;
+        transition: background 0.3s, transform 0.2s;
+    }
+
+    .subscribe-button:hover {
+        background: orange;
+        transform: scale(1.05);
+    }
+
+    .form-check {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .custom-checkbox input {
+        width: 20px;
+        height: 20px;
+    }
+
+    address p {
+        margin: 10px 0;
+        font-size: 16px;
+        color: #555;
+    }
+
+    .icon {
+        color: #2a5298;
+    }
+
+    .card-style {
+        padding: 15px;
+        background: #ffffff;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        text-align: left;
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.06);
+    }
+
+    .card-style i {
+        color: #2a5298;
+        margin-right: 10px;
+    }
+</style>
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+<div class="container">
+    <h1><i class="fas fa-bolt icon me-2"></i>Welcome to AIS E-bike Rental</h1>
+    <p>Your one-stop solution for affordable and sustainable e-bike rentals.</p>
+
+    <div>
+        <h2><i class="fas fa-tools"></i> Our Services</h2>
+        <ul class="service-list">
+            <li><i class="fas fa-bicycle"></i> Affordable e-bike rentals for daily commuting</li>
+            <li><i class="fas fa-sliders-h"></i> Flexible rental plans to suit diverse needs</li>
+            <li><i class="fas fa-mobile-alt"></i> User-friendly web app for easy booking</li>
+            <li><i class="fas fa-shield-alt"></i> Regular maintenance for safety and reliability</li>
+        </ul>
+    </div>
+
+    <div class="how-it-works">
+        <h2><i class="fas fa-cogs"></i> How It Works</h2>
+        <div class="card-style"><i class="fas fa-user-plus"></i> Sign up and log in to your account</div>
+        <div class="card-style"><i class="fas fa-calendar-alt"></i> Choose your preferred e-bike and rental duration</div>
+        <div class="card-style"><i class="fas fa-check-circle"></i> Book the e-bike and wait for admin approval</div>
+        <div class="card-style"><i class="fas fa-road"></i> Ride and enjoy your eco-friendly journey</div>
+    </div>
+
+    <div class="why-choose-us">
+        <h2><i class="fas fa-star"></i> Why Choose Us</h2>
+        <ul class="service-list">
+            <li><i class="fas fa-leaf"></i> Eco-friendly transportation solution</li>
+            <li><i class="fas fa-wallet"></i> Cost-effective daily and weekly plans</li>
+            <li><i class="fas fa-clock"></i> Quick booking and flexible timings</li>
+            <li><i class="fas fa-headset"></i> 24/7 support and assistance</li>
+        </ul>
+    </div>
+
+    <div class="subscribe-section">
+        <h2><i class="fas fa-envelope"></i> Subscribe to our Newsletter</h2>
+        <form>
+            <div class="mb-3 form-check">
+                <div class="custom-checkbox">
+                    <input type="checkbox" id="subscribe">
+                </div>
+                <label class="form-check-label" for="subscribe">I agree to receive newsletters and promotional offers.</label>
+            </div>
+            <button type="submit" class="subscribe-button mt-2"><i class="fas fa-paper-plane me-1"></i>Subscribe</button>
+        </form>
+    </div>
+    <!-- Testimonial Carousel -->
+<div class="container my-5">
+    <h2 class="text-center"><i class="fas fa-users"></i> What Our Riders Say</h2>
+    <div id="testimonialCarousel" class="carousel slide mt-4" data-bs-ride="carousel">
+        <div class="carousel-inner text-center">
+            <div class="carousel-item active">
+                <blockquote class="blockquote">
+                    <p class="mb-3">“Easy booking process and the bike was in top condition. Loved it!”</p>
+                    <footer class="blockquote-footer">Ravi Kumar, Hyderabad</footer>
+                </blockquote>
+            </div>
+            <div class="carousel-item">
+                <blockquote class="blockquote">
+                    <p class="mb-3">“Affordable, reliable, and environment-friendly. Highly recommended!”</p>
+                    <footer class="blockquote-footer">Sneha Reddy, Bangalore</footer>
+                </blockquote>
+            </div>
+            <div class="carousel-item">
+                <blockquote class="blockquote">
+                    <p class="mb-3">“Customer support was super responsive when I had a question.”</p>
+                    <footer class="blockquote-footer">Arjun Mehta, Hyderabad</footer>
+                </blockquote>
+            </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon bg-dark rounded-circle" aria-hidden="true"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon bg-dark rounded-circle" aria-hidden="true"></span>
+        </button>
+    </div>
+</div>
+
+<!-- Intro Video Section -->
+<div class="container my-5">
+    <h2 class="text-center"><i class="fas fa-play-circle"></i> How It Works — Watch Video</h2>
+    <div class="ratio ratio-16x9 mt-3 rounded shadow">
+        <iframe src="https://www.youtube.com/embed/v3sYHtdykN4" title="AIS E-Bike Rental Intro" allowfullscreen></iframe>
+    </div>
+</div>
+
+
+    <div class="customer-support">
+        <h2><i class="fas fa-headphones-alt"></i> Customer Support</h2>
+        <p>Have questions or need help with your booking?</p>
+        <p><i class="fas fa-envelope"></i> support@aisebike.com</p>
+        <p><i class="fas fa-phone"></i> +91-98765-43210</p>
+    </div>
+
+    <div class="office-addresses">
+        <h2><i class="fas fa-map-marker-alt"></i> Our Office Addresses</h2>
+        <address>
+            <p><i class="fas fa-map-pin me-1"></i> Kondapur, Hyderabad - 500055</p>
+            <p><i class="fas fa-map-pin me-1"></i> Bangalore - HSR Layout, 560102</p>
+        </address>
+    </div>
+</div>
+{% endblock %}

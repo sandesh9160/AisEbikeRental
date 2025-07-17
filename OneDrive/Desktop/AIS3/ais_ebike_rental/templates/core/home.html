@@ -1,0 +1,360 @@
+{% extends 'core/base.html' %} {% block content %} {% load static %}
+
+<style>
+  carousel-img {
+    height: 400px; /* Adjust as needed */
+    object-fit: contain; /* Ensures full image is shown */
+    background-color: #fff; /* Fallback for transparent image parts */
+  }
+
+  .testimonials-section {
+    background-color: #f8f9fa;
+    padding: 60px 20px;
+  }
+
+  .testimonial-carousel .carousel-item {
+    display: flex;
+    justify-content: center;
+  }
+
+  .testimonial-card {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    max-width: 600px;
+    text-align: center;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+  }
+
+  .testimonial-card:hover {
+    transform: scale(1.02);
+  }
+
+  .testimonial-card img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-bottom: 15px;
+  }
+
+  .testimonial-card h5 {
+    margin-bottom: 5px;
+    color: #2a5298;
+  }
+
+  .testimonial-card p {
+    font-size: 15px;
+    color: #555;
+  }
+
+  .testimonial-card .stars {
+    color: #ffc107;
+    font-size: 20px;
+    margin: 10px 0;
+  }
+
+  .faq-section-modern {
+    background: rgb(156, 223, 245);
+    padding: 60px 20px;
+  }
+
+  .faq-box {
+    max-width: 800px;
+    margin: auto;
+  }
+
+  .faq-item-modern {
+    background-color: rgb(163, 227, 239);
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .faq-icon {
+    font-size: 30px;
+    color: #1e3c72;
+    margin-top: 5px;
+  }
+
+  .faq-content h5 {
+    margin: 0 0 5px;
+    font-size: 18px;
+    color: #2a2a2a;
+  }
+
+  .faq-content p {
+    margin: 0;
+    color: #555;
+  }
+  .rating-stars {
+    font-size: 1.5rem;
+    color: #ccc;
+    cursor: pointer;
+  }
+
+  .rating-stars input[type="radio"] {
+    display: none;
+  }
+
+  .rating-stars label {
+    color: #ccc;
+  }
+
+  .rating-stars input[type="radio"]:checked ~ label,
+  .rating-stars label:hover,
+  .rating-stars label:hover ~ label {
+    color: gold;
+  }
+
+  .card img {
+    height: 200px;
+    object-fit: cover;
+  }
+</style>
+
+<!-- Image Carousel -->
+<div
+  id="carouselExampleIndicators"
+  class="carousel slide"
+  data-bs-ride="carousel"
+>
+  <div class="carousel-inner">
+    <div class="carousel-item active">
+      <img
+        src="https://imgd.aeplcdn.com/664x374/n/bw/models/colors/revolt-select-model-pacific-blue-1706178230423.png?q=80"
+        class="d-block w-100"
+        alt="E-bike 1"
+      />
+    </div>
+    <div class="carousel-item">
+      <img
+        src="https://www.tvsmotor.com/electric-scooters/tvs-iqube/-/media/Vehicles/Feature/Iqube/Variant/TVS-iQube/Color_Images/Titanium-Grey-Glossy/titanim-grey-glossy03.webp"
+        class="d-block w-100"
+        alt="E-bike 2"
+      />
+    </div>
+    <div class="carousel-item">
+      <img
+        src="https://images.tractorjunction.com/3_RV_400_3b1b9bc0aa.png?format=webp&quality=40"
+        class="d-block w-100"
+        alt="E-bike 3"
+      />
+    </div>
+  </div>
+</div>
+
+<!-- Testimonials Carousel -->
+<div class="testimonials-section">
+  <h2 class="text-center">What Our Customers Say</h2>
+  <div
+    id="testimonialCarousel"
+    class="carousel slide testimonial-carousel"
+    data-bs-ride="carousel"
+  >
+    <div class="carousel-inner">
+      <div class="carousel-item active">
+        <div class="testimonial-card">
+          <img
+            src="https://randomuser.me/api/portraits/men/1.jpg"
+            alt="User Image"
+          />
+          <h5>John Doe</h5>
+          <div class="stars">⭐⭐⭐⭐⭐</div>
+          <p>
+            "Smooth rental experience and high-quality e-bikes. Highly
+            recommended!"
+          </p>
+        </div>
+      </div>
+      <div class="carousel-item">
+        <div class="testimonial-card">
+          <img
+            src="https://randomuser.me/api/portraits/women/2.jpg"
+            alt="User Image"
+          />
+          <h5>Jane Smith</h5>
+          <div class="stars">⭐⭐⭐⭐</div>
+          <p>
+            "Booking was easy and the bikes were reliable. Will definitely use
+            again."
+          </p>
+        </div>
+      </div>
+      <div class="carousel-item">
+        <div class="testimonial-card">
+          <img
+            src="https://randomuser.me/api/portraits/men/3.jpg"
+            alt="User Image"
+          />
+          <h5>Michael Lee</h5>
+          <div class="stars">⭐⭐⭐⭐⭐</div>
+          <p>"Great value and exceptional customer support. Loved it!"</p>
+        </div>
+      </div>
+    </div>
+    <button
+      class="carousel-control-prev"
+      type="button"
+      data-bs-target="#testimonialCarousel"
+      data-bs-slide="prev"
+    >
+      <span class="carousel-control-prev-icon"></span>
+    </button>
+    <button
+      class="carousel-control-next"
+      type="button"
+      data-bs-target="#testimonialCarousel"
+      data-bs-slide="next"
+    >
+      <span class="carousel-control-next-icon"></span>
+    </button>
+  </div>
+</div>
+
+<div class="container mt-5">
+  <h2 class="text-center">Frequently Asked Questions</h2>
+  <div class="accordion" id="faqAccordion">
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="headingOne">
+        <button
+          class="accordion-button"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#faq1"
+          aria-expanded="true"
+          aria-controls="faq1"
+        >
+          What are the rental charges for an e-bike?
+        </button>
+      </h2>
+      <div
+        id="faq1"
+        class="accordion-collapse collapse show"
+        aria-labelledby="headingOne"
+        data-bs-parent="#faqAccordion"
+      >
+        <div class="accordion-body">
+          Our charges vary depending on the model and rental duration. Please
+          check the individual bike listings for pricing.
+        </div>
+      </div>
+    </div>
+
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="headingTwo">
+        <button
+          class="accordion-button collapsed"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#faq2"
+          aria-expanded="false"
+          aria-controls="faq2"
+        >
+          Do I need to provide a deposit?
+        </button>
+      </h2>
+      <div
+        id="faq2"
+        class="accordion-collapse collapse"
+        aria-labelledby="headingTwo"
+        data-bs-parent="#faqAccordion"
+      >
+        <div class="accordion-body">
+          A refundable deposit is required at the time of rental, which will be
+          refunded once the bike is returned in good condition.
+        </div>
+      </div>
+    </div>
+
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="headingThree">
+        <button
+          class="accordion-button collapsed"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#faq3"
+          aria-expanded="false"
+          aria-controls="faq3"
+        >
+          How do I book an e-bike?
+        </button>
+      </h2>
+      <div
+        id="faq3"
+        class="accordion-collapse collapse"
+        aria-labelledby="headingThree"
+        data-bs-parent="#faqAccordion"
+      >
+        <div class="accordion-body">
+          You can easily book an e-bike through our website or mobile app. Just
+          choose your preferred bike and rental duration.
+        </div>
+      </div>
+    </div>
+
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="headingFour">
+        <button
+          class="accordion-button collapsed"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#faq4"
+          aria-expanded="false"
+          aria-controls="faq4"
+        >
+          What if the bike breaks down during rental?
+        </button>
+      </h2>
+      <div
+        id="faq4"
+        class="accordion-collapse collapse"
+        aria-labelledby="headingFour"
+        data-bs-parent="#faqAccordion"
+      >
+        <div class="accordion-body">
+          If your bike breaks down, contact our support immediately. We'll
+          assist or send a replacement bike depending on the situation.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Review Form -->
+<div class="container mt-5">
+  <h3 class="text-center">Leave a Review</h3>
+  <form method="POST" action="{% url 'submit_review' %}">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label for="name" class="form-label">Your Name</label>
+      <input type="text" class="form-control" name="name" required />
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Rating</label>
+      <div class="rating-stars d-flex justify-content-start">
+        {% for i in "54321" %}
+        <input type="radio" name="rating" value="{{ i }}" id="star{{ i }}" />
+        <label for="star{{ i }}">★</label>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="mb-3">
+      <label for="message" class="form-label">Your Feedback</label>
+      <textarea
+        name="message"
+        class="form-control"
+        rows="3"
+        required
+      ></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit Review</button>
+  </form>
+</div>
+
+{% endblock %}
