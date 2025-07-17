@@ -32,43 +32,43 @@ A powerful, scalable, and user-friendly **e-bike rental system** that connects r
 ![Home Page](./homepage.png)
 
 ### Login Page
-![Login Page](https://raw.githubusercontent.com/sandesh9160/AisEbikeRental/main/screenshots/loginpage.png)
+![Login Page](./loginpage.png)
 
 ### Signup Page
-![Signup Page](https://raw.githubusercontent.com/sandesh9160/AisEbikeRental/main/screenshots/signuppage.png)
+![Signup Page](./signuppage.png)
 
 ### Available E-Bikes
-![Available E-Bikes](https://raw.githubusercontent.com/sandesh9160/AisEbikeRental/main/screenshots/available_ebikes.png)
+![Available E-Bikes](./available_ebikes.png)
 
 ### Rider Dashboard
-![Rider Dashboard 1](https://raw.githubusercontent.com/sandesh9160/AisEbikeRental/main/screenshots/riderdashboard_1.png)
-![Rider Dashboard 2](https://raw.githubusercontent.com/sandesh9160/AisEbikeRental/main/screenshots/riderdashboard_2.png)
-![Rider Dashboard 3](https://raw.githubusercontent.com/sandesh9160/AisEbikeRental/main/screenshots/riderdashboard_3.png)
+![Rider Dashboard 1](./riderdashboard_1.png)
+![Rider Dashboard 2](./riderdashboard_2.png)
+![Rider Dashboard 3](./riderdashboard_3.png)
 
 ### Book E-Bike
-![Book E-Bike](https://raw.githubusercontent.com/sandesh9160/AisEbikeRental/main/screenshots/book_ebike.png)
+![Book E-Bike](./book_ebike.png)
 
 ### Payment Page
-![Payment Page](https://raw.githubusercontent.com/sandesh9160/AisEbikeRental/main/screenshots/payementpage.png)
+![Payment Page](./payementpage.png)
 
 ### Payment Confirmation
-![Payment Confirmation](https://raw.githubusercontent.com/sandesh9160/AisEbikeRental/main/screenshots/payement_conformpage.png)
+![Payment Confirmation](./payement_conformpage.png)
 
 ### Receipt
-![Receipt](https://raw.githubusercontent.com/sandesh9160/AisEbikeRental/main/screenshots/recipt.png)
+![Receipt](./recipt.png)
 
 ### Provider Dashboard
-![Provider Dashboard 1](https://raw.githubusercontent.com/sandesh9160/AisEbikeRental/main/screenshots/providerdashboard_1.png)
-![Provider Dashboard 2](https://raw.githubusercontent.com/sandesh9160/AisEbikeRental/main/screenshots/providerdashboard_2.png)
+![Provider Dashboard 1](./providerdashboard_1.png)
+![Provider Dashboard 2](./providerdashboard_2.png)
 
 ### Add E-Bike Page
-![Add E-Bike Page](https://raw.githubusercontent.com/sandesh9160/AisEbikeRental/main/screenshots/add_ebikepage.png)
+![Add E-Bike Page](./add_ebikepage.png)
 
 ### Admin Dashboard
-![Admin Dashboard 1](https://raw.githubusercontent.com/sandesh9160/AisEbikeRental/main/screenshots/admin_dashboard1.png)
-![Admin Dashboard 2](https://raw.githubusercontent.com/sandesh9160/AisEbikeRental/main/screenshots/admin_dashboard2.png)
-![Admin Dashboard 3](https://raw.githubusercontent.com/sandesh9160/AisEbikeRental/main/screenshots/admin_dashboard3.png)
-![Admin Dashboard 4](https://raw.githubusercontent.com/sandesh9160/AisEbikeRental/main/screenshots/admin_dashboard4.png)
+![Admin Dashboard 1](./admin_dashboard1.png)
+![Admin Dashboard 2](./admin_dashboard2.png)
+![Admin Dashboard 3](./admin_dashboard3.png)
+![Admin Dashboard 4](./admin_dashboard4.png)
 
 ---
 
