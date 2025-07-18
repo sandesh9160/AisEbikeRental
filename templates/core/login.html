@@ -1,0 +1,141 @@
+{% extends 'core/base.html' %} {% block content %}
+<!-- Font Awesome CDN for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+<style>
+  body {
+    background: linear-gradient(120deg, #e0eafc 0%, #cfdef3 100%);
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 100vh;
+  }
+  .login-container {
+    max-width: 400px;
+    margin: 60px auto;
+    background: rgba(255, 255, 255, 0.55);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.10);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-radius: 20px;
+    padding: 36px 32px 28px 32px;
+    animation: fadeIn 0.5s ease-in-out;
+    border: 1px solid rgba(255,255,255,0.22);
+  }
+  .login-title {
+    background: linear-gradient(90deg, #5a8dee 0%, #6fc3f7 100%);
+    color: #fff;
+    padding: 18px 0;
+    border-radius: 14px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.6rem;
+    letter-spacing: 1px;
+    margin-bottom: 18px;
+    box-shadow: 0 4px 12px rgba(90, 141, 238, 0.13);
+  }
+  .input-group {
+    position: relative;
+    margin-bottom: 22px;
+  }
+  .input-group .fa-solid {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #5a8dee;
+    font-size: 1.1rem;
+    opacity: 0.65;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .input-group input,
+  .input-group select,
+  .input-group textarea {
+    border-radius: 10px;
+    border: 1.5px solid #e0e7ef;
+    padding: 10px 12px 10px 48px !important;
+    width: 100%;
+    font-size: 1rem;
+    background: rgba(255,255,255,0.85);
+    transition: all 0.3s cubic-bezier(.4,0,.2,1);
+    box-shadow: 0 1px 2px rgba(90,141,238,0.04);
+    color: #222;
+  }
+  .input-group input:focus {
+    border-color: #5a8dee;
+    box-shadow: 0 0 0 3px rgba(90,141,238,0.13);
+    background: #fff;
+    outline: none;
+  }
+  .btn-primary {
+    background: linear-gradient(90deg, #5a8dee 0%, #6fc3f7 100%);
+    border: none;
+    border-radius: 10px;
+    padding: 12px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: 0.5px;
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(90,141,238,0.10);
+    transition: all 0.2s cubic-bezier(.4,0,.2,1);
+  }
+  .btn-primary:hover {
+    background: linear-gradient(90deg, #6fc3f7 0%, #5a8dee 100%);
+    box-shadow: 0 8px 24px rgba(90,141,238,0.15);
+    transform: translateY(-2px) scale(1.03);
+  }
+  .text-muted a {
+    text-decoration: none;
+    font-weight: bold;
+    color: #5a8dee;
+    transition: color 0.2s;
+  }
+  .text-muted a:hover {
+    text-decoration: underline;
+    color: #2a5298;
+  }
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>
+<div class="container">
+  <div class="login-container">
+    <div class="login-title"><i class="fa-solid fa-right-to-bracket"></i> Login</div>
+    <form method="post">
+      {% csrf_token %}
+      <div class="input-group mt-4">
+        <i class="fa-solid fa-user"></i>
+        <input
+          type="text"
+          name="username"
+          class="form-control"
+          id="id_username"
+          required
+          placeholder="Username"
+        />
+      </div>
+      <div class="input-group">
+        <i class="fa-solid fa-lock"></i>
+        <input
+          type="password"
+          name="password"
+          class="form-control"
+          id="id_password"
+          required
+          placeholder="Password"
+        />
+      </div>
+      <button type="submit" class="btn btn-primary w-100 mt-2">Login</button>
+    </form>
+    <div class="text-center mt-3 text-muted">
+      Don't have an account?
+      <a href="{% url 'signup' %}">Sign up</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
