@@ -135,6 +135,12 @@
       {% endif %}
     </a>
     <a class="nav-link text-white sidebar-link" href="#earnings"><i class="fas fa-wallet me-2"></i>Earnings</a>
+    <a class="nav-link text-white sidebar-link" href="{% url 'review_documents' %}">
+      <i class="fas fa-file-alt me-2"></i>Document Verification
+      {% if pending_documents|length > 0 %}
+        <span class="badge bg-warning ms-2 align-middle">{{ pending_documents|length }}</span>
+      {% endif %}
+    </a>
     <a class="nav-link text-white sidebar-link" href="#analysis-section"><i class="bi bi-bar-chart-fill me-2"></i>Analysis</a>
     <a class="nav-link text-white sidebar-link" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a>
   </nav>
@@ -579,6 +585,99 @@
         </div>
       </div>
     </div>
+
+    <!-- Document Verification Section -->
+    {% if pending_documents or pending_providers %}
+    <div class="row mb-4" id="document-verification">
+      <div class="col-12">
+        <div class="card bg-white shadow-sm">
+          <div class="card-header bg-warning text-dark fw-semibold">
+            <i class="fas fa-file-alt me-2"></i>Document Verification
+            {% if pending_documents|length > 0 %}
+              <span class="badge bg-danger ms-2">{{ pending_documents|length }} Pending</span>
+            {% endif %}
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <!-- Pending Documents -->
+              {% if pending_documents %}
+                <div class="col-md-6 mb-3">
+                  <h6 class="text-warning mb-3">
+                    <i class="fas fa-clock me-1"></i>Pending Document Reviews
+                  </h6>
+                  {% for document in pending_documents|slice:":3" %}
+                    <div class="card border-warning mb-2">
+                      <div class="card-body p-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                          <div>
+                            <h6 class="mb-1">{{ document.get_document_type_display }}</h6>
+                            <small class="text-muted">Provider: {{ document.provider.username }}</small>
+                            <br>
+                            <small class="text-muted">{{ document.uploaded_at|date:"M d, Y H:i" }}</small>
+                          </div>
+                          <div>
+                            <a href="{% url 'verify_document' document.id %}" class="btn btn-warning btn-sm">
+                              <i class="fas fa-eye me-1"></i>Review
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  {% endfor %}
+                  {% if pending_documents|length > 3 %}
+                    <div class="text-center">
+                      <a href="{% url 'review_documents' %}" class="btn btn-outline-warning">
+                        View All {{ pending_documents|length }} Documents
+                      </a>
+                    </div>
+                  {% endif %}
+                </div>
+              {% endif %}
+
+              <!-- Pending Provider Verifications -->
+              {% if pending_providers %}
+                <div class="col-md-6 mb-3">
+                  <h6 class="text-info mb-3">
+                    <i class="fas fa-user-check me-1"></i>Unverified Providers
+                  </h6>
+                  {% for provider in pending_providers|slice:":3" %}
+                    <div class="card border-info mb-2">
+                      <div class="card-body p-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                          <div>
+                            <h6 class="mb-1">{{ provider.username }}</h6>
+                            <small class="text-muted">Email: {{ provider.email }}</small>
+                            <br>
+                            <small class="text-muted">Joined: {{ provider.date_joined|date:"M d, Y" }}</small>
+                          </div>
+                          <div>
+                            <a href="{% url 'verify_provider' provider.id %}" class="btn btn-info btn-sm">
+                              <i class="fas fa-check me-1"></i>Verify
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  {% endfor %}
+                  {% if pending_providers|length > 3 %}
+                    <div class="text-center">
+                      <span class="text-muted">+{{ pending_providers|length|add:"-3" }} more providers</span>
+                    </div>
+                  {% endif %}
+                </div>
+              {% endif %}
+            </div>
+            
+            <div class="text-center mt-3">
+              <a href="{% url 'review_documents' %}" class="btn btn-primary">
+                <i class="fas fa-file-alt me-1"></i>Go to Document Review
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
 
     <!-- Bookings Table -->
     <div class="row" id="bookings">

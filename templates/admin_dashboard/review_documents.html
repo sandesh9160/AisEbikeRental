@@ -1,0 +1,409 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Review Documents{% endblock %}
+
+{% block content %}
+<!-- Custom Styles -->
+<style>
+    .document-review-page {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        min-height: 100vh;
+    }
+    .main-header {
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        color: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+        border-radius: 0 0 20px 20px;
+        box-shadow: 0 4px 20px rgba(30, 60, 114, 0.15);
+    }
+    .stats-card {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        border: none;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+    .document-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
+    .document-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+    .status-badge {
+        font-size: 0.75rem;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+    }
+    .section-header {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        border-left: 5px solid;
+    }
+    .pending-header { border-left-color: #ffc107; }
+    .approved-header { border-left-color: #28a745; }
+    .rejected-header { border-left-color: #dc3545; }
+</style>
+
+<div class="document-review-page">
+    <!-- Main Header -->
+    <div class="main-header">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="mb-0">
+                        <i class="fas fa-file-alt me-3"></i>
+                        Document Verification Center
+                    </h1>
+                    <p class="mb-0 mt-2 opacity-75">Review and verify provider documents</p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <a href="{% url 'admin_dashboard' %}" class="btn btn-light shadow-sm">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <!-- Statistics Cards -->
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="stats-card text-center">
+                    <div class="text-warning mb-2">
+                        <i class="fas fa-clock fa-2x"></i>
+                    </div>
+                    <h3 class="mb-1">{{ pending_documents|length }}</h3>
+                    <p class="mb-0 text-muted">Pending Review</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="stats-card text-center">
+                    <div class="text-success mb-2">
+                        <i class="fas fa-check-circle fa-2x"></i>
+                    </div>
+                    <h3 class="mb-1">{{ approved_documents|length }}</h3>
+                    <p class="mb-0 text-muted">Approved</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="stats-card text-center">
+                    <div class="text-danger mb-2">
+                        <i class="fas fa-times-circle fa-2x"></i>
+                    </div>
+                    <h3 class="mb-1">{{ rejected_documents|length }}</h3>
+                    <p class="mb-0 text-muted">Rejected</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="stats-card text-center">
+                    <div class="text-info mb-2">
+                        <i class="fas fa-file-alt fa-2x"></i>
+                    </div>
+                    <h3 class="mb-1">{{ pending_documents|length|add:approved_documents|length|add:rejected_documents|length }}</h3>
+                    <p class="mb-0 text-muted">Total Documents</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+
+            <!-- Pending Documents -->
+            {% if pending_documents %}
+                <div class="section-header pending-header">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <h4 class="mb-1 text-warning">
+                                <i class="fas fa-clock me-2"></i>
+                                Pending Review
+                            </h4>
+                            <p class="mb-0 text-muted">{{ pending_documents|length }} documents waiting for your review</p>
+                        </div>
+                        <span class="status-badge bg-warning text-dark">{{ pending_documents|length }} Pending</span>
+                    </div>
+                </div>
+                
+                <div class="row mb-4">
+                    {% for document in pending_documents %}
+                        <div class="col-md-6 col-lg-4 mb-3">
+                            <div class="document-card">
+                                <div class="card-body p-4">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="bg-warning bg-opacity-10 rounded-circle p-3 me-3">
+                                            <i class="fas fa-file-alt text-warning fa-2x"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-1 fw-bold">{{ document.get_document_type_display }}</h6>
+                                            <small class="text-muted">
+                                                <i class="fas fa-user me-1"></i>{{ document.provider.username }}
+                                            </small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="fas fa-calendar-alt text-muted me-2"></i>
+                                            <small class="text-muted">{{ document.uploaded_at|date:"M d, Y H:i" }}</small>
+                                        </div>
+                                        
+                                        {% if document.document_number %}
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-hashtag text-muted me-2"></i>
+                                                <small class="text-muted">{{ document.document_number }}</small>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="d-grid gap-2">
+                                        <a href="{{ document.document_file.url }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-eye me-1"></i>Preview Document
+                                        </a>
+                                        <a href="{% url 'verify_document' document.id %}" class="btn btn-warning btn-sm">
+                                            <i class="fas fa-check me-1"></i>Review & Verify
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- Approved Documents -->
+            {% if approved_documents %}
+                <div class="section-header approved-header">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <h4 class="mb-1 text-success">
+                                <i class="fas fa-check-circle me-2"></i>
+                                Approved Documents
+                            </h4>
+                            <p class="mb-0 text-muted">{{ approved_documents|length }} documents have been verified and approved</p>
+                        </div>
+                        <span class="status-badge bg-success text-white">{{ approved_documents|length }} Approved</span>
+                    </div>
+                </div>
+                
+                <div class="card mb-4 border-0 shadow-sm">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="border-0 py-3 px-4">
+                                            <i class="fas fa-user me-2"></i>Provider
+                                        </th>
+                                        <th class="border-0 py-3">
+                                            <i class="fas fa-file-alt me-2"></i>Document Type
+                                        </th>
+                                        <th class="border-0 py-3">
+                                            <i class="fas fa-hashtag me-2"></i>Document Number
+                                        </th>
+                                        <th class="border-0 py-3">
+                                            <i class="fas fa-calendar-plus me-2"></i>Uploaded
+                                        </th>
+                                        <th class="border-0 py-3">
+                                            <i class="fas fa-user-check me-2"></i>Reviewed By
+                                        </th>
+                                        <th class="border-0 py-3">
+                                            <i class="fas fa-clock me-2"></i>Reviewed At
+                                        </th>
+                                        <th class="border-0 py-3 text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for document in approved_documents %}
+                                        <tr class="border-0">
+                                            <td class="py-3 px-4">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="bg-success bg-opacity-10 rounded-circle p-2 me-3">
+                                                        <i class="fas fa-user-circle text-success"></i>
+                                                    </div>
+                                                    <span class="fw-medium">{{ document.provider.username }}</span>
+                                                </div>
+                                            </td>
+                                            <td class="py-3">
+                                                <span class="badge bg-success bg-opacity-10 text-success">
+                                                    {{ document.get_document_type_display }}
+                                                </span>
+                                            </td>
+                                            <td class="py-3">
+                                                <span class="text-muted">{{ document.document_number|default:"-" }}</span>
+                                            </td>
+                                            <td class="py-3">
+                                                <small class="text-muted">{{ document.uploaded_at|date:"M d, Y" }}</small>
+                                            </td>
+                                            <td class="py-3">
+                                                <span class="fw-medium">{{ document.reviewed_by.username }}</span>
+                                            </td>
+                                            <td class="py-3">
+                                                <small class="text-muted">{{ document.reviewed_at|date:"M d, Y H:i" }}</small>
+                                            </td>
+                                            <td class="py-3 text-center">
+                                                <a href="{{ document.document_file.url }}" target="_blank" class="btn btn-outline-primary btn-sm shadow-sm">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Rejected Documents -->
+            {% if rejected_documents %}
+                <div class="section-header rejected-header">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <h4 class="mb-1 text-danger">
+                                <i class="fas fa-times-circle me-2"></i>
+                                Rejected Documents
+                            </h4>
+                            <p class="mb-0 text-muted">{{ rejected_documents|length }} documents were rejected and need resubmission</p>
+                        </div>
+                        <span class="status-badge bg-danger text-white">{{ rejected_documents|length }} Rejected</span>
+                    </div>
+                </div>
+                
+                <div class="card mb-4 border-0 shadow-sm">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="border-0 py-3 px-4">
+                                            <i class="fas fa-user me-2"></i>Provider
+                                        </th>
+                                        <th class="border-0 py-3">
+                                            <i class="fas fa-file-alt me-2"></i>Document Type
+                                        </th>
+                                        <th class="border-0 py-3">
+                                            <i class="fas fa-hashtag me-2"></i>Document Number
+                                        </th>
+                                        <th class="border-0 py-3">
+                                            <i class="fas fa-calendar-plus me-2"></i>Uploaded
+                                        </th>
+                                        <th class="border-0 py-3">
+                                            <i class="fas fa-user-check me-2"></i>Reviewed By
+                                        </th>
+                                        <th class="border-0 py-3">
+                                            <i class="fas fa-clock me-2"></i>Reviewed At
+                                        </th>
+                                        <th class="border-0 py-3">
+                                            <i class="fas fa-comment me-2"></i>Admin Notes
+                                        </th>
+                                        <th class="border-0 py-3 text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for document in rejected_documents %}
+                                        <tr class="border-0">
+                                            <td class="py-3 px-4">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="bg-danger bg-opacity-10 rounded-circle p-2 me-3">
+                                                        <i class="fas fa-user-circle text-danger"></i>
+                                                    </div>
+                                                    <span class="fw-medium">{{ document.provider.username }}</span>
+                                                </div>
+                                            </td>
+                                            <td class="py-3">
+                                                <span class="badge bg-danger bg-opacity-10 text-danger">
+                                                    {{ document.get_document_type_display }}
+                                                </span>
+                                            </td>
+                                            <td class="py-3">
+                                                <span class="text-muted">{{ document.document_number|default:"-" }}</span>
+                                            </td>
+                                            <td class="py-3">
+                                                <small class="text-muted">{{ document.uploaded_at|date:"M d, Y" }}</small>
+                                            </td>
+                                            <td class="py-3">
+                                                <span class="fw-medium">{{ document.reviewed_by.username }}</span>
+                                            </td>
+                                            <td class="py-3">
+                                                <small class="text-muted">{{ document.reviewed_at|date:"M d, Y H:i" }}</small>
+                                            </td>
+                                            <td class="py-3">
+                                                {% if document.admin_notes %}
+                                                    <span class="badge bg-light text-dark" data-bs-toggle="tooltip" title="{{ document.admin_notes }}">
+                                                        <i class="fas fa-comment"></i>
+                                                    </span>
+                                                {% else %}
+                                                    <span class="text-muted">-</span>
+                                                {% endif %}
+                                            </td>
+                                            <td class="py-3 text-center">
+                                                <a href="{{ document.document_file.url }}" target="_blank" class="btn btn-outline-primary btn-sm shadow-sm me-1">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="{% url 'verify_document' document.id %}" class="btn btn-outline-success btn-sm shadow-sm">
+                                                    <i class="fas fa-redo"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Empty State -->
+            {% if not pending_documents and not approved_documents and not rejected_documents %}
+                <div class="text-center py-5">
+                    <div class="bg-white rounded-3 shadow-sm p-5">
+                        <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-4" style="width: 120px; height: 120px;">
+                            <i class="fas fa-file-alt fa-3x text-muted"></i>
+                        </div>
+                        <h4 class="text-muted mb-3">No Documents to Review</h4>
+                        <p class="text-muted mb-4">No provider documents have been uploaded yet. Check back later when providers start uploading their verification documents.</p>
+                        <a href="{% url 'admin_dashboard' %}" class="btn btn-primary shadow-sm">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Initialize tooltips
+var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl)
+})
+
+// Add smooth scrolling for better UX
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        document.querySelector(this.getAttribute('href')).scrollIntoView({
+            behavior: 'smooth'
+        });
+    });
+});
+</script>
+{% endblock %}

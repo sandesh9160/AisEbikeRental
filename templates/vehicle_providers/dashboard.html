@@ -14,6 +14,8 @@
     <a class="nav-link text-white sidebar-link" href="#ebikes-section"><i class="fas fa-bicycle me-2"></i>Your E-bikes</a>
     <a class="nav-link text-white sidebar-link" href="#earnings-section"><i class="fas fa-wallet me-2"></i>Earnings</a>
     <a class="nav-link text-white sidebar-link" href="#bookings-section"><i class="fas fa-calendar-check me-2"></i>Bookings</a>
+    <a class="nav-link text-white sidebar-link" href="{% url 'upload_documents' %}"><i class="fas fa-file-upload me-2"></i>Upload Documents</a>
+    <a class="nav-link text-white sidebar-link" href="{% url 'view_documents' %}"><i class="fas fa-file-alt me-2"></i>View Documents</a>
     <a class="nav-link text-white sidebar-link" href="{% url 'add_ebike' %}"><i class="fas fa-plus me-2"></i>Add E-bike</a>
     <a class="nav-link text-white sidebar-link" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a>
   </nav>
@@ -31,6 +33,30 @@
     <h2 class="text-center text-white bg-primary py-3 px-2 rounded shadow-sm mb-4">
       👋 Hello {{ request.user.username }} — Welcome to your Dashboard
     </h2>
+    
+    <!-- Verification Status Card -->
+    {% if request.user.is_verified_provider %}
+      <div class="alert alert-success text-center mb-4" role="alert">
+        <i class="fas fa-check-circle fa-2x mb-2"></i>
+        <h5 class="alert-heading">Account Verified!</h5>
+        <p class="mb-0">Your account has been verified. You can add ebikes and manage your business on the platform.</p>
+      </div>
+    {% else %}
+      <div class="alert alert-warning text-center mb-4" role="alert">
+        <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
+        <h5 class="alert-heading">Account Verification Required</h5>
+        <p class="mb-2">Your account is not yet verified. Please upload your documents to get verified and start adding ebikes.</p>
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+          <a href="{% url 'upload_documents' %}" class="btn btn-warning">
+            <i class="fas fa-file-upload me-1"></i>Upload Documents
+          </a>
+          <a href="{% url 'view_documents' %}" class="btn btn-outline-warning">
+            <i class="fas fa-file-alt me-1"></i>View Status
+          </a>
+        </div>
+      </div>
+    {% endif %}
+    
     <div class="row g-4 mb-4">
       <div class="col-md-6 col-12">
         <div class="card summary-card h-100 border-0 text-center">

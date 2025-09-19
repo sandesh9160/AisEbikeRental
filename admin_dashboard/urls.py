@@ -8,5 +8,8 @@ urlpatterns = [
     path('reject-booking/<int:booking_id>/', views.reject_booking, name='reject_booking'),
     path('delete-user/<int:user_id>/', views.delete_user, name='delete_user'),
     path('cancel-booking/<int:booking_id>/', views.cancel_booking, name='cancel_booking'),
+    path('review-documents/', views.review_documents, name='review_documents'),
+    path('verify-document/<int:document_id>/', views.verify_document, name='verify_document'),
+    path('verify-provider/<int:provider_id>/', views.verify_provider, name='verify_provider'),
 ]
 

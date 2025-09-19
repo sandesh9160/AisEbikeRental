@@ -6,6 +6,8 @@ class User(AbstractUser):
     is_vehicle_provider = models.BooleanField(default=False)
     mobile_number = models.CharField(max_length=15)
     profile_image = models.ImageField(upload_to='profile_images/', blank=True, null=True)
+    is_verified_provider = models.BooleanField(default=False, help_text="Admin verification status for vehicle providers")
+    verification_notes = models.TextField(blank=True, null=True, help_text="Admin notes about verification")
 
 class EBike(models.Model):
     name = models.CharField(max_length=100)
@@ -30,6 +32,39 @@ class VehicleRegistration(models.Model):
     vehicle_number = models.CharField(max_length=20)
     rc_document = models.FileField(upload_to='rc_documents/')
     is_approved = models.BooleanField(default=False)
+
+
+class ProviderDocument(models.Model):
+    DOCUMENT_TYPES = [
+        ('aadhar', 'Aadhar Card'),
+        ('pan', 'PAN Card'),
+        ('driving_license', 'Driving License'),
+        ('business_license', 'Business License'),
+        ('insurance', 'Insurance Document'),
+        ('other', 'Other'),
+    ]
+    
+    VERIFICATION_STATUS = [
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    ]
+    
+    provider = models.ForeignKey(User, on_delete=models.CASCADE, related_name='provider_documents')
+    document_type = models.CharField(max_length=20, choices=DOCUMENT_TYPES)
+    document_file = models.FileField(upload_to='provider_documents/')
+    document_number = models.CharField(max_length=100, blank=True, null=True)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=10, choices=VERIFICATION_STATUS, default='pending')
+    admin_notes = models.TextField(blank=True, null=True, help_text="Admin notes about this document")
+    reviewed_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='reviewed_documents')
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+    
+    class Meta:
+        ordering = ['-uploaded_at']
+    
+    def __str__(self):
+        return f"{self.provider.username} - {self.get_document_type_display()}"
 
 
 class Review(models.Model):

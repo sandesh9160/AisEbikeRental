@@ -121,11 +121,14 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR , 'static']
-import os
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+
+# Media files (User uploads)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
@@ -133,3 +136,17 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'core.User'
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
+
+if DEBUG:  # Local development
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+else: 
+# Email Configuration
+    EMAIL_HOST = 'smtp.gmail.com' 
+    EMAIL_PORT = 587
+    EMAIL_USE_TLS = True
+    EMAIL_HOST_USER = 'ebikerental19@gmail.com' 
+    EMAIL_HOST_PASSWORD = 'pknucnotleoslfna' 
+    DEFAULT_FROM_EMAIL = 'AIS E-Bike Rental <ebikerental19@gmail.com>'
+
+    # For development/testing, use console backend to see emails in terminal
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

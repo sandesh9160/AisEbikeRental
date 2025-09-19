@@ -24,5 +24,10 @@ urlpatterns = [
     path('riders/', include('riders.urls')),
     path('vehicle-providers/', include('vehicle_providers.urls')),
     path('admin-dashboard/', include('admin_dashboard.urls')),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]
+
+# Serve static and media files during development
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

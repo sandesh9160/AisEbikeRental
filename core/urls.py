@@ -11,5 +11,10 @@ urlpatterns = [
     path('ebikes/', views.ebikes, name='ebikes'),
     path('submit-review/', views.submit_review, name='submit_review'),
     path('profile/update/', views.profile_update, name='profile_update'),
+    
+    # Password Reset URLs
+    path('password-reset/', views.password_reset_request, name='password_reset_request'),
+    path('password-reset/done/', views.password_reset_done, name='password_reset_done'),
+    path('password-reset/confirm/<uidb64>/<token>/', views.password_reset_confirm, name='password_reset_confirm'),
 ]
 
