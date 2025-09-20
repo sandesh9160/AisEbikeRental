@@ -164,4 +164,19 @@
     </div>
   </div>
 </div>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+      const rider = document.getElementById("id_is_rider");
+      const provider = document.getElementById("id_is_vehicle_provider");
+  
+      rider.addEventListener("change", function() {
+          if (this.checked) provider.checked = false;
+      });
+  
+      provider.addEventListener("change", function() {
+          if (this.checked) rider.checked = false;
+      });
+  });
+  </script>
+  
 {% endblock %}

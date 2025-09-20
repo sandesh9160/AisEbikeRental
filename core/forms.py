@@ -73,13 +73,11 @@ class PasswordResetConfirmForm(forms.Form):
 
     def clean(self):
         cleaned_data = super().clean()
-        password1 = cleaned_data.get('new_password1')
-        password2 = cleaned_data.get('new_password2')
+        is_rider = cleaned_data.get("is_rider")
+        is_vehicle_provider = cleaned_data.get("is_vehicle_provider")
 
-        if password1 and password2:
-            if password1 != password2:
-                raise forms.ValidationError("Passwords don't match")
-            if len(password1) < 8:
-                raise forms.ValidationError("Password must be at least 8 characters long")
-        
+        if is_rider and is_vehicle_provider:
+            raise forms.ValidationError("You can select only one role: Rider or Vehicle Provider.")
+        if not is_rider and not is_vehicle_provider:
+            raise forms.ValidationError("You must select one role: Rider or Vehicle Provider.")
         return cleaned_data
