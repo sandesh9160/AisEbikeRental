@@ -1,0 +1,420 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Remove Document Verification{% endblock %}
+
+{% block content %}
+<!-- Custom Styles -->
+<style>
+    .remove-verification-page {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+    .remove-verification-header {
+        background: linear-gradient(135deg, #e17055 0%, #d63031 100%);
+        color: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+        border-radius: 0 0 30px 30px;
+        box-shadow: 0 10px 40px rgba(225, 112, 85, 0.2);
+        position: relative;
+        overflow: hidden;
+    }
+    .remove-verification-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/><circle cx="10" cy="60" r="0.5" fill="white" opacity="0.1"/><circle cx="90" cy="40" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+        opacity: 0.3;
+    }
+    .remove-verification-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        overflow: hidden;
+    }
+    .remove-verification-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    }
+    .warning-section {
+        background: linear-gradient(135deg, rgba(225, 112, 85, 0.1), rgba(214, 48, 49, 0.1));
+        border-left: 4px solid #e17055;
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+    .warning-section::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle, rgba(225, 112, 85, 0.1) 0%, transparent 70%);
+        animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+        0% { transform: scale(1); opacity: 0.5; }
+        50% { transform: scale(1.1); opacity: 0.3; }
+        100% { transform: scale(1); opacity: 0.5; }
+    }
+    .info-section {
+        background: linear-gradient(135deg, rgba(108, 117, 125, 0.1), rgba(73, 80, 87, 0.1));
+        border-left: 4px solid #6c757d;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    .action-buttons {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+    .modern-btn {
+        border-radius: 12px;
+        padding: 1rem 2rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 0.9rem;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        border: none;
+        margin: 0.5rem;
+    }
+    .modern-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+    .modern-btn-danger {
+        background: linear-gradient(135deg, #e17055, #d63031);
+        color: white;
+    }
+    .modern-btn-secondary {
+        background: linear-gradient(135deg, #6c757d, #495057);
+        color: white;
+    }
+    .form-label {
+        font-weight: 600;
+        color: #2d3436;
+    }
+    .danger-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #e17055, #d63031);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        animation: shake 0.5s ease-in-out infinite alternate;
+    }
+    @keyframes shake {
+        0% { transform: translateX(-2px); }
+        100% { transform: translateX(2px); }
+    }
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    .fade-in-up {
+        animation: fadeInUp 0.6s ease-out;
+    }
+    .confirmation-steps {
+        background: rgba(248, 249, 250, 0.8);
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    .step-item {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid rgba(0,0,0,0.1);
+    }
+    .step-item:last-child {
+        border-bottom: none;
+    }
+    .step-number {
+        width: 30px;
+        height: 30px;
+        background: linear-gradient(135deg, #e17055, #d63031);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        margin-right: 1rem;
+        font-size: 0.8rem;
+    }
+</style>
+
+<div class="remove-verification-page">
+    <!-- Header -->
+    <div class="remove-verification-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="mb-0 fade-in-up">
+                        <i class="fas fa-times-circle me-3"></i>
+                        Remove Document Verification
+                    </h1>
+                    <p class="mb-0 mt-3 opacity-75 fade-in-up" style="animation-delay: 0.2s;">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Permanently remove document verification
+                    </p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <a href="{% url 'review_documents' %}" class="btn btn-light btn-sm fade-in-up" style="animation-delay: 0.4s;">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Review
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="remove-verification-card fade-in-up">
+                    <div class="card-body p-4">
+                        <!-- Warning Section -->
+                        <div class="warning-section">
+                            <div class="danger-icon">
+                                <i class="fas fa-exclamation-triangle fa-2x text-white"></i>
+                            </div>
+                            <h4 class="text-center mb-4 fw-bold text-dark">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                Critical Action Warning
+                            </h4>
+                            <p class="text-center mb-4 text-dark">
+                                You are about to permanently remove verification for this document. This action cannot be undone and will have significant consequences.
+                            </p>
+                            
+                            <div class="confirmation-steps">
+                                <h6 class="mb-3 fw-bold text-dark">
+                                    <i class="fas fa-list-ol me-2"></i>What will happen:
+                                </h6>
+                                <div class="step-item">
+                                    <div class="step-number">1</div>
+                                    <div>
+                                        <strong>Document Status Reset:</strong> Set the document status back to "Pending"
+                                    </div>
+                                </div>
+                                <div class="step-item">
+                                    <div class="step-number">2</div>
+                                    <div>
+                                        <strong>Review Data Removal:</strong> Remove reviewer information and timestamps
+                                    </div>
+                                </div>
+                                <div class="step-item">
+                                    <div class="step-number">3</div>
+                                    <div>
+                                        <strong>Notes Deletion:</strong> Clear all admin notes and comments
+                                    </div>
+                                </div>
+                                <div class="step-item">
+                                    <div class="step-number">4</div>
+                                    <div>
+                                        <strong>Provider Notification:</strong> Notify the provider about the verification removal
+                                    </div>
+                                </div>
+                                <div class="step-item">
+                                    <div class="step-number">5</div>
+                                    <div>
+                                        <strong>Account Impact:</strong> If this is the last approved document, unverify the provider account
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Document Details -->
+                        <div class="info-section">
+                            <h5 class="mb-3 fw-bold">
+                                <i class="fas fa-file-alt me-2"></i>Document Details
+                            </h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label text-muted">Provider</label>
+                                        <p class="fw-bold text-dark mb-0">{{ document.provider.username }}</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label text-muted">Document Type</label>
+                                        <p class="fw-bold text-dark mb-0">{{ document.get_document_type_display }}</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label text-muted">Document Number</label>
+                                        <p class="fw-bold text-dark mb-0">
+                                            {% if document.document_number %}
+                                                #{{ document.document_number }}
+                                            {% else %}
+                                                <span class="text-muted">Not provided</span>
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label text-muted">Uploaded</label>
+                                        <p class="fw-bold text-dark mb-0">{{ document.uploaded_at|date:"M d, Y H:i" }}</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label text-muted">Reviewed By</label>
+                                        <p class="fw-bold text-dark mb-0">{{ document.reviewed_by.username }}</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label text-muted">Reviewed At</label>
+                                        <p class="fw-bold text-dark mb-0">{{ document.reviewed_at|date:"M d, Y H:i" }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {% if document.admin_notes %}
+                            <div class="mt-3">
+                                <label class="form-label text-muted">Current Admin Notes</label>
+                                <div class="bg-light p-3 rounded">
+                                    <p class="mb-0 text-dark">{{ document.admin_notes }}</p>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Confirmation Form -->
+                        <div class="action-buttons">
+                            <form method="post" id="removeForm">
+                                {% csrf_token %}
+                                <div class="mb-4">
+                                    <h5 class="mb-3 fw-bold text-center">
+                                        <i class="fas fa-shield-alt me-2"></i>Final Confirmation
+                                    </h5>
+                                    <p class="text-center text-muted mb-4">
+                                        Type <strong>"REMOVE"</strong> in the box below to confirm this action
+                                    </p>
+                                    <div class="row justify-content-center">
+                                        <div class="col-md-6">
+                                            <input type="text" class="form-control text-center" id="confirmationInput" 
+                                                   placeholder="Type REMOVE to confirm" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-flex justify-content-center gap-3">
+                                    <a href="{% url 'review_documents' %}" class="btn modern-btn modern-btn-secondary">
+                                        <i class="fas fa-arrow-left me-2"></i>Cancel
+                                    </a>
+                                    <button type="button" class="btn modern-btn modern-btn-danger" 
+                                            id="removeBtn" onclick="confirmRemoval()" disabled>
+                                        <i class="fas fa-times-circle me-2"></i>Remove Verification
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function confirmRemoval() {
+    const confirmationInput = document.getElementById('confirmationInput');
+    const removeBtn = document.getElementById('removeBtn');
+    
+    if (confirmationInput.value === 'REMOVE') {
+        if (confirm('Are you absolutely sure you want to remove this verification? This action cannot be undone.')) {
+            if (confirm('This will permanently remove the verification. Are you certain?')) {
+                removeBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Removing...';
+                removeBtn.disabled = true;
+                document.getElementById('removeForm').submit();
+            }
+        }
+    } else {
+        alert('Please type "REMOVE" exactly to confirm this action.');
+    }
+}
+
+// Add smooth animations and interactions
+document.addEventListener('DOMContentLoaded', function() {
+    // Enable/disable remove button based on confirmation input
+    const confirmationInput = document.getElementById('confirmationInput');
+    const removeBtn = document.getElementById('removeBtn');
+    
+    confirmationInput.addEventListener('input', function() {
+        if (this.value === 'REMOVE') {
+            removeBtn.disabled = false;
+            removeBtn.style.opacity = '1';
+        } else {
+            removeBtn.disabled = true;
+            removeBtn.style.opacity = '0.5';
+        }
+    });
+    
+    // Add visual feedback for confirmation input
+    confirmationInput.addEventListener('input', function() {
+        if (this.value === 'REMOVE') {
+            this.style.borderColor = '#28a745';
+            this.style.backgroundColor = 'rgba(40, 167, 69, 0.1)';
+        } else {
+            this.style.borderColor = '#dc3545';
+            this.style.backgroundColor = 'rgba(220, 53, 69, 0.1)';
+        }
+    });
+    
+    // Add shake animation to danger icon
+    const dangerIcon = document.querySelector('.danger-icon');
+    if (dangerIcon) {
+        setInterval(() => {
+            dangerIcon.style.animation = 'shake 0.5s ease-in-out';
+            setTimeout(() => {
+                dangerIcon.style.animation = 'shake 0.5s ease-in-out infinite alternate';
+            }, 500);
+        }, 3000);
+    }
+    
+    // Add hover effects to step items
+    const stepItems = document.querySelectorAll('.step-item');
+    stepItems.forEach(item => {
+        item.addEventListener('mouseenter', function() {
+            this.style.backgroundColor = 'rgba(225, 112, 85, 0.1)';
+            this.style.borderRadius = '8px';
+            this.style.padding = '0.75rem';
+        });
+        
+        item.addEventListener('mouseleave', function() {
+            this.style.backgroundColor = 'transparent';
+            this.style.borderRadius = '0';
+            this.style.padding = '0.75rem 0';
+        });
+    });
+    
+    // Add click-to-focus on confirmation input
+    const confirmationSection = document.querySelector('.action-buttons');
+    confirmationSection.addEventListener('click', function(e) {
+        if (e.target === this || e.target.classList.contains('action-buttons')) {
+            confirmationInput.focus();
+        }
+    });
+});
+</script>
+{% endblock %}
+

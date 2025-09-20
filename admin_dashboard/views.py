@@ -135,10 +135,31 @@ def review_documents(request):
     approved_documents = ProviderDocument.objects.filter(status='approved').order_by('-reviewed_at')
     rejected_documents = ProviderDocument.objects.filter(status='rejected').order_by('-reviewed_at')
     
+    # Group documents by provider for better organization
+    from collections import defaultdict
+    
+    # Group pending documents by provider
+    pending_by_provider = defaultdict(list)
+    for doc in pending_documents:
+        pending_by_provider[doc.provider].append(doc)
+    
+    # Group approved documents by provider
+    approved_by_provider = defaultdict(list)
+    for doc in approved_documents:
+        approved_by_provider[doc.provider].append(doc)
+    
+    # Group rejected documents by provider
+    rejected_by_provider = defaultdict(list)
+    for doc in rejected_documents:
+        rejected_by_provider[doc.provider].append(doc)
+    
     return render(request, 'admin_dashboard/review_documents.html', {
         'pending_documents': pending_documents,
         'approved_documents': approved_documents,
         'rejected_documents': rejected_documents,
+        'pending_by_provider': dict(pending_by_provider),
+        'approved_by_provider': dict(approved_by_provider),
+        'rejected_by_provider': dict(rejected_by_provider),
     })
 
 
@@ -236,3 +257,82 @@ def verify_provider(request, provider_id):
         'provider_documents': provider_documents,
     })
 
+
+@user_passes_test(is_admin)
+def edit_document_verification(request, document_id):
+    """Edit verification details for an approved document"""
+    document = get_object_or_404(ProviderDocument, id=document_id)
+    
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        admin_notes = request.POST.get('admin_notes', '')
+        
+        if action == 'update':
+            document.admin_notes = admin_notes
+            document.save()
+            messages.success(request, 'Document verification details updated successfully!')
+            return redirect('review_documents')
+            
+        elif action == 'remove_verification':
+            # Remove verification and set back to pending
+            document.status = 'pending'
+            document.reviewed_by = None
+            document.reviewed_at = None
+            document.admin_notes = admin_notes
+            document.save()
+            
+            # If this was the last approved document, unverify the provider
+            all_documents = ProviderDocument.objects.filter(provider=document.provider)
+            if not all_documents.filter(status='approved').exists():
+                document.provider.is_verified_provider = False
+                document.provider.verification_notes = f"Verification removed on {timezone.now().strftime('%Y-%m-%d %H:%M')}"
+                document.provider.save()
+                
+                # Notify provider
+                Notification.objects.create(
+                    recipient=document.provider,
+                    message="Your document verification has been removed. Please resubmit your documents for verification.",
+                    link="/vehicle-providers/view-documents/"
+                )
+                messages.success(request, 'Document verification removed and provider unverified!')
+            else:
+                messages.success(request, 'Document verification removed successfully!')
+            
+            return redirect('review_documents')
+    
+    return render(request, 'admin_dashboard/edit_document_verification.html', {'document': document})
+
+
+@user_passes_test(is_admin)
+def remove_document_verification(request, document_id):
+    """Remove verification for an approved document"""
+    document = get_object_or_404(ProviderDocument, id=document_id)
+    
+    if request.method == 'POST':
+        # Remove verification and set back to pending
+        document.status = 'pending'
+        document.reviewed_by = None
+        document.reviewed_at = None
+        document.admin_notes = ''
+        document.save()
+        
+        # If this was the last approved document, unverify the provider
+        all_documents = ProviderDocument.objects.filter(provider=document.provider)
+        if not all_documents.filter(status='approved').exists():
+            document.provider.is_verified_provider = False
+            document.provider.verification_notes = f"Verification removed on {timezone.now().strftime('%Y-%m-%d %H:%M')}"
+            document.provider.save()
+            
+            # Notify provider
+            Notification.objects.create(
+                recipient=document.provider,
+                message="Your document verification has been removed. Please resubmit your documents for verification.",
+                link="/vehicle-providers/view-documents/"
+            )
+            messages.success(request, 'Document verification removed and provider unverified!')
+        else:
+            messages.success(request, 'Document verification removed successfully!')
+        
+        return redirect('review_documents')
+    
+    return render(request, 'admin_dashboard/remove_document_verification.html', {'document': document})

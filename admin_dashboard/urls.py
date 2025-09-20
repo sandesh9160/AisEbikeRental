@@ -11,5 +11,7 @@ urlpatterns = [
     path('review-documents/', views.review_documents, name='review_documents'),
     path('verify-document/<int:document_id>/', views.verify_document, name='verify_document'),
     path('verify-provider/<int:provider_id>/', views.verify_provider, name='verify_provider'),
+    path('edit-document-verification/<int:document_id>/', views.edit_document_verification, name='edit_document_verification'),
+    path('remove-document-verification/<int:document_id>/', views.remove_document_verification, name='remove_document_verification'),
 ]
 

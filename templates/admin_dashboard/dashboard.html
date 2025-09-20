@@ -11,16 +11,16 @@
     left: 0;
     height: 100vh;
     width: 220px;
-    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
     color: #fff;
     z-index: 1200;
     display: flex;
     flex-direction: column;
     transition: left 0.3s;
-    box-shadow: 2px 0 8px rgba(30,60,114,0.08);
+    box-shadow: 2px 0 8px rgba(116, 185, 255, 0.2);
   }
   .dashboard-sidebar-toggle {
-    background: #1e3c72;
+    background: #74b9ff;
     color: #fff;
     border: none;
     border-radius: 6px;
@@ -34,12 +34,12 @@
     transition: background 0.2s;
   }
   .dashboard-sidebar-toggle:hover {
-    background: #2a5298;
+    background: #0984e3;
   }
   .sidebar-overlay {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(30,60,114,0.25);
+    background: rgba(116, 185, 255, 0.25);
     z-index: 1199;
     display: none;
   }
@@ -55,7 +55,7 @@
       bottom: 0;
       position: fixed;
       z-index: 1200;
-      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
       transition: left 0.3s;
       height: 100vh;
       overflow-y: auto;
@@ -73,7 +73,7 @@
       width: 220px;
       height: 100vh;
       z-index: 1200;
-      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
     }
   }
   .dashboard-content { margin-left: 220px; transition: margin-left 0.3s; }
@@ -92,7 +92,7 @@
   .card-header {
     border-bottom: none;
     padding: 1rem 1.2rem;
-    background: linear-gradient(90deg, #1e3c72 0%, #2a5298 100%);
+    background: linear-gradient(90deg, #74b9ff 0%, #0984e3 100%);
     color: #fff;
     border-radius: 1rem 1rem 0 0;
   }
@@ -173,21 +173,32 @@
 
 <!-- Main Dashboard Content -->
 <div class="main-content-with-sidebar dashboard-content">
-  <div class="d-flex justify-content-between align-items-center p-3" style="background: #fff;">
+  <div class="d-flex justify-content-between align-items-center p-4" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 20px; margin: 1rem; box-shadow: 0 8px 32px rgba(0,0,0,0.1);">
     <!-- Section Header -->
     <div>
       <div style="
         display: inline-block;
-        padding: 1rem 2rem;
-        border-radius: 20px;
-        background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-        color: #222;
-        font-size: 1.5rem;
+        padding: 1.5rem 2.5rem;
+        border-radius: 25px;
+        background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+        color: white;
+        font-size: 1.6rem;
         font-weight: bold;
-        border: 2px solid #ffa07a;
-        box-shadow: 0 2px 8px rgba(252,182,159,0.1);
+        box-shadow: 0 8px 32px rgba(116, 185, 255, 0.3);
+        position: relative;
+        overflow: hidden;
       ">
-         Welcome, {{ request.user.username }} to Admin (Dashboard)
+        <i class="fas fa-shield-check me-3"></i>Welcome, {{ request.user.username }} to Admin Dashboard
+        <div style="
+          position: absolute;
+          top: 0;
+          right: 0;
+          width: 100px;
+          height: 100px;
+          background: linear-gradient(45deg, rgba(255,255,255,0.1), transparent);
+          border-radius: 50%;
+          transform: translate(30px, -30px);
+        "></div>
       </div>
     </div>
     <!-- Profile and Logout -->
@@ -202,75 +213,73 @@
     </h2>
 
     <!-- Summary Cards -->
-    <div class="row g-4 mb-4">
+    <div class="row g-4 mb-4 mx-1">
       <div class="col-md-3 col-12">
-        <div class="card summary-card h-100 border-0 text-center">
+        <div class="card summary-card h-100 border-0 text-center" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.1);">
           <div class="card-body py-4 d-flex flex-column align-items-center justify-content-center">
-            <div class="icon-circle mb-3" style="background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);"><i class="bi bi-people-fill"></i></div>
-            <h6 class="fw-bold text-secondary mb-1">Total Riders</h6>
-            <h2 class="fw-bold mb-0">{{ riders|length }}</h2>
-           
+            <div class="icon-circle mb-3" style="background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);"><i class="fas fa-users"></i></div>
+            <h6 class="fw-bold text-dark mb-1">Total Riders</h6>
+            <h2 class="fw-bold mb-0" style="background: linear-gradient(135deg, #74b9ff, #0984e3); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">{{ riders|length }}</h2>
           </div>
         </div>
       </div>
       <div class="col-md-3 col-12">
-        <div class="card summary-card h-100 border-0 text-center">
+        <div class="card summary-card h-100 border-0 text-center" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.1);">
           <div class="card-body py-4 d-flex flex-column align-items-center justify-content-center">
-            <div class="icon-circle mb-3" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);"><i class="bi bi-person-gear"></i></div>
-            <h6 class="fw-bold text-secondary mb-1">Vehicle Providers</h6>
-            <h2 class="fw-bold mb-0">{{ vehicle_providers|length }}</h2>
+            <div class="icon-circle mb-3" style="background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);"><i class="fas fa-user-tie"></i></div>
+            <h6 class="fw-bold text-dark mb-1">Vehicle Providers</h6>
+            <h2 class="fw-bold mb-0" style="background: linear-gradient(135deg, #00b894, #00cec9); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">{{ vehicle_providers|length }}</h2>
           </div>
         </div>
       </div>
       <div class="col-md-3 col-12">
-        <div class="card summary-card h-100 border-0 text-center">
+        <div class="card summary-card h-100 border-0 text-center" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.1);">
           <div class="card-body py-4 d-flex flex-column align-items-center justify-content-center">
-            <div class="icon-circle mb-3" style="background: linear-gradient(135deg, #f7971e 0%, #ffd200 100%);"><i class="bi bi-bicycle"></i></div>
-            <h6 class="fw-bold text-secondary mb-1">E-bikes</h6>
-            <h2 class="fw-bold mb-0">{{ ebikes|length }}</h2>
+            <div class="icon-circle mb-3" style="background: linear-gradient(135deg, #fdcb6e 0%, #f39c12 100%);"><i class="fas fa-bicycle"></i></div>
+            <h6 class="fw-bold text-dark mb-1">E-bikes</h6>
+            <h2 class="fw-bold mb-0" style="background: linear-gradient(135deg, #fdcb6e, #f39c12); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">{{ ebikes|length }}</h2>
           </div>
         </div>
       </div>
       <div class="col-md-3 col-12">
-        <div class="card summary-card h-100 border-0 text-center">
+        <div class="card summary-card h-100 border-0 text-center" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.1);">
           <div class="card-body py-4 d-flex flex-column align-items-center justify-content-center">
-            <div class="icon-circle mb-3" style="background: linear-gradient(135deg, #ff5858 0%, #f09819 100%);"><i class="bi bi-receipt-cutoff"></i></div>
-            <h6 class="fw-bold text-secondary mb-1">Bookings</h6>
-            <h2 class="fw-bold mb-0">{{ bookings|length }}</h2>
-            
+            <div class="icon-circle mb-3" style="background: linear-gradient(135deg, #e17055 0%, #d63031 100%);"><i class="fas fa-book-open"></i></div>
+            <h6 class="fw-bold text-dark mb-1">Bookings</h6>
+            <h2 class="fw-bold mb-0" style="background: linear-gradient(135deg, #e17055, #d63031); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">{{ bookings|length }}</h2>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Analytics Charts Row: Side by Side -->
-    <div class="row mb-4" id="analysis-section">
+    <div class="row mb-4 mx-1" id="analysis-section">
       <div class="col-md-4 col-12 mb-3">
-        <div class="card bg-white shadow-sm mb-4" style="border-radius: 1.5rem; height: 230px;">
-          <div class="card-header bg-info text-white fw-semibold" style="border-radius: 1.5rem 1.5rem 0 0;">
-            <i class="bi bi-graph-up me-2"></i>Bookings Per Month
+        <div class="card mb-4" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); height: 280px;">
+          <div class="card-header fw-semibold" style="background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%); color: white; border-radius: 20px 20px 0 0;">
+            <i class="fas fa-chart-line me-2"></i>Bookings Per Month
           </div>
-          <div class="card-body" style="background: #fff; border-radius: 0 0 1.5rem 1.5rem; display: flex; justify-content: center; align-items: center; min-height: 130px; height: 130px;">
+          <div class="card-body" style="background: transparent; border-radius: 0 0 20px 20px; display: flex; justify-content: center; align-items: center; min-height: 180px; height: 180px;">
             <canvas id="bookingsLineChart" width="220" height="130" style="max-width:220px; margin:0 auto;"></canvas>
           </div>
         </div>
       </div>
       <div class="col-md-4 col-12 mb-3">
-        <div class="card bg-white shadow-sm mb-4" style="border-radius: 1.5rem; height: 230px;">
-          <div class="card-header bg-success text-white fw-semibold" style="border-radius: 1.5rem 1.5rem 0 0;">
-            <i class="bi bi-pie-chart-fill me-2"></i>Booking Status
+        <div class="card mb-4" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); height: 280px;">
+          <div class="card-header fw-semibold" style="background: linear-gradient(135deg, #00b894 0%, #00cec9 100%); color: white; border-radius: 20px 20px 0 0;">
+            <i class="fas fa-chart-pie me-2"></i>Booking Status
           </div>
-          <div class="card-body" style="background: #fff; border-radius: 0 0 1.5rem 1.5rem; display: flex; justify-content: center; align-items: center; min-height: 130px; height: 130px;">
+          <div class="card-body" style="background: transparent; border-radius: 0 0 20px 20px; display: flex; justify-content: center; align-items: center; min-height: 180px; height: 180px;">
             <canvas id="statusPieChart" width="220" height="130" style="max-width:220px; margin:0 auto;"></canvas>
           </div>
         </div>
       </div>
       <div class="col-md-4 col-12 mb-3">
-        <div class="card bg-white shadow-sm mb-4" style="border-radius: 1.5rem; height: 230px;">
-          <div class="card-header bg-warning text-white fw-semibold" style="border-radius: 1.5rem 1.5rem 0 0; color: #fff;">
-            <i class="bi bi-graph-up-arrow me-2"></i>Provider Earnings vs Bikes
+        <div class="card mb-4" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); height: 280px;">
+          <div class="card-header fw-semibold" style="background: linear-gradient(135deg, #fdcb6e 0%, #f39c12 100%); color: white; border-radius: 20px 20px 0 0;">
+            <i class="fas fa-chart-scatter me-2"></i>Provider Earnings vs Bikes
           </div>
-          <div class="card-body" style="background: #fff; border-radius: 0 0 1.5rem 1.5rem; display: flex; justify-content: center; align-items: center; min-height: 130px; height: 130px;">
+          <div class="card-body" style="background: transparent; border-radius: 0 0 20px 20px; display: flex; justify-content: center; align-items: center; min-height: 180px; height: 180px;">
             <canvas id="providerScatterChart" width="220" height="130" style="max-width:220px; margin:0 auto;"></canvas>
           </div>
         </div>
@@ -422,33 +431,37 @@
     </script>
 
     <!-- Earnings -->
-    <div class="row mb-4">
+    <div class="row mb-4 mx-1">
       <div class="col-md-6 mb-3">
-        <div class="card bg-light text-center">
-          <div class="card-body">
-            <i class="bi bi-wallet2 icon-large text-warning"></i>
-            <h5 class="card-title mt-2">Providers Earnings</h5>
-            <h2 class="text-dark">₹{{ total_providers_earnings }}</h2>
+        <div class="card text-center" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.1);">
+          <div class="card-body py-4">
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 80px; height: 80px; background: linear-gradient(135deg, #00b894, #00cec9);">
+              <i class="fas fa-wallet fa-2x text-white"></i>
+            </div>
+            <h5 class="card-title mt-2 fw-bold text-dark">Providers Earnings</h5>
+            <h2 class="text-dark fw-bold" style="background: linear-gradient(135deg, #00b894, #00cec9); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">₹{{ total_providers_earnings }}</h2>
           </div>
         </div>
       </div>
       <div class="col-md-6 mb-3">
-        <div class="card bg-light text-center">
-          <div class="card-body">
-            <i class="bi bi-currency-rupee icon-large text-danger"></i>
-            <h5 class="card-title mt-2">Admin Profit</h5>
-            <h2 class="text-dark">₹{{ platform_charges }}</h2>
+        <div class="card text-center" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.1);">
+          <div class="card-body py-4">
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 80px; height: 80px; background: linear-gradient(135deg, #e17055, #d63031);">
+              <i class="fas fa-coins fa-2x text-white"></i>
+            </div>
+            <h5 class="card-title mt-2 fw-bold text-dark">Admin Profit</h5>
+            <h2 class="text-dark fw-bold" style="background: linear-gradient(135deg, #e17055, #d63031); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">₹{{ platform_charges }}</h2>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Riders and Providers Tables -->
-    <div class="row" id="riders">
+    <div class="row mx-1" id="riders">
       <div class="col-md-6 mb-4">
-        <div class="card bg-white shadow-sm">
-          <div class="card-header bg-primary text-white fw-semibold">
-            <i class="bi bi-person-circle me-2"></i>Riders
+        <div class="card" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.1);">
+          <div class="card-header fw-semibold" style="background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%); color: white; border-radius: 20px 20px 0 0;">
+            <i class="fas fa-users me-2"></i>Riders
           </div>
           <div class="card-body">
             <table class="table table-hover align-middle">
@@ -486,9 +499,9 @@
       </div>
 
       <div class="col-12 mb-4" id="providers">
-        <div class="card bg-white shadow-sm">
-          <div class="card-header bg-success text-white fw-semibold">
-            <i class="bi bi-person-vcard-fill me-2"></i>Vehicle Providers
+        <div class="card" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.1);">
+          <div class="card-header fw-semibold" style="background: linear-gradient(135deg, #00b894 0%, #00cec9 100%); color: white; border-radius: 20px 20px 0 0;">
+            <i class="fas fa-user-tie me-2"></i>Vehicle Providers
           </div>
           <div class="card-body table-responsive">
             <table class="table table-hover align-middle">
@@ -540,11 +553,11 @@
     </div>
 
     <!-- Earnings Table -->
-    <div class="row" id="earnings">
+    <div class="row mx-1" id="earnings">
       <div class="col-md-12 mb-4">
-        <div class="card bg-white shadow-sm">
-          <div class="card-header bg-info text-white fw-semibold">
-            <i class="bi bi-cash-coin me-2"></i>Provider Earnings
+        <div class="card" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.1);">
+          <div class="card-header fw-semibold" style="background: linear-gradient(135deg, #fdcb6e 0%, #f39c12 100%); color: white; border-radius: 20px 20px 0 0;">
+            <i class="fas fa-coins me-2"></i>Provider Earnings
           </div>
           <div class="card-body">
             <table class="table table-hover align-middle">
@@ -588,10 +601,10 @@
 
     <!-- Document Verification Section -->
     {% if pending_documents or pending_providers %}
-    <div class="row mb-4" id="document-verification">
+    <div class="row mb-4 mx-1" id="document-verification">
       <div class="col-12">
-        <div class="card bg-white shadow-sm">
-          <div class="card-header bg-warning text-dark fw-semibold">
+        <div class="card" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.1);">
+          <div class="card-header fw-semibold" style="background: linear-gradient(135deg, #fdcb6e 0%, #f39c12 100%); color: white; border-radius: 20px 20px 0 0;">
             <i class="fas fa-file-alt me-2"></i>Document Verification
             {% if pending_documents|length > 0 %}
               <span class="badge bg-danger ms-2">{{ pending_documents|length }} Pending</span>
@@ -680,11 +693,11 @@
     {% endif %}
 
     <!-- Bookings Table -->
-    <div class="row" id="bookings">
+    <div class="row mx-1" id="bookings">
       <div class="col-12 mb-4">
-        <div class="card bg-white shadow-sm">
-          <div class="card-header bg-dark text-white fw-semibold">
-            <i class="bi bi-bookmarks-fill me-2"></i>Bookings
+        <div class="card" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.1);">
+          <div class="card-header fw-semibold" style="background: linear-gradient(135deg, #e17055 0%, #d63031 100%); color: white; border-radius: 20px 20px 0 0;">
+            <i class="fas fa-book-open me-2"></i>Bookings
           </div>
           <div class="card-body">
             <div class="row g-3">
@@ -737,7 +750,7 @@
 
 <style>
   body {
-    background: #f5f8fa;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
     font-family: "Segoe UI", sans-serif;
     color: #333;
   }
@@ -848,7 +861,7 @@
   .dashboard-content {
     margin-left: 220px;
     transition: margin-left 0.3s;
-    background: #f5f8fa;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
     min-height: 100vh;
   }
   @media (max-width: 991px) {
@@ -929,7 +942,7 @@
   .main-content-with-sidebar {
     margin-left: 220px;
     transition: margin-left 0.3s;
-    background: #f5f8fa;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
     min-height: 100vh;
   }
   @media (max-width: 991.98px) {
@@ -995,44 +1008,73 @@
 
 <script>
 // Sidebar toggle for mobile and desktop
-const sidebar = document.getElementById('sidebar');
-const sidebarOverlay = document.getElementById('sidebarOverlay');
-const sidebarCloseBtn = document.getElementById('sidebarCloseBtn');
-const sidebarToggle = document.getElementById('sidebarToggle');
+document.addEventListener('DOMContentLoaded', function() {
+  const sidebar = document.getElementById('sidebar');
+  const sidebarOverlay = document.getElementById('sidebarOverlay');
+  const sidebarCloseBtn = document.getElementById('sidebarCloseBtn');
+  const sidebarToggle = document.getElementById('sidebarToggle');
 
-function openSidebar() {
-  sidebar.classList.add('open');
-  sidebarOverlay.classList.add('show');
-}
-function closeSidebar() {
-  sidebar.classList.remove('open');
-  sidebarOverlay.classList.remove('show');
-}
-if (sidebarCloseBtn) sidebarCloseBtn.onclick = closeSidebar;
-if (sidebarOverlay) sidebarOverlay.onclick = closeSidebar;
-if (sidebarToggle) sidebarToggle.onclick = function() {
-  if (window.innerWidth < 992) {
-    openSidebar();
-  } else {
-    sidebar.classList.toggle('collapsed');
-    document.querySelector('.main-content-with-sidebar').classList.toggle('collapsed');
+  function openSidebar() {
+    if (sidebar) {
+      sidebar.classList.add('open');
+      if (sidebarOverlay) sidebarOverlay.classList.add('show');
+    }
   }
-};
-// Smooth scroll for sidebar links
-const sidebarLinks = document.querySelectorAll('.sidebar-link');
-sidebarLinks.forEach(link => {
-  link.addEventListener('click', function(e) {
-    const href = this.getAttribute('href');
-    if (href.startsWith('#')) {
-      e.preventDefault();
-      const target = document.querySelector(href);
-      if (target) {
-        window.scrollTo({
-          top: target.offsetTop - 20,
-          behavior: 'smooth'
-        });
-        if (window.innerWidth < 992) closeSidebar();
+  
+  function closeSidebar() {
+    if (sidebar) {
+      sidebar.classList.remove('open');
+      if (sidebarOverlay) sidebarOverlay.classList.remove('show');
+    }
+  }
+  
+  if (sidebarCloseBtn) {
+    sidebarCloseBtn.addEventListener('click', closeSidebar);
+  }
+  
+  if (sidebarOverlay) {
+    sidebarOverlay.addEventListener('click', closeSidebar);
+  }
+  
+  if (sidebarToggle) {
+    sidebarToggle.addEventListener('click', function() {
+      if (window.innerWidth < 992) {
+        openSidebar();
+      } else {
+        if (sidebar) {
+          sidebar.classList.toggle('collapsed');
+          const mainContent = document.querySelector('.main-content-with-sidebar') || document.querySelector('.dashboard-content');
+          if (mainContent) {
+            mainContent.classList.toggle('collapsed');
+          }
+        }
       }
+    });
+  }
+  
+  // Smooth scroll for sidebar links
+  const sidebarLinks = document.querySelectorAll('.sidebar-link');
+  sidebarLinks.forEach(link => {
+    link.addEventListener('click', function(e) {
+      const href = this.getAttribute('href');
+      if (href && href.startsWith('#')) {
+        e.preventDefault();
+        const target = document.querySelector(href);
+        if (target) {
+          window.scrollTo({
+            top: target.offsetTop - 20,
+            behavior: 'smooth'
+          });
+          if (window.innerWidth < 992) closeSidebar();
+        }
+      }
+    });
+  });
+  
+  // Handle window resize
+  window.addEventListener('resize', function() {
+    if (window.innerWidth >= 992) {
+      closeSidebar();
     }
   });
 });
