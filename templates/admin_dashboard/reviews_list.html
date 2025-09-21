@@ -1,0 +1,95 @@
+{% extends 'core/base.html' %}
+{% block navbar %}{% endblock %}
+{% block title %}Reviews - Admin{% endblock %}
+{% block content %}
+<button class="dashboard-sidebar-toggle d-lg-none" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+<div id="sidebar" class="dashboard-sidebar bg-dark text-white">
+  <div class="sidebar-header d-flex align-items-center justify-content-between px-3 py-3">
+    <span class="fw-bold fs-4"><i class="fas fa-user-shield me-2"></i>Admin</span>
+    <button class="btn btn-sm btn-outline-light d-md-none" id="sidebarCloseBtn" onclick="closeAdminSidebar()"><i class="fas fa-times"></i></button>
+  </div>
+  <nav class="nav flex-column px-2">
+    <a class="nav-link text-white sidebar-link" href="{% url 'admin_dashboard' %}"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a>
+    <a class="nav-link text-white sidebar-link active" href="{% url 'admin_reviews_list' %}"><i class="fas fa-star-half-alt me-2"></i>Reviews</a>
+    <a class="nav-link text-white sidebar-link" href="{% url 'admin_feedback_list' %}"><i class="fas fa-envelope me-2"></i>Contact Messages</a>
+  </nav>
+</div>
+<div id="sidebarOverlay" class="sidebar-overlay d-md-none"></div>
+
+<div class="main-content-with-sidebar">
+  <div class="container-xxl py-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3 gap-3">
+      <h3 class="mb-0"><i class="fas fa-star-half-alt me-2"></i>Reviews</h3>
+      <form class="d-flex gap-2" method="get" action="">
+        <input type="text" name="q" class="form-control" placeholder="Search by name or review message" value="{{ q }}" style="min-width:280px;">
+        <button class="btn btn-outline-primary" type="submit"><i class="fas fa-search me-1"></i>Search</button>
+      </form>
+    </div>
+
+    <div class="card card-glass">
+      <div class="card-header d-flex align-items-center justify-content-between header-gradient-teal">
+        <h5 class="mb-0">All Reviews</h5>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle modern-table mb-0">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Rating</th>
+                <th>Message</th>
+                <th>Created</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for r in reviews %}
+              <tr>
+                <td class="fw-semibold">{{ r.name }}</td>
+                <td><span class="badge bg-info">{{ r.rating }}/5</span></td>
+                <td style="max-width: 520px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ r.message }}</td>
+                <td><small class="text-muted">{{ r.created_at|date:"M d, Y H:i" }}</small></td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="4" class="text-center text-muted">No reviews found.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    {% if page_obj %}
+    <nav class="mt-3" aria-label="Reviews pagination">
+      <ul class="pagination justify-content-end">
+        <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
+          <a class="page-link" href="{% if page_obj.has_previous %}?q={{ q }}&page={{ page_obj.previous_page_number }}{% else %}#{% endif %}" tabindex="-1">Previous</a>
+        </li>
+        {% for num in page_obj.paginator.page_range %}
+          <li class="page-item {% if page_obj.number == num %}active{% endif %}"><a class="page-link" href="?q={{ q }}&page={{ num }}">{{ num }}</a></li>
+        {% endfor %}
+        <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
+          <a class="page-link" href="{% if page_obj.has_next %}?q={{ q }}&page={{ page_obj.next_page_number }}{% else %}#{% endif %}">Next</a>
+        </li>
+      </ul>
+    </nav>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+function closeAdminSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('show');
+}
+const sidebar = document.getElementById('sidebar');
+const sidebarOverlay = document.getElementById('sidebarOverlay');
+const sidebarToggle = document.getElementById('sidebarToggle');
+if (sidebarToggle) sidebarToggle.onclick = function(){
+  if (window.innerWidth < 992) { sidebar.classList.add('open'); sidebarOverlay.classList.add('show'); }
+  else { sidebar.classList.toggle('collapsed'); document.querySelector('.main-content-with-sidebar').classList.toggle('collapsed'); }
+};
+if (sidebarOverlay) sidebarOverlay.onclick = closeAdminSidebar;
+</script>
+{% endblock %}

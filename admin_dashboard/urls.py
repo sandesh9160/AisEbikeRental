@@ -22,5 +22,13 @@ urlpatterns = [
     path('bulk-verify-providers/', views.bulk_verify_providers, name='bulk_verify_providers'),
     # AJAX endpoints
     path('api/filtered-data/', views.get_filtered_data, name='get_filtered_data'),
+    # Feedback management
+    path('feedback/', views.feedback_list, name='admin_feedback_list'),
+    path('feedback/<int:pk>/', views.feedback_detail, name='admin_feedback_detail'),
+    path('feedback/<int:pk>/mark-responded/', views.feedback_mark_responded, name='admin_feedback_mark_responded'),
+    # Reviews management
+    path('reviews/', views.reviews_list, name='admin_reviews_list'),
+    # Provider detail page
+    path('provider/<int:provider_id>/', views.provider_detail, name='admin_provider_detail'),
 ]
 

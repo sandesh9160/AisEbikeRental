@@ -21,9 +21,11 @@
     <a class="nav-link text-white sidebar-link" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a>
   </nav>
   <div class="sidebar-profile text-center mt-auto mb-4 px-3">
-    <img src="{% if request.user.profile_image %}{{ request.user.profile_image.url }}{% else %}https://api.dicebear.com/7.x/avataaars/svg?seed={{ request.user.username }}{% endif %}"
-         alt="Profile" class="rounded-circle mb-2" style="width:60px; height:60px; object-fit:cover; cursor:pointer;" data-bs-toggle="modal" data-bs-target="#profileEditModal">
-    <div class="fw-semibold">{{ request.user.username }}</div>
+    <img id="sidebarProfileImage" src="{% if request.user.profile_image %}{{ request.user.profile_image.url }}{% else %}https://api.dicebear.com/7.x/avataaars/svg?seed={{ request.user.username }}{% endif %}"
+         alt="Profile" class="rounded-circle mb-2 open-profile-modal" style="width:60px; height:60px; object-fit:cover; cursor:pointer;">
+    <div id="sidebarUsername" class="fw-semibold">{{ request.user.username }}</div>
+    <div id="sidebarEmail" class="text-muted small">{{ request.user.email }}</div>
+    <div id="sidebarMobile" class="text-muted small">{{ request.user.mobile_number }}</div>
   </div>
 </div>
 <div id="sidebarOverlay" class="sidebar-overlay d-md-none"></div>
@@ -31,6 +33,13 @@
 <!-- Main content with sidebar offset -->
 <div class="main-content-with-sidebar">
   <div class="container-xxl py-4">
+    {% if messages %}
+      <div class="mb-3">
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} mb-2" role="alert">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
     <h2 class="text-center text-white bg-primary py-3 px-2 rounded shadow-sm mb-4">
       👋 Hello {{ request.user.username }} — Welcome to your Dashboard
     </h2>
@@ -165,149 +174,6 @@
   </div>
 </div>
 
-<style>
-  /* Removed global navbar hiding to avoid conflicts; base navbar is suppressed via block override */
-  .summary-card, .provider-ebike-card, .provider-booking-card {
-    border-radius: 1rem !important;
-    box-shadow: 0 2px 8px rgba(30,60,114,0.08);
-    transition: transform 0.2s, box-shadow 0.2s;
-    min-height: 260px;
-    margin-bottom: 0;
-  }
-  .summary-card:hover, .provider-ebike-card:hover, .provider-booking-card:hover {
-    transform: translateY(-4px) scale(1.03);
-    box-shadow: 0 8px 32px rgba(30,60,114,0.15);
-  }
-  .icon-circle {
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2rem;
-    color: #fff;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  }
-  .bike-name-short {
-    display: -webkit-box;
-    -webkit-line-clamp: 1;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 120px;
-  }
-  .bike-desc-short {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    min-height: 2.6em;
-    max-height: 2.6em;
-    line-height: 1.3em;
-  }
-  .sticky-ebike-header {
-    position: sticky;
-    top: 0;
-    z-index: 2;
-    border-radius: 1.5rem 1.5rem 0 0;
-  }
-  .dashboard-sidebar-toggle {
-    position: fixed;
-    top: 18px;
-    left: 18px;
-    background: #1e3c72;
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    width: 36px;
-    height: 36px;
-    z-index: 1100;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.3rem;
-  }
-  @media (min-width: 992px) {
-    .dashboard-sidebar-toggle { display: none; }
-  }
-  .sidebar {
-    display: flex;
-    flex-direction: column;
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100vh;
-    width: 240px;
-    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important;
-    z-index: 1050;
-    transition: transform 0.3s ease;
-    box-shadow: 4px 0 24px rgba(30,60,114,0.10), 0 1.5px 0 #2a5298;
-    border-right: 1.5px solid #2a5298;
-    overflow-y: auto;
-  }
-  .sidebar-header {
-    border-bottom: 1.5px solid #2a5298;
-  }
-  .sidebar-profile {
-    margin-top: auto;
-    padding-top: 1.5rem;
-    border-top: 1.5px solid #2a5298;
-  }
-  .sidebar-profile img {
-    border: 3px solid #fff;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  }
-  .sidebar-link {
-    padding: 0.75rem 1.2rem;
-    border-radius: 8px;
-    margin-bottom: 0.2rem;
-    transition: background 0.2s, color 0.2s;
-    font-size: 1.08rem;
-    font-weight: 500;
-    position: relative;
-  }
-  .sidebar-link:hover, .sidebar-link.active {
-    background: #1e3c72;
-    color: #fff;
-    text-decoration: none;
-    font-weight: 700;
-  }
-  .sidebar-overlay {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(30,60,114,0.25);
-    z-index: 1040;
-    display: none;
-  }
-  .main-content-with-sidebar {
-    margin-left: 240px;
-    transition: margin-left 0.3s;
-    background: #f5f8fa;
-    min-height: 100vh;
-  }
-  @media (max-width: 991.98px) {
-    .sidebar {
-      transform: translateX(-100%);
-      width: 220px;
-    }
-    .sidebar.open {
-      transform: translateX(0);
-    }
-    .main-content-with-sidebar {
-      margin-left: 0;
-    }
-    .sidebar-overlay.show {
-      display: block;
-    }
-  }
-</style>
-
-<!-- Font Awesome -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-
 <script>
 // Sidebar toggle for mobile and desktop
 const sidebar = document.getElementById('sidebar');
@@ -352,35 +218,109 @@ sidebarLinks.forEach(link => {
   });
 });
 </script>
-<!-- Profile Edit Modal -->
-<div class="modal fade" id="profileEditModal" tabindex="-1" aria-labelledby="profileEditModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <form method="post" enctype="multipart/form-data" action="{% url 'profile_update' %}">
-      {% csrf_token %}
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="profileEditModalLabel">Edit Profile</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <div class="mb-3 text-center">
-            <img src="{% if request.user.profile_image %}{{ request.user.profile_image.url }}{% else %}https://api.dicebear.com/7.x/avataaars/svg?seed={{ request.user.username }}{% endif %}"
-                 alt="Profile Image" class="rounded-circle mb-2" style="width: 80px; height: 80px; object-fit: cover;">
+<!-- Provider Profile Edit Modal (Local) -->
+<div class="modal fade" id="providerProfileModal" tabindex="-1" aria-labelledby="providerProfileModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="providerProfileModalLabel">Edit Profile</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="providerProfileModalBody">
+        <div class="text-center py-4" id="providerProfileModalLoader">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
           </div>
-          <div class="mb-3">
-            <label for="id_username" class="form-label">Username</label>
-            <input type="text" name="username" class="form-control" id="id_username" value="{{ request.user.username }}" required>
-          </div>
-          <div class="mb-3">
-            <label for="id_profile_image" class="form-label">Profile Image</label>
-            <input type="file" name="profile_image" class="form-control" id="id_profile_image">
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-primary">Save changes</button>
         </div>
       </div>
-    </form>
+    </div>
   </div>
-</div>
+  </div>
+
+<script>
+  // Local AJAX modal for Provider Dashboard
+  (function(){
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+
+    const modalEl = document.getElementById('providerProfileModal');
+    const modalBody = document.getElementById('providerProfileModalBody');
+    const modalLoader = document.getElementById('providerProfileModalLoader');
+    const triggers = document.querySelectorAll('.open-profile-modal');
+
+    async function openProviderProfileModal(e){
+      if (e) e.preventDefault();
+      if (!modalEl) return;
+      const modal = new bootstrap.Modal(modalEl);
+      modalBody.innerHTML = modalLoader ? modalLoader.outerHTML : '';
+      modal.show();
+      try {
+        const resp = await fetch("{% url 'profile_update' %}", { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+        const data = await resp.json();
+        if (data.success && data.html) {
+          modalBody.innerHTML = data.html;
+          const form = document.getElementById('profile-update-form');
+          if (form) {
+            form.addEventListener('submit', async function (ev) {
+              ev.preventDefault();
+              const formData = new FormData(form);
+              const btn = form.querySelector('button[type=\"submit\"]');
+              if (btn) btn.disabled = true;
+              try {
+                const r = await fetch(form.getAttribute('action'), {
+                  method: 'POST',
+                  headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRFToken': getCookie('csrftoken') },
+                  body: formData
+                });
+                if (r.ok) {
+                  const ok = await r.json();
+                  // Update sidebar values in-place (no reload)
+                  const uEl = document.getElementById('sidebarUsername');
+                  const eEl = document.getElementById('sidebarEmail');
+                  const mEl = document.getElementById('sidebarMobile');
+                  const imgEl = document.getElementById('sidebarProfileImage');
+                  if (uEl && ok.username) uEl.textContent = ok.username;
+                  if (eEl && ok.email) eEl.textContent = ok.email;
+                  if (mEl && ok.mobile_number) mEl.textContent = ok.mobile_number;
+                  if (imgEl && ok.profile_image_url) imgEl.src = ok.profile_image_url;
+                  modalBody.insertAdjacentHTML('afterbegin', `<div class=\"alert alert-success\">${ok.message || 'Profile updated successfully!'}</div>`);
+                  setTimeout(() => { const inst = bootstrap.Modal.getInstance(modalEl); if (inst) inst.hide(); }, 700);
+                } else {
+                  const err = await r.json();
+                  modalBody.innerHTML = err.html || '<div class=\"alert alert-danger\">Failed to update profile.</div>';
+                  // Rebind after re-render
+                  openProviderProfileModal();
+                }
+              } catch (ex) {
+                modalBody.insertAdjacentHTML('afterbegin', '<div class=\"alert alert-danger\">Unexpected error. Please try again.</div>');
+              } finally {
+                if (btn) btn.disabled = false;
+              }
+            });
+          }
+        } else {
+          modalBody.innerHTML = '<div class=\"alert alert-danger\">Failed to load form.</div>';
+        }
+      } catch (e) {
+        modalBody.innerHTML = '<div class=\"alert alert-danger\">Failed to load form.</div>';
+      }
+    }
+
+    if (triggers.length) {
+      triggers.forEach(t => t.addEventListener('click', openProviderProfileModal));
+    }
+  })();
+</script>
 {% endblock %}

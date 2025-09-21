@@ -1,0 +1,115 @@
+{% extends 'core/base.html' %}
+{% block navbar %}{% endblock %}
+{% block title %}Verify Provider - Admin{% endblock %}
+{% block content %}
+<button class="dashboard-sidebar-toggle d-lg-none" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+<div id="sidebar" class="dashboard-sidebar bg-dark text-white">
+  <div class="sidebar-header d-flex align-items-center justify-content-between px-3 py-3">
+    <span class="fw-bold fs-4"><i class="fas fa-user-shield me-2"></i>Admin</span>
+    <button class="btn btn-sm btn-outline-light d-md-none" id="sidebarCloseBtn" onclick="closeAdminSidebar()"><i class="fas fa-times"></i></button>
+  </div>
+  <nav class="nav flex-column px-2">
+    <a class="nav-link text-white sidebar-link" href="{% url 'admin_dashboard' %}"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a>
+    <a class="nav-link text-white sidebar-link" href="{% url 'admin_feedback_list' %}"><i class="fas fa-envelope me-2"></i>Contact Messages</a>
+  </nav>
+</div>
+<div id="sidebarOverlay" class="sidebar-overlay d-md-none"></div>
+
+<div class="main-content-with-sidebar">
+  <div class="container-xxl py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h3 class="mb-0"><i class="fas fa-user-check me-2"></i>Verify Provider</h3>
+      <a href="{% url 'admin_dashboard' %}#providers-status" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-1"></i>Back</a>
+    </div>
+
+    <div class="card card-glass mb-4">
+      <div class="card-header header-gradient-teal text-white d-flex align-items-center">
+        <img src="{% if provider.profile_image %}{{ provider.profile_image.url }}{% else %}https://api.dicebear.com/7.x/avataaars/svg?seed={{ provider.username }}{% endif %}"
+             alt="{{ provider.username }}" class="rounded-circle me-2" style="width:42px;height:42px;object-fit:cover;border:2px solid #fff;">
+        <div>
+          <div class="fw-bold">{{ provider.username }}</div>
+          <small class="text-white-50">{{ provider.email }}</small>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="mb-2"><strong>Joined:</strong> {{ provider.date_joined|date:"M d, Y H:i" }}</div>
+            <div class="mb-2"><strong>Mobile:</strong> {{ provider.mobile_number }}</div>
+            <div class="mb-2"><strong>Verified:</strong> {% if provider.is_verified_provider %}<span class="badge bg-success">Yes</span>{% else %}<span class="badge bg-warning text-dark">No</span>{% endif %}</div>
+          </div>
+          <div class="col-md-6">
+            <form method="post" class="d-flex flex-column gap-2">
+              {% csrf_token %}
+              <label class="form-label fw-semibold" for="id_verification_notes">Admin Notes</label>
+              <textarea class="form-control" id="id_verification_notes" name="verification_notes" rows="4" placeholder="Add verification notes...">{{ provider.verification_notes }}</textarea>
+              <div class="d-flex gap-2 mt-2">
+                {% if not provider.is_verified_provider %}
+                <button type="submit" name="action" value="verify" class="btn btn-success"><i class="fas fa-check me-1"></i>Verify</button>
+                {% else %}
+                <button type="submit" name="action" value="reject" class="btn btn-warning"><i class="fas fa-user-times me-1"></i>Unverify</button>
+                {% endif %}
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card card-glass">
+      <div class="card-header header-gradient-blue text-white">
+        <i class="fas fa-file-alt me-2"></i>Provider Documents
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle modern-table mb-0">
+            <thead>
+              <tr>
+                <th>Type</th>
+                <th>Number</th>
+                <th>Status</th>
+                <th>Uploaded</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for doc in provider_documents %}
+              <tr>
+                <td>{{ doc.get_document_type_display }}</td>
+                <td>{{ doc.document_number|default:'—' }}</td>
+                <td>
+                  <span class="badge {% if doc.status == 'approved' %}bg-success{% elif doc.status == 'rejected' %}bg-danger{% else %}bg-warning text-dark{% endif %}">{{ doc.status|title }}</span>
+                </td>
+                <td><small class="text-muted">{{ doc.uploaded_at|date:"M d, Y H:i" }}</small></td>
+                <td class="text-end">
+                  <a href="{% url 'verify_document' doc.id %}" class="btn btn-sm btn-outline-primary">Review</a>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="5" class="text-center text-muted">No documents uploaded.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function closeAdminSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('show');
+}
+const sidebar = document.getElementById('sidebar');
+const sidebarOverlay = document.getElementById('sidebarOverlay');
+const sidebarToggle = document.getElementById('sidebarToggle');
+if (sidebarToggle) sidebarToggle.onclick = function(){
+  if (window.innerWidth < 992) { sidebar.classList.add('open'); sidebarOverlay.classList.add('show'); }
+  else { sidebar.classList.toggle('collapsed'); document.querySelector('.main-content-with-sidebar').classList.toggle('collapsed'); }
+};
+if (sidebarOverlay) sidebarOverlay.onclick = closeAdminSidebar;
+</script>
+{% endblock %}

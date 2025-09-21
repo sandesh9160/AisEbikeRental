@@ -3,7 +3,7 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.models import User as AuthUser
 from django.contrib import messages
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.tokens import default_token_generator
@@ -12,9 +12,10 @@ from django.utils.encoding import force_bytes, force_str
 from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from .models import EBike, User, Review
+from .models import EBike, User, Review, ContactMessage
 from .forms import SignUpForm, ProfileUpdateForm, CustomPasswordResetForm, PasswordResetConfirmForm
 from django.views.decorators.csrf import csrf_protect
+from django.template.loader import render_to_string
 
 def home(request):
     ebikes = EBike.objects.filter(is_available=True)[:5]
@@ -72,10 +73,22 @@ def ebikes(request):
 
 @login_required
 def profile_update(request):
+    is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
     if request.method == 'POST':
         form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
-            form.save()
+            user = form.save()
+            # If AJAX, return JSON success without redirect
+            if is_ajax:
+                return JsonResponse({
+                    'success': True,
+                    'message': 'Profile updated successfully!',
+                    'username': user.username,
+                    'email': user.email,
+                    'mobile_number': user.mobile_number,
+                    'profile_image_url': (user.profile_image.url if user.profile_image else ''),
+                })
+            messages.success(request, 'Profile updated successfully!')
             # Redirect to the correct dashboard based on user type
             if request.user.is_rider:
                 return redirect('rider_dashboard')
@@ -85,8 +98,15 @@ def profile_update(request):
                 return redirect('admin_dashboard')
             else:
                 return redirect('home')
+        else:
+            if is_ajax:
+                html = render_to_string('core/_profile_update_form.html', {'form': form}, request=request)
+                return JsonResponse({'success': False, 'html': html}, status=400)
     else:
         form = ProfileUpdateForm(instance=request.user)
+        if is_ajax:
+            html = render_to_string('core/_profile_update_form.html', {'form': form}, request=request)
+            return JsonResponse({'success': True, 'html': html})
     return render(request, 'core/profile_update.html', {'form': form})
 
 
@@ -178,4 +198,42 @@ def password_reset_confirm(request, uidb64, token):
 
 def password_reset_done(request):
     return render(request, 'core/password_reset_done.html')
+
+
+def contact(request):
+    """Contact Us page: saves message to DB and emails site owner."""
+    if request.method == 'POST':
+        name = request.POST.get('name', '').strip()
+        email = request.POST.get('email', '').strip()
+        subject = request.POST.get('subject', '').strip()
+        message = request.POST.get('message', '').strip()
+
+        if not (name and email and subject and message):
+            messages.error(request, 'Please fill in all fields.')
+            return render(request, 'core/contact.html', {
+                'prefill': {'name': name, 'email': email, 'subject': subject, 'message': message}
+            })
+
+        # Save to DB
+        ContactMessage.objects.create(name=name, email=email, subject=subject, message=message)
+
+        # Send email to admin/owner
+        to_email = getattr(settings, 'CONTACT_RECEIVER_EMAIL', None) or getattr(settings, 'DEFAULT_FROM_EMAIL', None)
+        if to_email:
+            try:
+                send_mail(
+                    subject=f"[Contact] {subject}",
+                    message=f"From: {name} <{email}>\n\n{message}",
+                    from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', email),
+                    recipient_list=[to_email],
+                    fail_silently=True,
+                )
+            except Exception:
+                # Silently ignore email failures but still accept the submission
+                pass
+
+        messages.success(request, 'Thanks for contacting us! We will get back to you soon.')
+        return redirect('contact')
+
+    return render(request, 'core/contact.html')
 

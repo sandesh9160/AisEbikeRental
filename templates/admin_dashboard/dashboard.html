@@ -1,126 +1,7 @@
 {% extends 'core/base.html' %}
 {% block navbar %}{% endblock %}
 {% block content %}
-<!-- Bootstrap 5 CDN for responsive utilities -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-<style>
-  /* Do not globally hide all navbars; ensure mobile navbars remain functional */
-  .dashboard-sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100vh;
-    width: 220px;
-    background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
-    color: #fff;
-    z-index: 1200;
-    display: flex;
-    flex-direction: column;
-    transition: left 0.3s;
-    box-shadow: 2px 0 8px rgba(116, 185, 255, 0.2);
-  }
-  .dashboard-sidebar-toggle {
-    position: fixed;
-    top: 18px;
-    left: 18px;
-    z-index: 1300;
-    background: #74b9ff;
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    width: 36px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.3rem;
-    transition: background 0.2s;
-  }
-  .dashboard-sidebar-toggle:hover {
-    background: #0984e3;
-  }
-  .sidebar-overlay {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(116, 185, 255, 0.25);
-    z-index: 1199;
-    display: none;
-  }
-  .sidebar-overlay.show {
-    display: block;
-  }
-  @media (max-width: 991px) {
-    .dashboard-sidebar-toggle { display: flex !important; }
-    .dashboard-sidebar {
-      width: 220px;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      position: fixed;
-      z-index: 1200;
-      background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
-      transition: transform 0.3s ease;
-      transform: translateX(-100%);
-      height: 100vh;
-      overflow-y: auto;
-    }
-    .dashboard-sidebar.open {
-      transform: translateX(0);
-    }
-    .dashboard-content { margin-left: 0 !important; }
-  }
-  @media (min-width: 992px) {
-    .dashboard-sidebar-toggle { display: none !important; }
-    .dashboard-sidebar {
-      left: 0;
-      position: fixed;
-      width: 220px;
-      height: 100vh;
-      z-index: 1200;
-      background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
-    }
-  }
-  .dashboard-content { margin-left: 220px; transition: margin-left 0.3s; }
-  .dashboard-sidebar.collapsed ~ .dashboard-content { margin-left: 60px; }
-  html { scroll-behavior: smooth; }
-  .booking-card, .rider-card, .provider-card, .ebike-card, .earning-card {
-    border-radius: 1rem !important;
-    transition: transform 0.2s, box-shadow 0.2s;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(30,60,114,0.08);
-  }
-  .booking-card:hover, .rider-card:hover, .provider-card:hover, .ebike-card:hover, .earning-card:hover {
-    transform: translateY(-6px) scale(1.03);
-    box-shadow: 0 8px 32px rgba(30,60,114,0.15);
-  }
-  .card-header {
-    border-bottom: none;
-    padding: 1rem 1.2rem;
-    background: linear-gradient(90deg, #74b9ff 0%, #0984e3 100%);
-    color: #fff;
-    border-radius: 1rem 1rem 0 0;
-  }
-  .avatar img {
-    border: 2px solid #fff;
-    box-shadow: 0 2px 8px rgba(30,60,114,0.08);
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    object-fit: cover;
-  }
-  .card-body {
-    padding: 1.2rem;
-    background: #f8f9fa;
-    border-radius: 0 0 1rem 1rem;
-  }
-  .badge {
-    font-size: 0.95rem;
-    border-radius: 8px;
-    padding: 0.4em 0.9em;
-    font-weight: 500;
-  }
-</style>
+<!-- Modern styles are now loaded globally via base.html and static/css/dashboard.css -->
 <script>
   // Global fallback so inline onclick is always defined
   window.handleSidebarToggle = function() {
@@ -189,16 +70,21 @@
         <span class="badge bg-warning ms-2 align-middle">{{ pending_documents|length }}</span>
       {% endif %}
     </a>
+    <a class="nav-link text-white sidebar-link" href="{% url 'admin_feedback_list' %}" onclick="if(window.innerWidth<992) closeAdminSidebar()"><i class="fas fa-envelope me-2"></i>Contact Messages</a>
     <a class="nav-link text-white sidebar-link" href="#analysis-section" onclick="if(window.innerWidth<992) closeAdminSidebar()"><i class="bi bi-bar-chart-fill me-2"></i>Analysis</a>
     <a class="nav-link text-white sidebar-link" href="{% url 'logout' %}" onclick="if(window.innerWidth<992) closeAdminSidebar()"><i class="fas fa-sign-out-alt me-2"></i>Logout</a>
   </nav>
   <div class="sidebar-profile text-center mt-auto mb-4 px-3">
-    <img src="{% if request.user.profile_image %}{{ request.user.profile_image.url }}{% else %}https://api.dicebear.com/7.x/avataaars/svg?seed={{ request.user.username }}{% endif %}"
-         alt="Profile" class="rounded-circle mb-2" style="width:60px; height:60px; object-fit:cover; cursor:pointer;" data-bs-toggle="modal" data-bs-target="#profileEditModal">
-    <div class="fw-semibold">{{ request.user.username }}</div>
+    <img id="sidebarProfileImage" src="{% if request.user.profile_image %}{{ request.user.profile_image.url }}{% else %}https://api.dicebear.com/7.x/avataaars/svg?seed={{ request.user.username }}{% endif %}"
+         alt="Profile" class="rounded-circle mb-2 open-profile-modal" style="width:60px; height:60px; object-fit:cover; cursor:pointer;">
+    <div id="sidebarUsername" class="fw-semibold">{{ request.user.username }}</div>
+    <div id="sidebarEmail" class="text-muted small">{{ request.user.email }}</div>
+    <div id="sidebarMobile" class="text-muted small">{{ request.user.mobile_number }}</div>
   </div>
 </div>
 <div id="sidebarOverlay" class="sidebar-overlay d-md-none"></div>
+
+<!-- Removed old jQuery-based profile modal and script; using admin modal and fetch API below -->
 
 <!-- Removed horizontal navbar for dashboards as requested -->
 
@@ -252,7 +138,7 @@
           <div class="card-body py-4 d-flex flex-column align-items-center justify-content-center">
             <div class="icon-circle mb-3" style="background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);"><i class="fas fa-users"></i></div>
             <h6 class="fw-bold text-dark mb-1">Total Riders</h6>
-            <h2 class="fw-bold mb-0" style="background: linear-gradient(135deg, #74b9ff, #0984e3); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">{{ riders|length }}</h2>
+            <h2 class="fw-bold mb-0 text-gradient-blue">{{ riders|length }}</h2>
           </div>
         </div>
       </div>
@@ -261,7 +147,7 @@
           <div class="card-body py-4 d-flex flex-column align-items-center justify-content-center">
             <div class="icon-circle mb-3" style="background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);"><i class="fas fa-user-tie"></i></div>
             <h6 class="fw-bold text-dark mb-1">Vehicle Providers</h6>
-            <h2 class="fw-bold mb-0" style="background: linear-gradient(135deg, #00b894, #00cec9); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">{{ vehicle_providers|length }}</h2>
+            <h2 class="fw-bold mb-0 text-gradient-teal">{{ vehicle_providers|length }}</h2>
           </div>
         </div>
       </div>
@@ -270,7 +156,7 @@
           <div class="card-body py-4 d-flex flex-column align-items-center justify-content-center">
             <div class="icon-circle mb-3" style="background: linear-gradient(135deg, #fdcb6e 0%, #f39c12 100%);"><i class="fas fa-bicycle"></i></div>
             <h6 class="fw-bold text-dark mb-1">E-bikes</h6>
-            <h2 class="fw-bold mb-0" style="background: linear-gradient(135deg, #fdcb6e, #f39c12); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">{{ ebikes|length }}</h2>
+            <h2 class="fw-bold mb-0 text-gradient-orange">{{ ebikes|length }}</h2>
           </div>
         </div>
       </div>
@@ -279,40 +165,42 @@
           <div class="card-body py-4 d-flex flex-column align-items-center justify-content-center">
             <div class="icon-circle mb-3" style="background: linear-gradient(135deg, #e17055 0%, #d63031 100%);"><i class="fas fa-book-open"></i></div>
             <h6 class="fw-bold text-dark mb-1">Bookings</h6>
-            <h2 class="fw-bold mb-0" style="background: linear-gradient(135deg, #e17055, #d63031); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">{{ bookings|length }}</h2>
+            <h2 class="fw-bold mb-0 text-gradient-red">{{ bookings|length }}</h2>
           </div>
         </div>
       </div>
     </div>
 
+    
+
     <!-- Analytics Charts Row: Side by Side -->
     <div class="row mb-4 mx-1" id="analysis-section">
       <div class="col-md-4 col-12 mb-3">
-        <div class="card mb-4" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); height: 280px;">
-          <div class="card-header fw-semibold" style="background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%); color: white; border-radius: 20px 20px 0 0;">
+        <div class="card card-glass admin-analytics-card mb-4">
+          <div class="card-header fw-semibold header-gradient-blue">
             <i class="fas fa-chart-line me-2"></i>Bookings Per Month
           </div>
-          <div class="card-body" style="background: transparent; border-radius: 0 0 20px 20px; display: flex; justify-content: center; align-items: center; min-height: 180px; height: 180px;">
+          <div class="card-body d-flex justify-content-center align-items-center" style="background: transparent;">
             <canvas id="bookingsLineChart" width="220" height="130" style="max-width:220px; margin:0 auto;"></canvas>
           </div>
         </div>
       </div>
       <div class="col-md-4 col-12 mb-3">
-        <div class="card mb-4" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); height: 280px;">
-          <div class="card-header fw-semibold" style="background: linear-gradient(135deg, #00b894 0%, #00cec9 100%); color: white; border-radius: 20px 20px 0 0;">
+        <div class="card card-glass admin-analytics-card mb-4">
+          <div class="card-header fw-semibold header-gradient-teal">
             <i class="fas fa-chart-pie me-2"></i>Booking Status
           </div>
-          <div class="card-body" style="background: transparent; border-radius: 0 0 20px 20px; display: flex; justify-content: center; align-items: center; min-height: 180px; height: 180px;">
+          <div class="card-body d-flex justify-content-center align-items-center" style="background: transparent;">
             <canvas id="statusPieChart" width="220" height="130" style="max-width:220px; margin:0 auto;"></canvas>
           </div>
         </div>
       </div>
       <div class="col-md-4 col-12 mb-3">
-        <div class="card mb-4" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); height: 280px;">
-          <div class="card-header fw-semibold" style="background: linear-gradient(135deg, #fdcb6e 0%, #f39c12 100%); color: white; border-radius: 20px 20px 0 0;">
+        <div class="card card-glass admin-analytics-card mb-4">
+          <div class="card-header fw-semibold header-gradient-orange">
             <i class="fas fa-chart-scatter me-2"></i>Provider Earnings vs Bikes
           </div>
-          <div class="card-body" style="background: transparent; border-radius: 0 0 20px 20px; display: flex; justify-content: center; align-items: center; min-height: 180px; height: 180px;">
+          <div class="card-body d-flex justify-content-center align-items-center" style="background: transparent;">
             <canvas id="providerScatterChart" width="220" height="130" style="max-width:220px; margin:0 auto;"></canvas>
           </div>
         </div>
@@ -472,6 +360,112 @@
       }
     </script>
 
+    <!-- Profile Edit Modal (Admin Only) -->
+    <div class="modal fade" id="adminProfileModal" tabindex="-1" aria-labelledby="adminProfileModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="adminProfileModalLabel">Edit Profile</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body" id="adminProfileModalBody">
+            <div class="text-center py-4" id="adminProfileModalLoader">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Minimal AJAX modal specifically for Admin Dashboard
+      (function(){
+        function getCookie(name) {
+          let cookieValue = null;
+          if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+              const cookie = cookies[i].trim();
+              if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+              }
+            }
+          }
+          return cookieValue;
+        }
+
+        const modalEl = document.getElementById('adminProfileModal');
+        const modalBody = document.getElementById('adminProfileModalBody');
+        const modalLoader = document.getElementById('adminProfileModalLoader');
+        const triggers = document.querySelectorAll('.open-profile-modal');
+
+        async function openAdminProfileModal(e){
+          if (e) e.preventDefault();
+          if (!modalEl) return;
+          const modal = new bootstrap.Modal(modalEl);
+          modalBody.innerHTML = modalLoader ? modalLoader.outerHTML : '';
+          modal.show();
+          try {
+            const resp = await fetch("{% url 'profile_update' %}", { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+            const data = await resp.json();
+            if (data.success && data.html) {
+              modalBody.innerHTML = data.html;
+              const form = document.getElementById('profile-update-form');
+              if (form) {
+                form.addEventListener('submit', async function (ev) {
+                  ev.preventDefault();
+                  const formData = new FormData(form);
+                  const btn = form.querySelector('button[type="submit"]');
+                  if (btn) btn.disabled = true;
+                  try {
+                    const r = await fetch(form.getAttribute('action'), {
+                      method: 'POST',
+                      headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRFToken': getCookie('csrftoken') },
+                      body: formData
+                    });
+                    if (r.ok) {
+                      const ok = await r.json();
+                      // Update sidebar values in-place
+                      const uEl = document.getElementById('sidebarUsername');
+                      const eEl = document.getElementById('sidebarEmail');
+                      const mEl = document.getElementById('sidebarMobile');
+                      const imgEl = document.getElementById('sidebarProfileImage');
+                      if (uEl && ok.username) uEl.textContent = ok.username;
+                      if (eEl && ok.email) eEl.textContent = ok.email;
+                      if (mEl && ok.mobile_number) mEl.textContent = ok.mobile_number;
+                      if (imgEl && ok.profile_image_url) imgEl.src = ok.profile_image_url;
+                      modalBody.insertAdjacentHTML('afterbegin', `<div class="alert alert-success">${ok.message || 'Profile updated successfully!'}</div>`);
+                      setTimeout(() => { const inst = bootstrap.Modal.getInstance(modalEl); if (inst) inst.hide(); }, 700);
+                    } else {
+                      const err = await r.json();
+                      modalBody.innerHTML = err.html || '<div class="alert alert-danger">Failed to update profile.</div>';
+                      // Re-bind after replacing body
+                      openAdminProfileModal(); // reloads form and rebinds
+                    }
+                  } catch (ex) {
+                    modalBody.insertAdjacentHTML('afterbegin', '<div class="alert alert-danger">Unexpected error. Please try again.</div>');
+                  } finally {
+                    if (btn) btn.disabled = false;
+                  }
+                });
+              }
+            } else {
+              modalBody.innerHTML = '<div class="alert alert-danger">Failed to load form.</div>';
+            }
+          } catch (e) {
+            modalBody.innerHTML = '<div class="alert alert-danger">Failed to load form.</div>';
+          }
+        }
+
+        if (triggers.length) {
+          triggers.forEach(t => t.addEventListener('click', openAdminProfileModal));
+        }
+      })();
+    </script>
+
     <!-- Earnings -->
     <div class="row mb-4 mx-1">
       <div class="col-md-6 mb-3">
@@ -492,7 +486,7 @@
               <i class="fas fa-coins fa-2x text-white"></i>
             </div>
             <h5 class="card-title mt-2 fw-bold text-dark">Admin Profit</h5>
-            <h2 class="text-dark fw-bold" style="background: linear-gradient(135deg, #e17055, #d63031); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">₹{{ platform_charges }}</h2>
+            <h2 class="text-gradient-red fw-bold">₹{{ platform_charges }}</h2>
           </div>
         </div>
       </div>
@@ -500,13 +494,13 @@
 
     <!-- Riders and Providers Tables -->
     <div class="row mx-1" id="riders">
-      <div class="col-md-6 mb-4">
-        <div class="card" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.1);">
-          <div class="card-header fw-semibold" style="background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%); color: white; border-radius: 20px 20px 0 0;">
+      <div class="col-12 mb-4">
+        <div class="card card-glass">
+          <div class="card-header fw-semibold header-gradient-blue">
             <i class="fas fa-users me-2"></i>Riders
           </div>
-          <div class="card-body">
-            <table class="table table-hover align-middle">
+          <div class="card-body table-responsive">
+            <table class="table table-hover align-middle modern-table">
               <thead class="table-dark">
                 <tr>
                   <th>Profile</th>
@@ -541,12 +535,12 @@
       </div>
 
       <div class="col-12 mb-4" id="providers">
-        <div class="card" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.1);">
-          <div class="card-header fw-semibold" style="background: linear-gradient(135deg, #00b894 0%, #00cec9 100%); color: white; border-radius: 20px 20px 0 0;">
+        <div class="card card-glass">
+          <div class="card-header fw-semibold header-gradient-teal">
             <i class="fas fa-user-tie me-2"></i>Vehicle Providers
           </div>
           <div class="card-body table-responsive">
-            <table class="table table-hover align-middle">
+            <table class="table table-hover align-middle modern-table">
               <thead class="table-dark">
                 <tr>
                   <th>Profile</th>
@@ -578,10 +572,10 @@
                     {% endfor %}
                   </td>
                   <td>
-                    <a
-                      href="{% url 'delete_user' provider.id %}"
-                      class="btn btn-outline-danger btn-sm"
-                    >
+                    <a href="{% url 'admin_provider_detail' provider.id %}" class="btn btn-outline-primary btn-sm me-1">
+                      <i class="bi bi-eye"></i> View
+                    </a>
+                    <a href="{% url 'delete_user' provider.id %}" class="btn btn-outline-danger btn-sm">
                       <i class="bi bi-trash"></i>
                     </a>
                   </td>
@@ -597,12 +591,12 @@
     <!-- Earnings Table -->
     <div class="row mx-1" id="earnings">
       <div class="col-md-12 mb-4">
-        <div class="card" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.1);">
-          <div class="card-header fw-semibold" style="background: linear-gradient(135deg, #fdcb6e 0%, #f39c12 100%); color: white; border-radius: 20px 20px 0 0;">
+        <div class="card card-glass">
+          <div class="card-header fw-semibold header-gradient-orange">
             <i class="fas fa-coins me-2"></i>Provider Earnings
           </div>
           <div class="card-body">
-            <table class="table table-hover align-middle">
+            <table class="table table-hover align-middle modern-table">
               <thead class="table-dark">
                 <tr>
                   <th>Profile</th>
@@ -787,6 +781,53 @@
         </div>
       </div>
     </div>
+
+    <!-- Recent Reviews Section -->
+    <div class="row mx-1 mt-3" id="recent-feedback">
+      <div class="col-12">
+        <div class="card shadow-soft border-0" style="border-radius: 20px;">
+          <div class="card-header d-flex align-items-center justify-content-between">
+            <h5 class="mb-0"><i class="fas fa-star-half-alt me-2"></i>Recent Reviews</h5>
+            <div class="d-flex align-items-center gap-2">
+              <span class="badge bg-primary">{{ recent_feedback|length }} New</span>
+              <!-- Reviews are from public site; Contact Messages managed in separate page -->
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle modern-table mb-0">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Rating</th>
+                    <th>Message</th>
+                    <th>Received</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for item in recent_feedback %}
+                  <tr>
+                    <td class="fw-semibold">{{ item.name }}</td>
+                    <td>
+                      {% for _ in "12345"|slice:":" %}{% endfor %}
+                      <span class="badge bg-info">{{ item.rating }}/5</span>
+                    </td>
+                    <td style="max-width: 420px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ item.message }}</td>
+                    <td><small class="text-muted">{{ item.created_at|date:"M d, Y H:i" }}</small></td>
+                  </tr>
+                  {% empty %}
+                  <tr>
+                    <td colspan="4" class="text-center text-muted">No reviews yet.</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 

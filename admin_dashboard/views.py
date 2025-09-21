@@ -2,12 +2,13 @@ from django.shortcuts import render, redirect,get_object_or_404, redirect, rever
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib import messages
 from django.utils import timezone
-from core.models import User, EBike, Booking, VehicleRegistration, Notification, ProviderDocument
+from core.models import User, EBike, Booking, VehicleRegistration, Notification, ProviderDocument, ContactMessage, Review
 from django.db.models import Sum, Q
 from decimal import Decimal
 from django.db.models.functions import TruncMonth
 from django.db.models import Count
 from django.http import JsonResponse
+from django.core.paginator import Paginator
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 import json
@@ -72,6 +73,23 @@ def admin_dashboard(request):
     # Document verification data
     pending_documents = ProviderDocument.objects.filter(status='pending').order_by('-uploaded_at')
     pending_providers = User.objects.filter(is_vehicle_provider=True, is_verified_provider=False)
+    prov_q = request.GET.get('prov_q', '').strip()
+    verified_qs = User.objects.filter(is_vehicle_provider=True, is_verified_provider=True)
+    unverified_qs = User.objects.filter(is_vehicle_provider=True, is_verified_provider=False)
+    if prov_q:
+        verified_qs = verified_qs.filter(Q(username__icontains=prov_q) | Q(email__icontains=prov_q))
+        unverified_qs = unverified_qs.filter(Q(username__icontains=prov_q) | Q(email__icontains=prov_q))
+
+    vpage = request.GET.get('vpage', 1)
+    upage = request.GET.get('upage', 1)
+    vp = Paginator(verified_qs.order_by('username'), 10)
+    up = Paginator(unverified_qs.order_by('username'), 10)
+    verified_page_obj = vp.get_page(vpage)
+    unverified_page_obj = up.get_page(upage)
+    verified_providers = verified_page_obj.object_list
+    unverified_providers = unverified_page_obj.object_list
+    # Recent user reviews for dashboard feedback section
+    recent_feedback = Review.objects.all()[:10]
     
     return render(request, 'admin_dashboard/dashboard.html', {
         'riders': riders,
@@ -90,6 +108,12 @@ def admin_dashboard(request):
         'pending_approvals_count': pending_approvals_count,
         'pending_documents': pending_documents,
         'pending_providers': pending_providers,
+        'verified_providers': verified_providers,
+        'unverified_providers': unverified_providers,
+        'verified_page_obj': verified_page_obj,
+        'unverified_page_obj': unverified_page_obj,
+        'prov_q': prov_q,
+        'recent_feedback': recent_feedback,
     })
 
 
@@ -204,6 +228,7 @@ def review_documents(request):
         'current_date_from': date_from,
         'current_date_to': date_to,
         'current_search': search,
+        'total_documents': queryset.count(),
     })
 
 
@@ -619,3 +644,91 @@ def get_filtered_data(request):
         'pending_bookings': bookings.filter(is_approved=False, is_rejected=False).count(),
         'rejected_bookings': bookings.filter(is_rejected=True).count(),
     })
+
+
+@user_passes_test(is_admin)
+def feedback_list(request):
+    """List all contact messages with simple filters."""
+    status = request.GET.get('status', 'all')  # all, new, responded
+    q = request.GET.get('q', '').strip()
+    page = request.GET.get('page', 1)
+
+    qs = ContactMessage.objects.all()
+    if status == 'new':
+        qs = qs.filter(responded=False)
+    elif status == 'responded':
+        qs = qs.filter(responded=True)
+    if q:
+        qs = qs.filter(
+            Q(name__icontains=q) | Q(email__icontains=q) | Q(subject__icontains=q) | Q(message__icontains=q)
+        )
+
+    paginator = Paginator(qs, 20)
+    page_obj = paginator.get_page(page)
+    context = {
+        'messages_qs': page_obj.object_list,
+        'page_obj': page_obj,
+        'current_status': status,
+        'q': q,
+    }
+    return render(request, 'admin_dashboard/feedback_list.html', context)
+
+
+@user_passes_test(is_admin)
+def feedback_detail(request, pk):
+    item = get_object_or_404(ContactMessage, pk=pk)
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        if action == 'mark_responded':
+            item.responded = True
+            item.save()
+            messages.success(request, 'Marked as responded.')
+            return redirect('admin_feedback_detail', pk=item.pk)
+    return render(request, 'admin_dashboard/feedback_detail.html', {'item': item})
+
+
+@user_passes_test(is_admin)
+@require_POST
+def feedback_mark_responded(request, pk):
+    item = get_object_or_404(ContactMessage, pk=pk)
+    item.responded = True
+    item.save()
+    messages.success(request, 'Feedback marked as responded.')
+    return redirect(request.GET.get('next') or 'admin_feedback_list')
+
+
+@user_passes_test(is_admin)
+def reviews_list(request):
+    """List and search Reviews with pagination."""
+    q = request.GET.get('q', '').strip()
+    page = request.GET.get('page', 1)
+    qs = Review.objects.all()
+    if q:
+        qs = qs.filter(Q(name__icontains=q) | Q(message__icontains=q))
+    paginator = Paginator(qs, 20)
+    page_obj = paginator.get_page(page)
+    return render(request, 'admin_dashboard/reviews_list.html', {
+        'reviews': page_obj.object_list,
+        'page_obj': page_obj,
+        'q': q,
+    })
+
+
+@user_passes_test(is_admin)
+def provider_detail(request, provider_id):
+    """Admin view: Show provider profile, documents grouped by status, and quick actions."""
+    provider = get_object_or_404(User, id=provider_id, is_vehicle_provider=True)
+    docs = ProviderDocument.objects.filter(provider=provider).order_by('-uploaded_at')
+
+    pending_docs = docs.filter(status='pending')
+    approved_docs = docs.filter(status='approved')
+    rejected_docs = docs.filter(status='rejected')
+
+    context = {
+        'provider': provider,
+        'pending_docs': pending_docs,
+        'approved_docs': approved_docs,
+        'rejected_docs': rejected_docs,
+        'total_docs': docs.count(),
+    }
+    return render(request, 'admin_dashboard/provider_detail.html', context)

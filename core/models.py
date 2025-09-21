@@ -89,3 +89,18 @@ class Notification(models.Model):
         return f"To {self.recipient.username if self.recipient else 'Public'}: {self.message[:30]}..."
 
 
+class ContactMessage(models.Model):
+    name = models.CharField(max_length=120)
+    email = models.EmailField()
+    subject = models.CharField(max_length=200)
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    responded = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.subject} from {self.name}"
+
+

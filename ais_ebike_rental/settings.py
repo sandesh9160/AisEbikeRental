@@ -138,15 +138,17 @@ LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
 
 if DEBUG:  # Local development
+    # Print emails to console during development
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-else: 
-# Email Configuration
-    EMAIL_HOST = 'smtp.gmail.com' 
+else:
+    # Email Configuration (Production)
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = 'smtp.gmail.com'
     EMAIL_PORT = 587
     EMAIL_USE_TLS = True
-    EMAIL_HOST_USER = 'ebikerental19@gmail.com' 
-    EMAIL_HOST_PASSWORD = 'pknucnotleoslfna' 
+    EMAIL_HOST_USER = 'ebikerental19@gmail.com'
+    EMAIL_HOST_PASSWORD = 'pknucnotleoslfna'
     DEFAULT_FROM_EMAIL = 'AIS E-Bike Rental <ebikerental19@gmail.com>'
 
-    # For development/testing, use console backend to see emails in terminal
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# Default receiver for Contact Us submissions (can be overridden by env var)
+CONTACT_RECEIVER_EMAIL = os.environ.get('CONTACT_RECEIVER_EMAIL', 'ebikerental19@gmail.com')

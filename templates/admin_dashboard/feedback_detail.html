@@ -1,0 +1,92 @@
+{% extends 'core/base.html' %}
+{% block navbar %}{% endblock %}
+{% block title %}Feedback Detail - Admin{% endblock %}
+{% block content %}
+<button class="dashboard-sidebar-toggle d-lg-none" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+<div id="sidebar" class="dashboard-sidebar bg-dark text-white">
+  <div class="sidebar-header d-flex align-items-center justify-content-between px-3 py-3">
+    <span class="fw-bold fs-4"><i class="fas fa-user-shield me-2"></i>Admin</span>
+    <button class="btn btn-sm btn-outline-light d-md-none" id="sidebarCloseBtn" onclick="closeAdminSidebar()"><i class="fas fa-times"></i></button>
+  </div>
+  <nav class="nav flex-column px-2">
+    <a class="nav-link text-white sidebar-link" href="{% url 'admin_dashboard' %}"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a>
+    <a class="nav-link text-white sidebar-link" href="{% url 'admin_feedback_list' %}"><i class="fas fa-comments me-2"></i>Feedback</a>
+  </nav>
+</div>
+<div id="sidebarOverlay" class="sidebar-overlay d-md-none"></div>
+
+<div class="main-content-with-sidebar">
+  <div class="container-xxl py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h3 class="mb-0"><i class="fas fa-comment-dots me-2"></i>Feedback Detail</h3>
+      <div>
+        <a href="{% url 'admin_feedback_list' %}" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-1"></i>Back to list</a>
+      </div>
+    </div>
+
+    <div class="card card-glass">
+      <div class="card-header d-flex align-items-center justify-content-between header-gradient-blue">
+        <h5 class="mb-0">{{ item.subject }}</h5>
+        <span class="badge badge-pill {% if item.responded %}bg-success{% else %}bg-warning text-dark{% endif %}">{% if item.responded %}Responded{% else %}New{% endif %}</span>
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="mb-2"><strong>Name:</strong> {{ item.name }}</div>
+            <div class="mb-2"><strong>Email:</strong> <a href="mailto:{{ item.email }}">{{ item.email }}</a></div>
+            <div class="mb-2"><strong>Received:</strong> {{ item.created_at|date:"M d, Y H:i" }}</div>
+          </div>
+          <div class="col-12">
+            <label class="form-label fw-semibold">Message</label>
+            <div class="p-3 border rounded-3 bg-light" style="white-space: pre-wrap;">{{ item.message }}</div>
+          </div>
+        </div>
+        <div class="d-flex justify-content-end gap-2 mt-4">
+          <a class="btn btn-outline-primary" href="mailto:{{ item.email }}?subject={{ 'Re: ' |add:item.subject|urlencode }}"><i class="fas fa-reply me-1"></i>Reply by Email</a>
+          {% if not item.responded %}
+          <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#confirmRespondedModal"><i class="fas fa-check me-1"></i>Mark as Responded</button>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Modal -->
+<div class="modal fade" id="confirmRespondedModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="fas fa-check-circle text-success me-2"></i>Confirm</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to mark this message as responded?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <form method="post" action="">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="mark_responded">
+          <button type="submit" class="btn btn-success">Yes, Mark Responded</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function closeAdminSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('show');
+}
+const sidebar = document.getElementById('sidebar');
+const sidebarOverlay = document.getElementById('sidebarOverlay');
+const sidebarToggle = document.getElementById('sidebarToggle');
+if (sidebarToggle) sidebarToggle.onclick = function(){
+  if (window.innerWidth < 992) { sidebar.classList.add('open'); sidebarOverlay.classList.add('show'); }
+  else { sidebar.classList.toggle('collapsed'); document.querySelector('.main-content-with-sidebar').classList.toggle('collapsed'); }
+};
+if (sidebarOverlay) sidebarOverlay.onclick = closeAdminSidebar;
+</script>
+{% endblock %}

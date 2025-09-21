@@ -10,6 +10,25 @@
         background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
         min-height: 100vh;
     }
+    .section-nav .nav-link {
+        border-radius: 20px;
+        font-weight: 600;
+        padding: 0.5rem 1rem;
+    }
+    .section-nav .nav-link.active {
+        color: #fff;
+        background: linear-gradient(135deg, #74b9ff, #0984e3);
+        box-shadow: 0 6px 18px rgba(9, 132, 227, 0.25);
+    }
+    .section-nav-container {
+        position: sticky;
+        top: 12px;
+        z-index: 9;
+    }
+    /* Smooth anchor offset so headers are not hidden under sticky bar */
+    #pending-section, #approved-section, #rejected-section {
+        scroll-margin-top: 90px;
+    }
     .main-header {
         background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
         color: white;
@@ -349,6 +368,19 @@
     </div>
 
     <div class="container-fluid">
+        <!-- Quick Section Navigation -->
+        <div class="section-header glass-effect fade-in-up section-nav-container">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                <ul class="nav section-nav">
+                    <li class="nav-item"><a class="nav-link active" href="#pending-section"><i class="fas fa-hourglass-half me-2"></i>Pending ({{ pending_documents|length }})</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#approved-section"><i class="fas fa-check-double me-2"></i>Approved ({{ approved_documents|length }})</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#rejected-section"><i class="fas fa-times-circle me-2"></i>Rejected ({{ rejected_documents|length }})</a></li>
+                </ul>
+                <div class="text-muted small fw-semibold">
+                    <i class="fas fa-database me-1"></i>Total: {{ total_documents }}
+                </div>
+            </div>
+        </div>
         <!-- Statistics Cards -->
         <div class="row mb-4">
             <div class="col-md-3 mb-3">
@@ -391,7 +423,7 @@
                             <i class="fas fa-folder-open fa-2x text-white"></i>
                         </div>
                     </div>
-                    <h2 class="mb-2 fw-bold" style="background: linear-gradient(135deg, #74b9ff, #0984e3); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">{{ pending_documents|length|add:approved_documents|length|add:rejected_documents|length }}</h2>
+                    <h2 class="mb-2 fw-bold" style="background: linear-gradient(135deg, #74b9ff, #0984e3); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">{{ total_documents }}</h2>
                     <p class="mb-0 text-muted fw-semibold">Total Documents</p>
                 </div>
             </div>
@@ -402,7 +434,7 @@
 
             <!-- Pending Documents -->
             {% if pending_documents %}
-                <div class="section-header pending-header fade-in-up">
+                <div id="pending-section" class="section-header pending-header fade-in-up">
                     <div class="d-flex align-items-center justify-content-between">
                         <div>
                             <h4 class="mb-2 fw-bold">
@@ -436,7 +468,7 @@
                 <div class="document-card mb-4">
                     <div class="card-body p-0">
                         <div class="table-responsive">
-                            <table class="table modern-table mb-0">
+                            <table class="table table-sm modern-table mb-0">
                                 <thead>
                                     <tr>
                                         <th class="py-3 px-4" style="width: 50px;">
@@ -503,7 +535,7 @@
                                                         </strong>
                                                         <div class="mt-2">
                                                             {% for document in documents %}
-                                        {% if document.document_number %}
+                                                                {% if document.document_number %}
                                                                     <span class="badge bg-light text-dark me-2 mb-1">
                                                                         <i class="fas fa-id-card me-1"></i>#{{ document.document_number }}
                                                                     </span>
@@ -511,11 +543,13 @@
                                                                     <span class="badge bg-secondary me-2 mb-1">
                                                                         <i class="fas fa-question me-1"></i>No ID
                                                                     </span>
-                                        {% endif %}
+                                                                {% endif %}
                                                             {% endfor %}
-                                    </div>
-                                </div>
-                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
                                             </td>
                                             <td class="py-3">
                                                 <div class="d-flex align-items-center">
@@ -559,7 +593,7 @@
 
             <!-- Approved Documents -->
             {% if approved_documents %}
-                <div class="section-header approved-header fade-in-up">
+                <div id="approved-section" class="section-header approved-header fade-in-up">
                     <div class="d-flex align-items-center justify-content-between">
                         <div>
                             <h4 class="mb-2 fw-bold">
@@ -577,7 +611,7 @@
                 <div class="document-card mb-4">
                     <div class="card-body p-0">
                         <div class="table-responsive">
-                            <table class="table modern-table mb-0">
+                            <table class="table table-sm modern-table mb-0">
                                 <thead>
                                     <tr>
                                         <th class="py-3 px-4">
@@ -692,7 +726,7 @@
 
             <!-- Rejected Documents -->
             {% if rejected_documents %}
-                <div class="section-header rejected-header fade-in-up">
+                <div id="rejected-section" class="section-header rejected-header fade-in-up">
                     <div class="d-flex align-items-center justify-content-between">
                         <div>
                             <h4 class="mb-2 fw-bold">
@@ -852,6 +886,23 @@
     </div>
 </div>
 
+<script>
+  // Smooth scroll for section nav
+  document.querySelectorAll('.section-nav .nav-link').forEach(link => {
+    link.addEventListener('click', function(e){
+      const href = this.getAttribute('href');
+      if (href && href.startsWith('#')) {
+        e.preventDefault();
+        const target = document.querySelector(href);
+        if (target) {
+          window.scrollTo({ top: target.offsetTop - 20, behavior: 'smooth' });
+          document.querySelectorAll('.section-nav .nav-link').forEach(l => l.classList.remove('active'));
+          this.classList.add('active');
+        }
+      }
+    });
+  });
+</script>
 <script>
 // Initialize tooltips
 var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
