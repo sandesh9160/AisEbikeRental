@@ -1,10 +1,11 @@
 {% extends 'core/base.html' %}
+{% block navbar %}{% endblock %}
 {% block content %}
 <!-- Bootstrap 5 CDN for responsive utilities -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <style>
-  .navbar { display: none !important; }
+  /* Do not globally hide all navbars; ensure mobile navbars remain functional */
   .dashboard-sidebar {
     position: fixed;
     top: 0;
@@ -20,6 +21,10 @@
     box-shadow: 2px 0 8px rgba(116, 185, 255, 0.2);
   }
   .dashboard-sidebar-toggle {
+    position: fixed;
+    top: 18px;
+    left: 18px;
+    z-index: 1300;
     background: #74b9ff;
     color: #fff;
     border: none;
@@ -30,7 +35,6 @@
     align-items: center;
     justify-content: center;
     font-size: 1.3rem;
-    margin: 16px auto 0 auto;
     transition: background 0.2s;
   }
   .dashboard-sidebar-toggle:hover {
@@ -50,18 +54,19 @@
     .dashboard-sidebar-toggle { display: flex !important; }
     .dashboard-sidebar {
       width: 220px;
-      left: -220px;
+      left: 0;
       top: 0;
       bottom: 0;
       position: fixed;
       z-index: 1200;
       background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
-      transition: left 0.3s;
+      transition: transform 0.3s ease;
+      transform: translateX(-100%);
       height: 100vh;
       overflow-y: auto;
     }
     .dashboard-sidebar.open {
-      left: 0;
+      transform: translateX(0);
     }
     .dashboard-content { margin-left: 0 !important; }
   }
@@ -116,33 +121,76 @@
     font-weight: 500;
   }
 </style>
+<script>
+  // Global fallback so inline onclick is always defined
+  window.handleSidebarToggle = function() {
+    try {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      if (window.innerWidth < 992) {
+        if (sidebar) sidebar.classList.add('open');
+        if (overlay) overlay.classList.add('show');
+        document.body.style.overflow = 'hidden';
+      } else if (sidebar) {
+        sidebar.classList.toggle('collapsed');
+        const main = document.querySelector('.main-content-with-sidebar') || document.querySelector('.dashboard-content');
+        if (main) main.classList.toggle('collapsed');
+      }
+    } catch (e) {
+      console.warn('Fallback handleSidebarToggle error:', e);
+    }
+  };
+  // Ensure overlay exists for fallback
+  (function(){
+    if (!document.getElementById('sidebarOverlay')) {
+      const ov = document.createElement('div');
+      ov.id = 'sidebarOverlay';
+      ov.className = 'sidebar-overlay d-md-none';
+      document.body.appendChild(ov);
+      ov.onclick = function(){
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar) sidebar.classList.remove('open');
+        ov.classList.remove('show');
+        document.body.style.overflow = '';
+      };
+    }
+  })();
+  // Global fallback close function for X button
+  window.closeAdminSidebar = function() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    if (sidebar) sidebar.classList.remove('open');
+    if (overlay) overlay.classList.remove('show');
+    document.body.style.overflow = '';
+  };
+</script>
 <!-- Sidebar Toggle Button -->
-<button class="dashboard-sidebar-toggle d-lg-none" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+<button class="dashboard-sidebar-toggle d-lg-none" id="sidebarToggle" onclick="handleSidebarToggle()"><i class="fas fa-bars"></i></button>
 <!-- Sidebar and overlay -->
-<div id="sidebar" class="sidebar bg-dark text-white">
+<div id="sidebar" class="dashboard-sidebar bg-dark text-white">
   <div class="sidebar-header d-flex align-items-center justify-content-between px-3 py-3">
     <span class="fw-bold fs-4"><i class="fas fa-user-shield me-2"></i>Admin</span>
-    <button class="btn btn-sm btn-outline-light d-md-none" id="sidebarCloseBtn"><i class="fas fa-times"></i></button>
+    <button class="btn btn-sm btn-outline-light d-md-none" id="sidebarCloseBtn" onclick="closeAdminSidebar()"><i class="fas fa-times"></i></button>
   </div>
   <nav class="nav flex-column px-2">
-    <a class="nav-link text-white sidebar-link" href="#dashboard-section"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a>
-    <a class="nav-link text-white sidebar-link" href="#riders"><i class="fas fa-users me-2"></i>Riders</a>
-    <a class="nav-link text-white sidebar-link" href="#providers"><i class="fas fa-user-tie me-2"></i>Providers</a>
-    <a class="nav-link text-white sidebar-link" href="#bookings">
+    <a class="nav-link text-white sidebar-link" href="#dashboard-section" onclick="if(window.innerWidth<992) closeAdminSidebar()"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a>
+    <a class="nav-link text-white sidebar-link" href="#riders" onclick="if(window.innerWidth<992) closeAdminSidebar()"><i class="fas fa-users me-2"></i>Riders</a>
+    <a class="nav-link text-white sidebar-link" href="#providers" onclick="if(window.innerWidth<992) closeAdminSidebar()"><i class="fas fa-user-tie me-2"></i>Providers</a>
+    <a class="nav-link text-white sidebar-link" href="#bookings" onclick="if(window.innerWidth<992) closeAdminSidebar()">
       <i class="fas fa-book-open me-2"></i>Bookings
       {% if pending_approvals_count > 0 %}
         <span class="badge bg-danger ms-2 align-middle">{{ pending_approvals_count }}</span>
       {% endif %}
     </a>
-    <a class="nav-link text-white sidebar-link" href="#earnings"><i class="fas fa-wallet me-2"></i>Earnings</a>
-    <a class="nav-link text-white sidebar-link" href="{% url 'review_documents' %}">
+    <a class="nav-link text-white sidebar-link" href="#earnings" onclick="if(window.innerWidth<992) closeAdminSidebar()"><i class="fas fa-wallet me-2"></i>Earnings</a>
+    <a class="nav-link text-white sidebar-link" href="{% url 'review_documents' %}" onclick="if(window.innerWidth<992) closeAdminSidebar()">
       <i class="fas fa-file-alt me-2"></i>Document Verification
       {% if pending_documents|length > 0 %}
         <span class="badge bg-warning ms-2 align-middle">{{ pending_documents|length }}</span>
       {% endif %}
     </a>
-    <a class="nav-link text-white sidebar-link" href="#analysis-section"><i class="bi bi-bar-chart-fill me-2"></i>Analysis</a>
-    <a class="nav-link text-white sidebar-link" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a>
+    <a class="nav-link text-white sidebar-link" href="#analysis-section" onclick="if(window.innerWidth<992) closeAdminSidebar()"><i class="bi bi-bar-chart-fill me-2"></i>Analysis</a>
+    <a class="nav-link text-white sidebar-link" href="{% url 'logout' %}" onclick="if(window.innerWidth<992) closeAdminSidebar()"><i class="fas fa-sign-out-alt me-2"></i>Logout</a>
   </nav>
   <div class="sidebar-profile text-center mt-auto mb-4 px-3">
     <img src="{% if request.user.profile_image %}{{ request.user.profile_image.url }}{% else %}https://api.dicebear.com/7.x/avataaars/svg?seed={{ request.user.username }}{% endif %}"
@@ -152,24 +200,7 @@
 </div>
 <div id="sidebarOverlay" class="sidebar-overlay d-md-none"></div>
 
-<!-- Admin Notification Bell (visible only for staff) -->
-{% if request.user.is_staff %}
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm mb-3">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="#"><i class="fas fa-tools"></i> Admin Panel</a>
-    <ul class="navbar-nav ms-auto">
-      <li class="nav-item">
-        <a class="nav-link position-relative" href="#bookings">
-          <i class="fas fa-bell"></i>
-          {% if pending_approvals_count > 0 %}
-            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{{ pending_approvals_count }}</span>
-          {% endif %}
-        </a>
-      </li>
-    </ul>
-  </div>
-</nav>
-{% endif %}
+<!-- Removed horizontal navbar for dashboards as requested -->
 
 <!-- Main Dashboard Content -->
 <div class="main-content-with-sidebar dashboard-content">
@@ -211,6 +242,8 @@
     <h2 class="text-center mb-5 fw-bold text-primary">
      
     </h2>
+
+    <!-- Filters removed from dashboard as per request -->
 
     <!-- Summary Cards -->
     <div class="row g-4 mb-4 mx-1">
@@ -292,7 +325,9 @@
       const chartMonths = {{ chart_months|default:'[]'|safe }};
       const chartCounts = {{ chart_counts|default:'[]'|safe }};
       if (chartMonths.length && chartCounts.length) {
-        const ctx = document.getElementById('bookingsLineChart').getContext('2d');
+        const lineEl = document.getElementById('bookingsLineChart');
+        if (lineEl && typeof lineEl.getContext === 'function') {
+        const ctx = lineEl.getContext('2d');
         const gradient = ctx.createLinearGradient(0, 0, 0, 130);
         gradient.addColorStop(0, 'rgba(54, 162, 235, 0.7)');
         gradient.addColorStop(1, 'rgba(54, 162, 235, 0.1)');
@@ -338,9 +373,12 @@
             }
           }
         });
+        }
       }
       // Stylish Pie Chart (Booking Status)
-      const statusPieCtx = document.getElementById('statusPieChart').getContext('2d');
+      const statusPieEl = document.getElementById('statusPieChart');
+      if (statusPieEl && typeof statusPieEl.getContext === 'function') {
+      const statusPieCtx = statusPieEl.getContext('2d');
       const approvedCount = {{ approved_count|default:'0' }};
       const pendingCount = {{ pending_count|default:'0' }};
       new Chart(statusPieCtx, {
@@ -377,8 +415,11 @@
           }
         }
       });
+      }
       // Stylish Scatter Chart (Provider Earnings vs Number of Bikes)
-      const scatterCtx = document.getElementById('providerScatterChart').getContext('2d');
+      const scatterEl = document.getElementById('providerScatterChart');
+      if (scatterEl && typeof scatterEl.getContext === 'function') {
+      const scatterCtx = scatterEl.getContext('2d');
       const scatterData = [
         {x: 2, y: 15000},
         {x: 4, y: 32000},
@@ -428,6 +469,7 @@
           }
         }
       });
+      }
     </script>
 
     <!-- Earnings -->
@@ -702,16 +744,16 @@
           <div class="card-body">
             <div class="row g-3">
               {% for booking in bookings %}
-                <div class="col-md-4">
-                  <div class="card shadow-sm border-0 h-100">
-                    <div class="card-body">
-                      <div class="d-flex align-items-center mb-2">
-                        <img src="{% if booking.rider.profile_image %}{{ booking.rider.profile_image.url }}{% else %}https://api.dicebear.com/7.x/avataaars/svg?seed={{ booking.rider.username }}{% endif %}"
-                             alt="{{ booking.rider.username }}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid #eee; margin-right: 8px;" />
-                        <h5 class="fw-bold text-primary mb-0">
-                          <i class="bi bi-person"></i> {{ booking.rider.username }}
-                        </h5>
-                      </div>
+              <div class="col-md-4">
+                <div class="card shadow-sm border-0 h-100">
+                  <div class="card-body">
+                    <div class="d-flex align-items-center mb-2">
+                      <img src="{% if booking.rider.profile_image %}{{ booking.rider.profile_image.url }}{% else %}https://api.dicebear.com/7.x/avataaars/svg?seed={{ booking.rider.username }}{% endif %}"
+                           alt="{{ booking.rider.username }}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid #eee; margin-right: 8px;" />
+                      <h5 class="fw-bold text-primary mb-0">
+                        <i class="bi bi-person"></i> {{ booking.rider.username }}
+                      </h5>
+                    </div>
                       <p class="mb-1">
                         {% if booking.ebike.image %}
                           <img src="{{ booking.ebike.image.url }}" alt="{{ booking.ebike.name }}" style="width: 40px; height: 28px; object-fit: cover; border-radius: 6px; margin-right: 4px;" />
@@ -737,10 +779,10 @@
                     </div>
                   </div>
                 </div>
-              {% empty %}
-                <div class="col-12 text-center text-muted">No bookings found.</div>
-              {% endfor %}
-            </div>
+                {% empty %}
+                  <div class="col-12 text-center text-muted">No bookings found.</div>
+                {% endfor %}
+              </div>
           </div>
         </div>
       </div>
@@ -1007,75 +1049,118 @@
 </script>
 
 <script>
-// Sidebar toggle for mobile and desktop
+// Sidebar toggle for mobile and desktop (stable version)
 document.addEventListener('DOMContentLoaded', function() {
   const sidebar = document.getElementById('sidebar');
-  const sidebarOverlay = document.getElementById('sidebarOverlay');
+  let sidebarOverlay = document.getElementById('sidebarOverlay');
   const sidebarCloseBtn = document.getElementById('sidebarCloseBtn');
   const sidebarToggle = document.getElementById('sidebarToggle');
+
+  // Ensure overlay exists
+  if (!sidebarOverlay) {
+    sidebarOverlay = document.createElement('div');
+    sidebarOverlay.id = 'sidebarOverlay';
+    sidebarOverlay.className = 'sidebar-overlay d-md-none';
+    document.body.appendChild(sidebarOverlay);
+  }
 
   function openSidebar() {
     if (sidebar) {
       sidebar.classList.add('open');
       if (sidebarOverlay) sidebarOverlay.classList.add('show');
+      document.body.style.overflow = 'hidden';
     }
   }
-  
+
   function closeSidebar() {
     if (sidebar) {
       sidebar.classList.remove('open');
       if (sidebarOverlay) sidebarOverlay.classList.remove('show');
+      document.body.style.overflow = '';
     }
   }
-  
-  if (sidebarCloseBtn) {
-    sidebarCloseBtn.addEventListener('click', closeSidebar);
-  }
-  
-  if (sidebarOverlay) {
-    sidebarOverlay.addEventListener('click', closeSidebar);
-  }
-  
+
+  // Expose a global closer for inline X button
+  window.closeAdminSidebar = closeSidebar;
+
+  if (sidebarCloseBtn) sidebarCloseBtn.onclick = closeSidebar;
+  if (sidebarOverlay) sidebarOverlay.onclick = closeSidebar;
   if (sidebarToggle) {
-    sidebarToggle.addEventListener('click', function() {
+    sidebarToggle.onclick = function () {
+      console.debug('[AdminSidebar] toggle clicked');
       if (window.innerWidth < 992) {
         openSidebar();
-      } else {
-        if (sidebar) {
-          sidebar.classList.toggle('collapsed');
-          const mainContent = document.querySelector('.main-content-with-sidebar') || document.querySelector('.dashboard-content');
-          if (mainContent) {
-            mainContent.classList.toggle('collapsed');
-          }
-        }
+      } else if (sidebar) {
+        sidebar.classList.toggle('collapsed');
+        const mainContent = document.querySelector('.main-content-with-sidebar') || document.querySelector('.dashboard-content');
+        if (mainContent) mainContent.classList.toggle('collapsed');
+      }
+    };
+  }
+
+  // Global fallback for inline onclick on the button
+  window.handleSidebarToggle = function() {
+    console.debug('[AdminSidebar] inline handleSidebarToggle');
+    if (window.innerWidth < 992) {
+      openSidebar();
+    } else if (sidebar) {
+      sidebar.classList.toggle('collapsed');
+      const mainContent = document.querySelector('.main-content-with-sidebar') || document.querySelector('.dashboard-content');
+      if (mainContent) mainContent.classList.toggle('collapsed');
+    }
+  };
+
+  // Smooth scroll for sidebar links + close on mobile after navigation
+  const sidebarLinks = document.querySelectorAll('.sidebar-link');
+  sidebarLinks.forEach(link => {
+    link.onclick = function(e) {
+      const href = this.getAttribute('href');
+      const isAnchor = href && href.startsWith('#');
+      if (window.innerWidth < 992) closeSidebar();
+      if (isAnchor) {
+        e.preventDefault();
+        const target = document.querySelector(href);
+        // Scroll after sidebar transition to avoid jank
+        setTimeout(() => {
+          if (target) window.scrollTo({ top: target.offsetTop - 20, behavior: 'smooth' });
+        }, 200);
+      }
+    };
+  });
+  // Extra safety: if hash changes, ensure sidebar is closed on mobile
+  window.addEventListener('hashchange', function() {
+    if (window.innerWidth < 992) closeSidebar();
+  });
+
+  // Event delegation: close sidebar on any link click within sidebar nav
+  const sidebarNav = document.querySelector('#sidebar nav');
+  if (sidebarNav) {
+    sidebarNav.addEventListener('click', function(e) {
+      const a = e.target.closest('a');
+      if (a && window.innerWidth < 992) {
+        // Let default navigation happen, but close the panel immediately
+        closeSidebar();
       }
     });
   }
-  
-  // Smooth scroll for sidebar links
-  const sidebarLinks = document.querySelectorAll('.sidebar-link');
-  sidebarLinks.forEach(link => {
-    link.addEventListener('click', function(e) {
-      const href = this.getAttribute('href');
-      if (href && href.startsWith('#')) {
-        e.preventDefault();
-        const target = document.querySelector(href);
-        if (target) {
-          window.scrollTo({
-            top: target.offsetTop - 20,
-            behavior: 'smooth'
-          });
-          if (window.innerWidth < 992) closeSidebar();
-        }
+
+  // Click outside to close on mobile
+  document.addEventListener('click', function(e) {
+    if (window.innerWidth < 992) {
+      const toggleBtn = document.getElementById('sidebarToggle');
+      if (
+        sidebar &&
+        sidebar.classList.contains('open') &&
+        !sidebar.contains(e.target) &&
+        !(toggleBtn && toggleBtn.contains(e.target))
+      ) {
+        closeSidebar();
       }
-    });
-  });
-  
-  // Handle window resize
-  window.addEventListener('resize', function() {
-    if (window.innerWidth >= 992) {
-      closeSidebar();
     }
+  });
+
+  window.addEventListener('resize', function () {
+    if (window.innerWidth >= 992) closeSidebar();
   });
 });
 </script>

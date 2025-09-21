@@ -274,56 +274,76 @@
         </div>
     </div>
 
-    <!-- Advanced Filters Panel -->
+    <!-- Advanced Filters Panel (GET form) -->
     <div class="container-fluid mb-4" id="filtersPanel" style="display: none;">
         <div class="card document-card">
             <div class="card-body">
-                <div class="row align-items-center">
-                    <div class="col-md-3">
-                        <label class="form-label fw-bold">
-                            <i class="fas fa-user me-2"></i>Provider
-                        </label>
-                        <select class="form-select" id="providerFilter">
-                            <option value="">All Providers</option>
-                            {% for provider in all_providers %}
-                                <option value="{{ provider.username }}">{{ provider.username }}</option>
-                            {% endfor %}
-                        </select>
+                <form method="get" action="{% url 'review_documents' %}">
+                    <div class="row align-items-end g-3">
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-user me-2"></i>Provider
+                            </label>
+                            <select class="form-select" name="provider">
+                                <option value="">All Providers</option>
+                                {% for provider in all_providers %}
+                                    <option value="{{ provider.id }}" {% if current_provider == provider.id|stringformat:'s' %}selected{% endif %}>{{ provider.username }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-file-alt me-2"></i>Document Type
+                            </label>
+                            <select class="form-select" name="document_type">
+                                <option value="">All Types</option>
+                                <option value="aadhar" {% if current_document_type == 'aadhar' %}selected{% endif %}>Aadhar Card</option>
+                                <option value="pan" {% if current_document_type == 'pan' %}selected{% endif %}>PAN Card</option>
+                                <option value="driving_license" {% if current_document_type == 'driving_license' %}selected{% endif %}>Driving License</option>
+                                <option value="business_license" {% if current_document_type == 'business_license' %}selected{% endif %}>Business License</option>
+                                <option value="insurance" {% if current_document_type == 'insurance' %}selected{% endif %}>Insurance Document</option>
+                                <option value="other" {% if current_document_type == 'other' %}selected{% endif %}>Other</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-traffic-light me-2"></i>Status
+                            </label>
+                            <select class="form-select" name="status">
+                                <option value="" {% if not current_status %}selected{% endif %}>All</option>
+                                <option value="pending" {% if current_status == 'pending' %}selected{% endif %}>Pending</option>
+                                <option value="approved" {% if current_status == 'approved' %}selected{% endif %}>Approved</option>
+                                <option value="rejected" {% if current_status == 'rejected' %}selected{% endif %}>Rejected</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-search me-2"></i>Search
+                            </label>
+                            <input type="text" class="form-control" name="search" value="{{ current_search }}" placeholder="Provider username or document number">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-calendar-plus me-2"></i>Date From
+                            </label>
+                            <input type="date" class="form-control" name="date_from" value="{{ current_date_from }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-calendar-minus me-2"></i>Date To
+                            </label>
+                            <input type="date" class="form-control" name="date_to" value="{{ current_date_to }}">
+                        </div>
+                        <div class="col-12 text-end">
+                            <button type="submit" class="btn modern-btn modern-btn-primary me-2">
+                                <i class="fas fa-search me-1"></i>Apply Filters
+                            </button>
+                            <a href="{% url 'review_documents' %}" class="btn modern-btn modern-btn-warning">
+                                <i class="fas fa-times me-1"></i>Clear
+                            </a>
+                        </div>
                     </div>
-                    <div class="col-md-3">
-                        <label class="form-label fw-bold">
-                            <i class="fas fa-file-alt me-2"></i>Document Type
-                        </label>
-                        <select class="form-select" id="documentTypeFilter">
-                            <option value="">All Types</option>
-                            <option value="aadhar">Aadhar Card</option>
-                            <option value="pan">PAN Card</option>
-                            <option value="license">Driving License</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label fw-bold">
-                            <i class="fas fa-calendar me-2"></i>Date Range
-                        </label>
-                        <input type="date" class="form-control" id="dateFilter">
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label fw-bold">
-                            <i class="fas fa-search me-2"></i>Search
-                        </label>
-                        <input type="text" class="form-control" id="searchFilter" placeholder="Search documents...">
-                    </div>
-                </div>
-                <div class="row mt-3">
-                    <div class="col-12 text-end">
-                        <button class="btn modern-btn modern-btn-primary me-2" onclick="applyFilters()">
-                            <i class="fas fa-search me-1"></i>Apply Filters
-                        </button>
-                        <button class="btn modern-btn modern-btn-warning" onclick="clearFilters()">
-                            <i class="fas fa-times me-1"></i>Clear
-                        </button>
-                    </div>
-                </div>
+                </form>
             </div>
         </div>
     </div>
@@ -401,10 +421,10 @@
                                 </label>
                             </div>
                             <div class="btn-group" role="group">
-                                <button class="btn modern-btn modern-btn-success btn-sm" onclick="bulkApprove('pending')" disabled id="bulkApproveBtn">
+                                <button type="button" class="btn modern-btn modern-btn-success btn-sm" id="bulkApproveBtn" onclick="bulkApprove('pending')" disabled>
                                     <i class="fas fa-check me-1"></i>Bulk Approve
                                 </button>
-                                <button class="btn modern-btn modern-btn-danger btn-sm" onclick="bulkReject('pending')" disabled id="bulkRejectBtn">
+                                <button type="button" class="btn modern-btn modern-btn-danger btn-sm" id="bulkRejectBtn" onclick="bulkReject('pending')" disabled>
                                     <i class="fas fa-times me-1"></i>Bulk Reject
                                 </button>
                             </div>
@@ -526,6 +546,15 @@
                         </div>
                     </div>
                 </div>
+                <form id="bulkActionForm" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="selected_ids" id="selectedIdsInput">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <input type="text" class="form-control" name="admin_notes" placeholder="Notes (optional for approve/reject)">
+                        </div>
+                    </div>
+                </form>
             {% endif %}
 
             <!-- Approved Documents -->
@@ -924,16 +953,17 @@ function bulkApprove(section) {
         alert('Please select documents to approve');
         return;
     }
-    
     const documentIds = [];
     checkedBoxes.forEach(checkbox => {
         documentIds.push(...checkbox.value.split(','));
     });
-    
+    const form = document.getElementById('bulkActionForm');
+    const selectedInput = document.getElementById('selectedIdsInput');
+    selectedInput.value = documentIds.join(',');
+    form.action = "{% url 'bulk_approve_documents' %}";
+    form.method = 'post';
     if (confirm(`Are you sure you want to approve ${documentIds.length} document(s)?`)) {
-        // Implement bulk approve functionality
-        console.log('Bulk approving documents:', documentIds);
-        alert('Bulk approve functionality will be implemented with backend integration');
+        form.submit();
     }
 }
 
@@ -943,16 +973,17 @@ function bulkReject(section) {
         alert('Please select documents to reject');
         return;
     }
-    
     const documentIds = [];
     checkedBoxes.forEach(checkbox => {
         documentIds.push(...checkbox.value.split(','));
     });
-    
+    const form = document.getElementById('bulkActionForm');
+    const selectedInput = document.getElementById('selectedIdsInput');
+    selectedInput.value = documentIds.join(',');
+    form.action = "{% url 'bulk_reject_documents' %}";
+    form.method = 'post';
     if (confirm(`Are you sure you want to reject ${documentIds.length} document(s)?`)) {
-        // Implement bulk reject functionality
-        console.log('Bulk rejecting documents:', documentIds);
-        alert('Bulk reject functionality will be implemented with backend integration');
+        form.submit();
     }
 }
 

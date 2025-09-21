@@ -13,5 +13,14 @@ urlpatterns = [
     path('verify-provider/<int:provider_id>/', views.verify_provider, name='verify_provider'),
     path('edit-document-verification/<int:document_id>/', views.edit_document_verification, name='edit_document_verification'),
     path('remove-document-verification/<int:document_id>/', views.remove_document_verification, name='remove_document_verification'),
+    # Bulk document actions for review documents page
+    path('bulk-approve-documents/', views.bulk_approve_documents, name='bulk_approve_documents'),
+    path('bulk-reject-documents/', views.bulk_reject_documents, name='bulk_reject_documents'),
+    # Bulk operations
+    path('bulk-approve-bookings/', views.bulk_approve_bookings, name='bulk_approve_bookings'),
+    path('bulk-reject-bookings/', views.bulk_reject_bookings, name='bulk_reject_bookings'),
+    path('bulk-verify-providers/', views.bulk_verify_providers, name='bulk_verify_providers'),
+    # AJAX endpoints
+    path('api/filtered-data/', views.get_filtered_data, name='get_filtered_data'),
 ]
 

@@ -1,4 +1,5 @@
 {% extends 'core/base.html' %}
+{% block navbar %}{% endblock %}
 
 {% block content %}
 <!-- Sidebar Toggle Button -->
@@ -165,8 +166,7 @@
 </div>
 
 <style>
-  .main-navbar { display: none !important; }
-  .navbar { display: none !important; }
+  /* Removed global navbar hiding to avoid conflicts; base navbar is suppressed via block override */
   .summary-card, .provider-ebike-card, .provider-booking-card {
     border-radius: 1rem !important;
     box-shadow: 0 2px 8px rgba(30,60,114,0.08);

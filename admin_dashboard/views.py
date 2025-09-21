@@ -3,17 +3,22 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib import messages
 from django.utils import timezone
 from core.models import User, EBike, Booking, VehicleRegistration, Notification, ProviderDocument
-from django.db.models import Sum
+from django.db.models import Sum, Q
 from decimal import Decimal
 from django.db.models.functions import TruncMonth
 from django.db.models import Count
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
 import json
+from datetime import datetime, timedelta
 
 def is_admin(user):
     return user.is_authenticated and user.is_staff
 
 @user_passes_test(is_admin)
 def admin_dashboard(request):
+    # Base querysets (no filters here per request)
     riders = User.objects.filter(is_rider=True)
     vehicle_providers = User.objects.filter(is_vehicle_provider=True)
     ebikes = EBike.objects.all()
@@ -58,8 +63,8 @@ def admin_dashboard(request):
     counts = [b['count'] for b in bookings_by_month]
 
     approved_count = Booking.objects.filter(is_approved=True).count()
-    pending_count = Booking.objects.filter(is_approved=False).count()
-    pending_approvals_count = Booking.objects.filter(is_approved=False).count()
+    pending_count = Booking.objects.filter(is_approved=False, is_rejected=False).count()
+    pending_approvals_count = Booking.objects.filter(is_approved=False, is_rejected=False).count()
 
     unread_notification_count = Notification.objects.filter(recipient=request.user, is_read=False).count()
     notifications = Notification.objects.filter(recipient=request.user).order_by('-created_at')[:10]
@@ -131,28 +136,59 @@ def delete_user(request, user_id):
 
 @user_passes_test(is_admin)
 def review_documents(request):
-    pending_documents = ProviderDocument.objects.filter(status='pending').order_by('-uploaded_at')
-    approved_documents = ProviderDocument.objects.filter(status='approved').order_by('-reviewed_at')
-    rejected_documents = ProviderDocument.objects.filter(status='rejected').order_by('-reviewed_at')
-    
-    # Group documents by provider for better organization
+    # Filters (applied here as requested)
+    provider_id = request.GET.get('provider', '')
+    document_type = request.GET.get('document_type', '')
+    status = request.GET.get('status', '')  # pending, approved, rejected, or '' for all
+    date_from = request.GET.get('date_from', '')
+    date_to = request.GET.get('date_to', '')
+    search = request.GET.get('search', '')
+
+    queryset = ProviderDocument.objects.all()
+
+    if provider_id:
+        queryset = queryset.filter(provider_id=provider_id)
+    if document_type:
+        queryset = queryset.filter(document_type=document_type)
+    if status in ['pending', 'approved', 'rejected']:
+        queryset = queryset.filter(status=status)
+    if date_from:
+        try:
+            df = timezone.datetime.strptime(date_from, '%Y-%m-%d').date()
+            queryset = queryset.filter(uploaded_at__date__gte=df)
+        except ValueError:
+            pass
+    if date_to:
+        try:
+            dt = timezone.datetime.strptime(date_to, '%Y-%m-%d').date()
+            queryset = queryset.filter(uploaded_at__date__lte=dt)
+        except ValueError:
+            pass
+    if search:
+        queryset = queryset.filter(
+            Q(provider__username__icontains=search) |
+            Q(document_number__icontains=search)
+        )
+
+    # Split by status
+    pending_documents = queryset.filter(status='pending').order_by('-uploaded_at')
+    approved_documents = queryset.filter(status='approved').order_by('-reviewed_at')
+    rejected_documents = queryset.filter(status='rejected').order_by('-reviewed_at')
+
+    # Group by provider
     from collections import defaultdict
-    
-    # Group pending documents by provider
     pending_by_provider = defaultdict(list)
     for doc in pending_documents:
         pending_by_provider[doc.provider].append(doc)
-    
-    # Group approved documents by provider
     approved_by_provider = defaultdict(list)
     for doc in approved_documents:
         approved_by_provider[doc.provider].append(doc)
-    
-    # Group rejected documents by provider
     rejected_by_provider = defaultdict(list)
     for doc in rejected_documents:
         rejected_by_provider[doc.provider].append(doc)
-    
+
+    all_providers = User.objects.filter(is_vehicle_provider=True).order_by('username')
+
     return render(request, 'admin_dashboard/review_documents.html', {
         'pending_documents': pending_documents,
         'approved_documents': approved_documents,
@@ -160,6 +196,14 @@ def review_documents(request):
         'pending_by_provider': dict(pending_by_provider),
         'approved_by_provider': dict(approved_by_provider),
         'rejected_by_provider': dict(rejected_by_provider),
+        # Filters context
+        'all_providers': all_providers,
+        'current_provider': provider_id,
+        'current_document_type': document_type,
+        'current_status': status,
+        'current_date_from': date_from,
+        'current_date_to': date_to,
+        'current_search': search,
     })
 
 
@@ -336,3 +380,242 @@ def remove_document_verification(request, document_id):
         return redirect('review_documents')
     
     return render(request, 'admin_dashboard/remove_document_verification.html', {'document': document})
+
+
+@user_passes_test(is_admin)
+@require_POST
+def bulk_approve_documents(request):
+    """Bulk approve provider documents from review_documents page"""
+    # Accept either multiple document_ids fields or a single comma-separated selected_ids
+    doc_ids = request.POST.getlist('document_ids')
+    if not doc_ids:
+        selected_ids = request.POST.get('selected_ids', '')
+        if selected_ids:
+            for chunk in selected_ids.split(','):
+                cid = chunk.strip()
+                if cid.isdigit():
+                    doc_ids.append(cid)
+    admin_notes = request.POST.get('admin_notes', '')
+
+    if not doc_ids:
+        messages.error(request, 'No documents selected.')
+        return redirect('review_documents')
+
+    documents = ProviderDocument.objects.filter(id__in=doc_ids)
+    approved_count = 0
+    affected_providers = set()
+
+    for document in documents:
+        if document.status != 'approved':
+            document.status = 'approved'
+            document.admin_notes = admin_notes
+            document.reviewed_by = request.user
+            document.reviewed_at = timezone.now()
+            document.save()
+            approved_count += 1
+            affected_providers.add(document.provider_id)
+
+    # Verify providers who have no pending documents
+    for provider_id in affected_providers:
+        all_docs = ProviderDocument.objects.filter(provider_id=provider_id)
+        if not all_docs.filter(status='pending').exists():
+            provider = User.objects.get(id=provider_id)
+            if not provider.is_verified_provider:
+                provider.is_verified_provider = True
+                provider.verification_notes = f"Verified on {timezone.now().strftime('%Y-%m-%d %H:%M')}"
+                provider.save()
+                Notification.objects.create(
+                    recipient=provider,
+                    message="Congratulations! Your account has been verified. You can now add ebikes to the platform.",
+                    link="/vehicle-providers/dashboard/"
+                )
+
+    messages.success(request, f'Successfully approved {approved_count} document(s).')
+    return redirect('review_documents')
+
+
+@user_passes_test(is_admin)
+@require_POST
+def bulk_reject_documents(request):
+    """Bulk reject provider documents from review_documents page"""
+    doc_ids = request.POST.getlist('document_ids')
+    if not doc_ids:
+        selected_ids = request.POST.get('selected_ids', '')
+        if selected_ids:
+            for chunk in selected_ids.split(','):
+                cid = chunk.strip()
+                if cid.isdigit():
+                    doc_ids.append(cid)
+    admin_notes = request.POST.get('admin_notes', '')
+
+    if not doc_ids:
+        messages.error(request, 'No documents selected.')
+        return redirect('review_documents')
+
+    documents = ProviderDocument.objects.filter(id__in=doc_ids)
+    rejected_count = 0
+
+    for document in documents:
+        if document.status != 'rejected':
+            document.status = 'rejected'
+            document.admin_notes = admin_notes
+            document.reviewed_by = request.user
+            document.reviewed_at = timezone.now()
+            document.save()
+            rejected_count += 1
+            Notification.objects.create(
+                recipient=document.provider,
+                message=f"Your document {document.get_document_type_display()} was rejected. Please review the admin notes and resubmit.",
+                link="/vehicle-providers/view-documents/"
+            )
+
+    messages.success(request, f'Successfully rejected {rejected_count} document(s).')
+    return redirect('review_documents')
+@user_passes_test(is_admin)
+@require_POST
+def bulk_approve_bookings(request):
+    """Bulk approve multiple bookings"""
+    booking_ids = request.POST.getlist('booking_ids')
+    if booking_ids:
+        bookings = Booking.objects.filter(id__in=booking_ids, is_approved=False)
+        approved_count = 0
+        
+        for booking in bookings:
+            booking.is_approved = True
+            booking.is_rejected = False
+            booking.save()
+            
+            # Notify the user
+            Notification.objects.create(
+                recipient=booking.rider,
+                message=f"Your booking for {booking.ebike.name} has been approved!",
+                link=f"/riders/booking/confirmation/{booking.id}/"
+            )
+            approved_count += 1
+        
+        messages.success(request, f'Successfully approved {approved_count} booking(s)!')
+    else:
+        messages.error(request, 'No bookings selected for approval.')
+    
+    return redirect('admin_dashboard')
+
+
+@user_passes_test(is_admin)
+@require_POST
+def bulk_reject_bookings(request):
+    """Bulk reject multiple bookings"""
+    booking_ids = request.POST.getlist('booking_ids')
+    rejection_reason = request.POST.get('rejection_reason', 'No reason provided')
+    
+    if booking_ids:
+        bookings = Booking.objects.filter(id__in=booking_ids, is_approved=False)
+        rejected_count = 0
+        
+        for booking in bookings:
+            booking.is_rejected = True
+            booking.is_approved = False
+            booking.save()
+            
+            # Notify the user
+            Notification.objects.create(
+                recipient=booking.rider,
+                message=f"Your booking for {booking.ebike.name} has been rejected. Reason: {rejection_reason}",
+                link=f"/riders/dashboard/"
+            )
+            rejected_count += 1
+        
+        messages.success(request, f'Successfully rejected {rejected_count} booking(s)!')
+    else:
+        messages.error(request, 'No bookings selected for rejection.')
+    
+    return redirect('admin_dashboard')
+
+
+@user_passes_test(is_admin)
+@require_POST
+def bulk_verify_providers(request):
+    """Bulk verify multiple providers"""
+    provider_ids = request.POST.getlist('provider_ids')
+    verification_notes = request.POST.get('verification_notes', 'Bulk verified by admin')
+    
+    if provider_ids:
+        providers = User.objects.filter(id__in=provider_ids, is_vehicle_provider=True, is_verified_provider=False)
+        verified_count = 0
+        
+        for provider in providers:
+            provider.is_verified_provider = True
+            provider.verification_notes = verification_notes
+            provider.save()
+            
+            # Notify provider
+            Notification.objects.create(
+                recipient=provider,
+                message="Congratulations! Your account has been verified. You can now add ebikes to the platform.",
+                link="/vehicle-providers/dashboard/"
+            )
+            verified_count += 1
+        
+        messages.success(request, f'Successfully verified {verified_count} provider(s)!')
+    else:
+        messages.error(request, 'No providers selected for verification.')
+    
+    return redirect('admin_dashboard')
+
+
+@user_passes_test(is_admin)
+def get_filtered_data(request):
+    """AJAX endpoint for filtered data"""
+    booking_status = request.GET.get('booking_status', 'all')
+    provider_status = request.GET.get('provider_status', 'all')
+    date_range = request.GET.get('date_range', 'all')
+    search_query = request.GET.get('search', '')
+    paid_status = request.GET.get('paid_status', 'all')
+    
+    # Apply the same filtering logic as in admin_dashboard
+    bookings = Booking.objects.all()
+    providers = User.objects.filter(is_vehicle_provider=True)
+    
+    # Apply filters (same logic as in admin_dashboard)
+    if booking_status == 'approved':
+        bookings = bookings.filter(is_approved=True)
+    elif booking_status == 'pending':
+        bookings = bookings.filter(is_approved=False, is_rejected=False)
+    elif booking_status == 'rejected':
+        bookings = bookings.filter(is_rejected=True)
+    
+    if provider_status == 'verified':
+        providers = providers.filter(is_verified_provider=True)
+    elif provider_status == 'unverified':
+        providers = providers.filter(is_verified_provider=False)
+    
+    # Date range filter
+    if date_range == 'today':
+        today = timezone.now().date()
+        bookings = bookings.filter(start_date=today)
+    elif date_range == 'week':
+        week_ago = timezone.now().date() - timedelta(days=7)
+        bookings = bookings.filter(start_date__gte=week_ago)
+    elif date_range == 'month':
+        month_ago = timezone.now().date() - timedelta(days=30)
+        bookings = bookings.filter(start_date__gte=month_ago)
+    
+    # Search filter
+    if search_query:
+        bookings = bookings.filter(
+            Q(rider__username__icontains=search_query) |
+            Q(ebike__name__icontains=search_query) |
+            Q(ebike__provider__username__icontains=search_query)
+        )
+        providers = providers.filter(
+            Q(username__icontains=search_query) |
+            Q(email__icontains=search_query)
+        )
+    
+    # Return counts
+    return JsonResponse({
+        'bookings_count': bookings.count(),
+        'providers_count': providers.count(),
+        'approved_bookings': bookings.filter(is_approved=True).count(),
+        'pending_bookings': bookings.filter(is_approved=False, is_rejected=False).count(),
+        'rejected_bookings': bookings.filter(is_rejected=True).count(),
+    })

@@ -25,6 +25,7 @@ class Booking(models.Model):
     end_date = models.DateField()
     total_price = models.DecimalField(max_digits=8, decimal_places=2)
     is_approved = models.BooleanField(default=False)
+    is_rejected = models.BooleanField(default=False)
     is_paid = models.BooleanField(default=False)
 
 class VehicleRegistration(models.Model):
