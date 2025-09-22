@@ -24,6 +24,12 @@ A powerful, scalable, and user-friendly **e-bike rental system** that connects r
 - 📝 Vehicle registration with document verification
 - 💸 Automated earnings and platform fee tracking
 
+### ✨ What's New (Sep 2025)
+- 🔧 Admin Provider Details page: view provider profile, document status (Pending/Approved/Rejected), and quick actions (Verify/Unverify, Edit, Remove).
+- 🗂️ Review Documents page: modern UI with sticky section navigation (Pending/Approved/Rejected), compact tables, smooth scrolling, and elegant empty states.
+- 🖼️ Sidebar profile pop-up (AJAX): update username, email, mobile, and profile photo in-place without page reload on all dashboards (Admin, Rider, Provider).
+- 📊 Admin dashboard clean-up: simplified providers section and improved analytics cards.
+
 ---
 
 ## 📸 Screenshots
@@ -70,6 +76,30 @@ A powerful, scalable, and user-friendly **e-bike rental system** that connects r
 ![Admin Dashboard 3](./admin_dashboard3.png)
 ![Admin Dashboard 4](./admin_dashboard4.png)
 
+### Review Documents (Modern UI)
+![Review Documents](./screenshots/review_documents_modern.png)
+
+### Provider Details (New)
+![Provider Details](./screenshots/provider_detail.png)
+
+---
+
+## 🎥 Demo GIFs
+
+> You can drop your recordings into the `screenshots/` folder with the names below and they will render automatically.
+
+- Admin → Provider Details flow
+  
+  ![Provider Detail Flow](./screenshots/provider_detail_flow.gif)
+
+- Review Documents: sticky section navigation
+  
+  ![Review Documents Sticky Nav](./screenshots/review_documents_sticky_nav.gif)
+
+- Profile update via AJAX modal (Admin/Rider/Provider)
+  
+  ![Profile Modal Update](./screenshots/profile_modal_update.gif)
+
 ---
 
 ## 🧩 Tech Stack
@@ -96,6 +126,7 @@ A powerful, scalable, and user-friendly **e-bike rental system** that connects r
 
 ### 🔸 `admin_dashboard/`
 - Admin dashboard for managing users, bookings, and vehicles
+- Provider details view (`provider_detail`) for per-provider insights and actions
 
 ---
 
@@ -184,6 +215,10 @@ vehicle_providers/       # Vehicle provider features
 media/                   # Uploaded images and documents
 screenshots/             # Project screenshots for documentation
 templates/               # HTML templates for all apps
+  └─ admin_dashboard/
+      ├─ dashboard.html               # Admin dashboard
+      ├─ review_documents.html        # Review documents center (modern UI)
+      └─ provider_detail.html         # Provider details (new)
 requirements.txt         # Python dependencies
 manage.py                # Django management script
 db.sqlite3               # SQLite database (default, for development)
@@ -216,3 +251,16 @@ Developed by Sandesh Kenchugundi and contributors.
 ---
 
 For more details, see the [GitHub repository](https://github.com/sandesh9160/AisEbikeRental). 
+
+---
+
+## 🧭 Admin Guide (Quick Links)
+
+- Provider Details: Admin Dashboard → Providers table → View
+- Review Documents: Admin Dashboard → Document Verification or /admin-dashboard/review-documents/
+- Edit Verification: From Provider Details (Approved section) → Edit; or Review Documents list.
+
+## 💡 Tips
+
+- Profile updates open in a modal (no page reload). On save, the sidebar name, email, mobile, and avatar update in-place.
+- On the Review Documents page, use the sticky navigation to jump between Pending/Approved/Rejected sections.
