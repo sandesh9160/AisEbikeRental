@@ -1,4 +1,5 @@
 from django.apps import apps
+from django.core.cache import cache
 
 def unread_notification_count(request):
     try:
@@ -12,3 +13,12 @@ def unread_notification_count(request):
     except Exception:
         count = 0
     return {'unread_notification_count': count} 
+
+
+def availability_sync_info(request):
+    """Expose the last availability sync date (if any) to all templates."""
+    try:
+        last_sync = cache.get("bike_availability_last_sync_date")
+    except Exception:
+        last_sync = None
+    return {"availability_last_sync_date": last_sync}

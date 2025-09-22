@@ -1,4 +1,239 @@
 {% extends 'core/base.html' %}
+{% load static %}
+{% block title %}Admin Dashboard - AIS E-Bike Rental{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboards.css' %}">
+<style>
+  /* Custom admin overrides */
+  .dashboard-content {
+    padding: 1.5rem;
+  }
+  
+  .dashboard-header {
+    background: white;
+    border-radius: var(--border-radius-lg);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .welcome-card {
+    background: var(--gradient-primary);
+    color: white;
+    padding: 1.5rem;
+    border-radius: var(--border-radius-lg);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .welcome-card h2 {
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+  
+  .welcome-card p {
+    opacity: 0.9;
+    margin-bottom: 0;
+  }
+  
+  .welcome-card .icon {
+    position: absolute;
+    right: 1.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 4rem;
+    opacity: 0.2;
+  }
+  
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  
+  .stat-card {
+    background: white;
+    border-radius: var(--border-radius-lg);
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+    border-left: 4px solid var(--primary);
+  }
+  
+  .stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+  }
+  
+  .stat-card h3 {
+    font-size: 0.9rem;
+    color: var(--gray);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .stat-card .value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: 0.5rem;
+  }
+  
+  .stat-card .trend {
+    display: flex;
+    align-items: center;
+    font-size: 0.85rem;
+  }
+  
+  .trend.up {
+    color: #10b981;
+  }
+  
+  .trend.down {
+    color: #ef4444;
+  }
+  
+  .section-card {
+    background: white;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow);
+    margin-bottom: 2rem;
+    overflow: hidden;
+  }
+  
+  .section-card .card-header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .section-card .card-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--dark);
+  }
+  
+  .section-card .card-body {
+    padding: 1.5rem;
+  }
+  
+  .table-responsive {
+    border-radius: var(--border-radius);
+    overflow: hidden;
+  }
+  
+  .table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    color: var(--gray);
+  }
+  
+  .badge {
+    padding: 0.35em 0.65em;
+    font-weight: 500;
+  }
+  
+  .chart-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
+  }
+  
+  .activity-item {
+    display: flex;
+    padding: 1rem 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  }
+  
+  .activity-item:last-child {
+    border-bottom: none;
+  }
+  
+  .activity-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(67, 97, 238, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    color: var(--primary);
+    flex-shrink: 0;
+  }
+  
+  .activity-details {
+    flex-grow: 1;
+  }
+  
+  .activity-details p {
+    margin-bottom: 0.25rem;
+  }
+  
+  .activity-time {
+    font-size: 0.8rem;
+    color: var(--gray);
+  }
+  
+  .btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border-radius: 50%;
+  }
+  
+  .avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+  
+  .status-badge.approved {
+    background-color: #e6f7ee;
+    color: #10b981;
+  }
+  
+  .status-badge.pending {
+    background-color: #fff8e6;
+    color: #f59e0b;
+  }
+  
+  .status-badge.rejected {
+    background-color: #fee2e2;
+    color: #ef4444;
+  }
+  
+  .status-badge i {
+    margin-right: 0.25rem;
+  }
+</style>
+{% endblock %}
+
 {% block navbar %}{% endblock %}
 {% block content %}
 <!-- Modern styles are now loaded globally via base.html and static/css/dashboard.css -->
@@ -120,7 +355,19 @@
     </div>
     <!-- Profile and Logout -->
     <div class="d-flex align-items-center mb-3">
-     
+      <div class="text-end">
+        {% if availability_last_sync_date %}
+          <span class="badge rounded-pill bg-success">
+            <i class="bi bi-check2-circle me-1"></i>
+            Availability synced: {{ availability_last_sync_date }}
+          </span>
+        {% else %}
+          <span class="badge rounded-pill bg-secondary">
+            <i class="bi bi-info-circle me-1"></i>
+            Availability sync pending
+          </span>
+        {% endif %}
+      </div>
     </div>
   </div>
 
@@ -809,7 +1056,9 @@
                   <tr>
                     <td class="fw-semibold">{{ item.name }}</td>
                     <td>
-                      {% for _ in "12345"|slice:":" %}{% endfor %}
+                      {% with ''|center:item.rating as range %}
+                        {% for _ in range %}<i class="fas fa-star text-warning"></i>{% endfor %}
+                      {% endwith %}
                       <span class="badge bg-info">{{ item.rating }}/5</span>
                     </td>
                     <td style="max-width: 420px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ item.message }}</td>

@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.utils import timezone
 
 class User(AbstractUser):
     is_rider = models.BooleanField(default=False)
@@ -19,14 +20,105 @@ class EBike(models.Model):
     is_available = models.BooleanField(default=True)
 
 class Booking(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending Approval'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+        ('cancelled', 'Cancelled'),
+    ]
+    
     rider = models.ForeignKey(User, on_delete=models.CASCADE, related_name='bookings')
     ebike = models.ForeignKey(EBike, on_delete=models.CASCADE, related_name='bookings')
-    start_date = models.DateField()
-    end_date = models.DateField()
+    start_date = models.DateField(help_text="Format: YYYY-MM-DD")
+    end_date = models.DateField(help_text="Format: YYYY-MM-DD")
     total_price = models.DecimalField(max_digits=8, decimal_places=2)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
     is_approved = models.BooleanField(default=False)
     is_rejected = models.BooleanField(default=False)
     is_paid = models.BooleanField(default=False)
+    razorpay_payment_id = models.CharField(max_length=100, blank=True, null=True)
+    razorpay_order_id = models.CharField(max_length=100, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def clean(self):
+        from django.core.exceptions import ValidationError
+        from datetime import date
+        
+        # Convert string dates to date objects if needed
+        if isinstance(self.start_date, str):
+            try:
+                from django.utils.dateparse import parse_date
+                self.start_date = parse_date(self.start_date)
+            except (ValueError, TypeError):
+                raise ValidationError({
+                    'start_date': 'Enter a valid date in YYYY-MM-DD format.'
+                })
+                
+        if isinstance(self.end_date, str):
+            try:
+                from django.utils.dateparse import parse_date
+                self.end_date = parse_date(self.end_date)
+            except (ValueError, TypeError):
+                raise ValidationError({
+                    'end_date': 'Enter a valid date in YYYY-MM-DD format.'
+                })
+        
+        # Ensure dates are valid date objects
+        if not isinstance(self.start_date, date) or not isinstance(self.end_date, date):
+            raise ValidationError('Invalid date format. Please use YYYY-MM-DD.')
+        
+        # Ensure end_date is after start_date
+        if self.end_date < self.start_date:
+            raise ValidationError({
+                'end_date': 'End date must be after start date.'
+            })
+            
+        # Ensure dates are not in the past
+        if self.start_date < date.today():
+            raise ValidationError({
+                'start_date': 'Start date cannot be in the past.'
+            })
+            
+        # Call parent's clean method
+        super().clean()
+
+    def save(self, *args, **kwargs):
+        # Convert string dates to date objects if needed
+        if isinstance(self.start_date, str):
+            from django.utils.dateparse import parse_date
+            self.start_date = parse_date(self.start_date) or self.start_date
+            
+        if isinstance(self.end_date, str):
+            from django.utils.dateparse import parse_date
+            self.end_date = parse_date(self.end_date) or self.end_date
+        
+        # Run full validation before saving
+        self.full_clean()
+        
+        # Set timestamps if not set
+        if not self.id and not self.created_at:
+            self.created_at = timezone.now()
+        self.updated_at = timezone.now()
+        
+        # Maintain backward compatibility with is_approved and is_rejected
+        if self.status == 'approved':
+            self.is_approved = True
+            self.is_rejected = False
+        elif self.status == 'rejected':
+            self.is_approved = False
+            self.is_rejected = True
+        else:
+            self.is_approved = False
+            self.is_rejected = False
+            
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.rider.username}'s booking for {self.ebike.name} ({self.get_status_display()})"
 
 class VehicleRegistration(models.Model):
     provider = models.ForeignKey(User, on_delete=models.CASCADE, related_name='vehicle_registrations')
@@ -102,5 +194,3 @@ class ContactMessage(models.Model):
 
     def __str__(self):
         return f"{self.subject} from {self.name}"
-
-

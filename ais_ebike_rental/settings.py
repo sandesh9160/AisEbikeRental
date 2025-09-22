@@ -11,16 +11,23 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+import environ
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# Load .env (development convenience)
+env = environ.Env()
+env_file = os.path.join(BASE_DIR, '.env')
+if os.path.exists(env_file):
+    environ.Env.read_env(env_file)
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '1xa3m_0xij=hrl71mww296skb-$%0&51dp8_tmku0s4g6tm69-'
+SECRET_KEY = env('SECRET_KEY', default='1xa3m_0xij=hrl71mww296skb-$%0&51dp8_tmku0s4g6tm69-')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -37,7 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'core',
+    'core.apps.CoreConfig',
     'riders',
     'admin_dashboard',
 ]
@@ -51,6 +58,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'core.middleware.DailyAvailabilitySyncMiddleware',
 ]
 
 ROOT_URLCONF = 'ais_ebike_rental.urls'
@@ -67,6 +75,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'core.context_processors.unread_notification_count',
+                'core.context_processors.availability_sync_info',
             ],
         },
     },
@@ -152,3 +161,8 @@ else:
 
 # Default receiver for Contact Us submissions (can be overridden by env var)
 CONTACT_RECEIVER_EMAIL = os.environ.get('CONTACT_RECEIVER_EMAIL', 'ebikerental19@gmail.com')
+
+# Payments: Razorpay configuration (set these in your environment for production)
+RAZORPAY_KEY_ID = env('RAZORPAY_KEY_ID', default='')
+RAZORPAY_KEY_SECRET = env('RAZORPAY_KEY_SECRET', default='')
+RAZORPAY_WEBHOOK_SECRET = env('RAZORPAY_WEBHOOK_SECRET', default='')

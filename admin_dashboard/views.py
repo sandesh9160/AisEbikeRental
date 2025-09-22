@@ -91,6 +91,10 @@ def admin_dashboard(request):
     # Recent user reviews for dashboard feedback section
     recent_feedback = Review.objects.all()[:10]
     
+    # Add availability sync date (placeholder for now)
+    from datetime import datetime
+    availability_last_sync_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    
     return render(request, 'admin_dashboard/dashboard.html', {
         'riders': riders,
         'vehicle_providers': vehicle_providers,
@@ -114,20 +118,26 @@ def admin_dashboard(request):
         'unverified_page_obj': unverified_page_obj,
         'prov_q': prov_q,
         'recent_feedback': recent_feedback,
+        'availability_last_sync_date': availability_last_sync_date,
     })
 
 
 @user_passes_test(is_admin)
 def approve_booking(request, booking_id):
-    booking = Booking.objects.get(id=booking_id)
-    booking.is_approved = True
+    booking = get_object_or_404(Booking, id=booking_id)
+    booking.status = 'approved'  # Set status to approved
+    booking.is_approved = True   # Also set is_approved for consistency
+    booking.is_rejected = False  # Reset rejection status
     booking.save()
+
     # Notify the user
     Notification.objects.create(
         recipient=booking.rider,
         message=f"Your booking for {booking.ebike.name} has been approved!",
         link=f"/riders/booking/confirmation/{booking.id}/"
     )
+
+    messages.success(request, f'Booking #{booking.id} has been approved successfully!')
     return redirect('admin_dashboard')
 
 @user_passes_test(is_admin)
@@ -140,9 +150,12 @@ def approve_vehicle_registration(request, registration_id):
 @user_passes_test(is_admin, login_url='login')
 def reject_booking(request, booking_id):
     booking = get_object_or_404(Booking, id=booking_id)
-    booking.is_approved = False
-    booking.is_rejected = True
+    booking.status = 'rejected'  # Set status to rejected
+    booking.is_approved = False  # Reset approval status
+    booking.is_rejected = True   # Set rejection status
     booking.save()
+
+    messages.success(request, f'Booking #{booking.id} has been rejected!')
     return redirect(request.GET.get('next') or reverse('admin_dashboard'))
 
 @user_passes_test(is_admin)
@@ -506,8 +519,9 @@ def bulk_approve_bookings(request):
         approved_count = 0
         
         for booking in bookings:
-            booking.is_approved = True
-            booking.is_rejected = False
+            booking.status = 'approved'  # Set status to approved
+            booking.is_approved = True   # Also set is_approved for consistency
+            booking.is_rejected = False  # Reset rejection status
             booking.save()
             
             # Notify the user
@@ -531,16 +545,17 @@ def bulk_reject_bookings(request):
     """Bulk reject multiple bookings"""
     booking_ids = request.POST.getlist('booking_ids')
     rejection_reason = request.POST.get('rejection_reason', 'No reason provided')
-    
+
     if booking_ids:
         bookings = Booking.objects.filter(id__in=booking_ids, is_approved=False)
         rejected_count = 0
-        
+
         for booking in bookings:
-            booking.is_rejected = True
-            booking.is_approved = False
+            booking.status = 'rejected'  # Set status to rejected
+            booking.is_rejected = True   # Set rejection status
+            booking.is_approved = False  # Reset approval status
             booking.save()
-            
+
             # Notify the user
             Notification.objects.create(
                 recipient=booking.rider,
@@ -548,11 +563,11 @@ def bulk_reject_bookings(request):
                 link=f"/riders/dashboard/"
             )
             rejected_count += 1
-        
+
         messages.success(request, f'Successfully rejected {rejected_count} booking(s)!')
     else:
         messages.error(request, 'No bookings selected for rejection.')
-    
+
     return redirect('admin_dashboard')
 
 
