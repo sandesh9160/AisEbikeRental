@@ -124,105 +124,247 @@
 <!-- Font Awesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
-<div class="container">
-    <h1><i class="fas fa-bolt icon me-2"></i>Welcome to AIS E-bike Rental</h1>
-    <p>Your one-stop solution for affordable and sustainable e-bike rentals.</p>
+<div class="main-content">
+    <div class="container">
+        <div class="hero-section text-center mb-5 fade-in-up">
+            <h1><i class="fas fa-bolt icon me-2"></i>Welcome to AIS E-bike Rental</h1>
+            <p class="lead">Your one-stop solution for affordable and sustainable e-bike rentals.</p>
+        </div>
 
-    <div>
+        <div class="section-container fade-in-up delay-1">
         <h2><i class="fas fa-tools"></i> Our Services</h2>
-        <ul class="service-list">
-            <li><i class="fas fa-bicycle"></i> Affordable e-bike rentals for daily commuting</li>
-            <li><i class="fas fa-sliders-h"></i> Flexible rental plans to suit diverse needs</li>
-            <li><i class="fas fa-mobile-alt"></i> User-friendly web app for easy booking</li>
-            <li><i class="fas fa-shield-alt"></i> Regular maintenance for safety and reliability</li>
-        </ul>
-    </div>
+            <ul class="service-list">
+                <li class="fade-in-up delay-1"><i class="fas fa-bicycle"></i> Affordable e-bike rentals for daily commuting</li>
+                <li class="fade-in-up delay-2"><i class="fas fa-sliders-h"></i> Flexible rental plans to suit diverse needs</li>
+                <li class="fade-in-up delay-3"><i class="fas fa-mobile-alt"></i> User-friendly web app for easy booking</li>
+                <li class="fade-in-up delay-4"><i class="fas fa-shield-alt"></i> Regular maintenance for safety and reliability</li>
+            </ul>
+        </div>
 
-    <div class="how-it-works">
-        <h2><i class="fas fa-cogs"></i> How It Works</h2>
-        <div class="card-style"><i class="fas fa-user-plus"></i> Sign up and log in to your account</div>
-        <div class="card-style"><i class="fas fa-calendar-alt"></i> Choose your preferred e-bike and rental duration</div>
-        <div class="card-style"><i class="fas fa-check-circle"></i> Book the e-bike and wait for admin approval</div>
-        <div class="card-style"><i class="fas fa-road"></i> Ride and enjoy your eco-friendly journey</div>
-    </div>
-
-    <div class="why-choose-us">
-        <h2><i class="fas fa-star"></i> Why Choose Us</h2>
-        <ul class="service-list">
-            <li><i class="fas fa-leaf"></i> Eco-friendly transportation solution</li>
-            <li><i class="fas fa-wallet"></i> Cost-effective daily and weekly plans</li>
-            <li><i class="fas fa-clock"></i> Quick booking and flexible timings</li>
-            <li><i class="fas fa-headset"></i> 24/7 support and assistance</li>
-        </ul>
-    </div>
-
-    <div class="subscribe-section">
-        <h2><i class="fas fa-envelope"></i> Subscribe to our Newsletter</h2>
-        <form>
-            <div class="mb-3 form-check">
-                <div class="custom-checkbox">
-                    <input type="checkbox" id="subscribe">
+        <div class="how-it-works fade-in-up delay-2">
+            <h2><i class="fas fa-cogs"></i> How It Works</h2>
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-3">
+                    <div class="card-style h-100">
+                        <i class="fas fa-user-plus"></i> Sign up and log in to your account
+                    </div>
                 </div>
-                <label class="form-check-label" for="subscribe">I agree to receive newsletters and promotional offers.</label>
-            </div>
-            <button type="submit" class="subscribe-button mt-2"><i class="fas fa-paper-plane me-1"></i>Subscribe</button>
-        </form>
-    </div>
-    <!-- Testimonial Carousel -->
-<div class="container my-5">
-    <h2 class="text-center"><i class="fas fa-users"></i> What Our Riders Say</h2>
-    <div id="testimonialCarousel" class="carousel slide mt-4" data-bs-ride="carousel">
-        <div class="carousel-inner text-center">
-            <div class="carousel-item active">
-                <blockquote class="blockquote">
-                    <p class="mb-3">“Easy booking process and the bike was in top condition. Loved it!”</p>
-                    <footer class="blockquote-footer">Ravi Kumar, Hyderabad</footer>
-                </blockquote>
-            </div>
-            <div class="carousel-item">
-                <blockquote class="blockquote">
-                    <p class="mb-3">“Affordable, reliable, and environment-friendly. Highly recommended!”</p>
-                    <footer class="blockquote-footer">Sneha Reddy, Bangalore</footer>
-                </blockquote>
-            </div>
-            <div class="carousel-item">
-                <blockquote class="blockquote">
-                    <p class="mb-3">“Customer support was super responsive when I had a question.”</p>
-                    <footer class="blockquote-footer">Arjun Mehta, Hyderabad</footer>
-                </blockquote>
+                <div class="col-md-6 col-lg-3">
+                    <div class="card-style h-100">
+                        <i class="fas fa-calendar-alt"></i> Choose your preferred e-bike and rental duration
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="card-style h-100">
+                        <i class="fas fa-check-circle"></i> Book the e-bike and wait for admin approval
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="card-style h-100">
+                        <i class="fas fa-road"></i> Ride and enjoy your eco-friendly journey
+                    </div>
+                </div>
             </div>
         </div>
-        <button class="carousel-control-prev" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon bg-dark rounded-circle" aria-hidden="true"></span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="next">
-            <span class="carousel-control-next-icon bg-dark rounded-circle" aria-hidden="true"></span>
-        </button>
+
+        <div class="why-choose-us fade-in-up delay-3">
+            <h2><i class="fas fa-star"></i> Why Choose Us</h2>
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="card-style h-100">
+                        <i class="fas fa-leaf"></i> Eco-friendly transportation solution
+                        <p class="mt-2 mb-0">Reduce your carbon footprint with our zero-emission e-bikes.</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card-style h-100">
+                        <i class="fas fa-wallet"></i> Cost-effective plans
+                        <p class="mt-2 mb-0">Affordable daily and weekly rental options to fit any budget.</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card-style h-100">
+                        <i class="fas fa-clock"></i> Flexible bookings
+                        <p class="mt-2 mb-0">Book in advance or on-demand with our easy-to-use platform.</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card-style h-100">
+                        <i class="fas fa-headset"></i> 24/7 support
+                        <p class="mt-2 mb-0">Our team is always ready to assist you with any queries.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="subscribe-section fade-in-up delay-4">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <h2><i class="fas fa-envelope"></i> Stay Updated</h2>
+                    <p class="mb-4">Subscribe to our newsletter for the latest offers and updates</p>
+                    <form class="needs-validation" novalidate>
+                        <div class="row g-3">
+                            <div class="col-md-8">
+                                <input type="email" class="form-control form-control-lg" placeholder="Enter your email" required>
+                                <div class="invalid-feedback">
+                                    Please provide a valid email address.
+                                </div>
+                            </div>
+                            <div class="col-md-4 d-grid">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-paper-plane me-2"></i>Subscribe
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-check mt-3">
+                            <input class="form-check-input" type="checkbox" id="subscribe" required>
+                            <label class="form-check-label small" for="subscribe">
+                                I agree to receive newsletters and promotional offers.
+                            </label>
+                            <div class="invalid-feedback">
+                                You must agree before subscribing.
+                            </div>
+                </div>
+                <div class="carousel-item">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-8">
+                            <blockquote class="blockquote">
+                                <p class="mb-4">"Affordable, reliable, and environment-friendly. The customer support team is always helpful whenever I have questions. Highly recommended!"</p>
+                                <footer class="blockquote-footer">Sneha Reddy, Bangalore</footer>
+                            </blockquote>
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-8">
+                            <blockquote class="blockquote">
+                                <p class="mb-4">"I was impressed by how responsive the support team was when I had a question about my booking. The whole experience has been fantastic!"</p>
+                                <footer class="blockquote-footer">Arjun Mehta, Hyderabad</footer>
+                            </blockquote>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
     </div>
 </div>
 
-<!-- Intro Video Section -->
-<div class="container my-5">
-    <h2 class="text-center"><i class="fas fa-play-circle"></i> How It Works — Watch Video</h2>
-    <div class="ratio ratio-16x9 mt-3 rounded shadow">
-        <iframe src="https://www.youtube.com/embed/v3sYHtdykN4" title="AIS E-Bike Rental Intro" allowfullscreen></iframe>
+<!-- Video Section -->
+<div class="video-section py-5 bg-light fade-in-up delay-3">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="text-center mb-5">
+                    <h2><i class="fas fa-play-circle"></i> How It Works</h2>
+                    <p class="lead">Watch our quick guide to renting an e-bike</p>
+                </div>
+                <div class="ratio ratio-16x9 rounded-4 shadow-lg overflow-hidden">
+                    <iframe src="https://www.youtube.com/embed/v3sYHtdykN4" title="AIS E-Bike Rental - How It Works" allowfullscreen></iframe>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
-
-    <div class="customer-support">
-        <h2><i class="fas fa-headphones-alt"></i> Customer Support</h2>
-        <p>Have questions or need help with your booking?</p>
-        <p><i class="fas fa-envelope"></i> support@aisebike.com</p>
-        <p><i class="fas fa-phone"></i> +91-98765-43210</p>
-    </div>
-
-    <div class="office-addresses">
-        <h2><i class="fas fa-map-marker-alt"></i> Our Office Addresses</h2>
-        <address>
-            <p><i class="fas fa-map-pin me-1"></i> Kondapur, Hyderabad - 500055</p>
-            <p><i class="fas fa-map-pin me-1"></i> Bangalore - HSR Layout, 560102</p>
-        </address>
+<!-- Contact & Support -->
+<div class="contact-section fade-in-up delay-4">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="customer-support h-100">
+                    <h2><i class="fas fa-headset"></i> Customer Support</h2>
+                    <p class="lead">Have questions or need help with your booking?</p>
+                    <div class="contact-methods mt-4">
+                        <p class="d-flex align-items-center">
+                            <i class="fas fa-envelope me-3"></i>
+                            <a href="mailto:support@aisebike.com" class="text-decoration-none">support@aisebike.com</a>
+                        </p>
+                        <p class="d-flex align-items-center">
+                            <i class="fas fa-phone me-3"></i>
+                            <a href="tel:+919876543210" class="text-decoration-none">+91 98765 43210</a>
+                        </p>
+                        <p class="d-flex align-items-center">
+                            <i class="fab fa-whatsapp me-3"></i>
+                            <a href="https://wa.me/919876543210" class="text-decoration-none">Chat on WhatsApp</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="office-addresses h-100">
+                    <h2><i class="fas fa-map-marker-alt"></i> Our Offices</h2>
+                    <div class="address-cards mt-4">
+                        <div class="address-card mb-4">
+                            <h5><i class="fas fa-city me-2"></i>Hyderabad Office</h5>
+                            <address class="mt-3">
+                                <p class="mb-1"><i class="fas fa-map-pin me-2"></i> 123 Tech Park, Hitech City</p>
+                                <p class="mb-1">Kondapur, Hyderabad - 500055</p>
+                                <p class="mb-0"><i class="fas fa-clock me-2"></i> Mon-Sat: 9:00 AM - 8:00 PM</p>
+                            </address>
+                        </div>
+                        <div class="address-card">
+                            <h5><i class="fas fa-city me-2"></i>Bangalore Office</h5>
+                            <address class="mt-3">
+                                <p class="mb-1"><i class="fas fa-map-pin me-2"></i> 456 Startup Hub</p>
+                                <p class="mb-1">HSR Layout, Bangalore - 560102</p>
+                                <p class="mb-0"><i class="fas fa-clock me-2"></i> Mon-Sat: 9:00 AM - 8:00 PM</p>
+                            </address>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
+<!-- Back to Top Button -->
+<button onclick="topFunction()" id="backToTop" class="btn btn-primary btn-lg rounded-circle shadow" title="Go to top">
+    <i class="fas fa-arrow-up"></i>
+</button>
+
+<script>
+    // Back to top button
+    let mybutton = document.getElementById("backToTop");
+
+    // When the user scrolls down 20px from the top, show the button
+    window.onscroll = function() {scrollFunction()};
+
+    function scrollFunction() {
+        if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+            mybutton.style.display = "block";
+        } else {
+            mybutton.style.display = "none";
+        }
+    }
+
+    // When the user clicks on the button, scroll to the top
+    function topFunction() {
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+
+    // Form validation
+    (function () {
+        'use strict'
+        var forms = document.querySelectorAll('.needs-validation')
+        Array.prototype.slice.call(forms)
+            .forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    form.classList.add('was-validated')
+                }, false)
+            })
+    })()
+</script>
 {% endblock %}

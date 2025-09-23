@@ -28,6 +28,26 @@ class ContactMessageAdmin(admin.ModelAdmin):
 
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
-    list_display = ('name', 'rating', 'created_at')
-    list_filter = ('rating', 'created_at')
-    search_fields = ('name', 'message')
+    list_display = ('name', 'user', 'rating', 'is_approved', 'created_at', 'updated_at')
+    list_filter = ('is_approved', 'rating', 'created_at')
+    search_fields = ('name', 'message', 'user__username')
+    list_editable = ('is_approved',)
+    readonly_fields = ('created_at', 'updated_at')
+    fieldsets = (
+        (None, {
+            'fields': ('user', 'name', 'rating', 'message', 'is_approved')
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('user')
+        
+    def save_model(self, request, obj, form, change):
+        # If user is authenticated and name is not set, use username
+        if obj.user and not obj.name:
+            obj.name = obj.user.username
+        super().save_model(request, obj, form, change)

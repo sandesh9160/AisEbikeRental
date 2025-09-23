@@ -1,0 +1,205 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<!-- Font Awesome CDN for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+<style>
+  body {
+    background: linear-gradient(120deg, #e0eafc 0%, #cfdef3 100%);
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 100vh;
+  }
+  .login-container {
+    max-width: 400px;
+    margin: 60px auto;
+    background: rgba(255, 255, 255, 0.55);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.10);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-radius: 20px;
+    padding: 36px 32px 28px 32px;
+    animation: fadeIn 0.5s ease-in-out;
+    border: 1px solid rgba(255,255,255,0.22);
+  }
+  .login-title {
+    background: linear-gradient(90deg, #5a8dee 0%, #6fc3f7 100%);
+    color: #fff;
+    padding: 18px 0;
+    border-radius: 14px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.6rem;
+    letter-spacing: 1px;
+    margin-bottom: 18px;
+    box-shadow: 0 4px 12px rgba(90, 141, 238, 0.13);
+  }
+  .input-group {
+    position: relative;
+    margin-bottom: 22px;
+  }
+  .input-group .fa-solid {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #5a8dee;
+    font-size: 1.1rem;
+    opacity: 0.65;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .input-group input,
+  .input-group select,
+  .input-group textarea {
+    width: 100%;
+    padding: 12px 16px 12px 44px;
+    border: 1px solid #e0e6ed;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    background-color: #f8fafc;
+    color: #1e293b;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+  .input-group input:focus,
+  .input-group select:focus,
+  .input-group textarea:focus {
+    border-color: #5a8dee;
+    box-shadow: 0 0 0 3px rgba(90, 141, 238, 0.2);
+    outline: none;
+  }
+  .btn-login {
+    background: linear-gradient(90deg, #5a8dee 0%, #6fc3f7 100%);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1rem;
+    width: 100%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+    box-shadow: 0 4px 12px rgba(90, 141, 238, 0.2);
+  }
+  .btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(90, 141, 238, 0.3);
+  }
+  .forgot-password {
+    text-align: right;
+    margin: 12px 0 20px;
+  }
+  .forgot-password a {
+    color: #5a8dee;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+  }
+  .forgot-password a:hover {
+    text-decoration: underline;
+  }
+  .signup-link {
+    text-align: center;
+    margin-top: 20px;
+    color: #64748b;
+    font-size: 0.95rem;
+  }
+  .signup-link a {
+    color: #5a8dee;
+    font-weight: 600;
+    text-decoration: none;
+    margin-left: 5px;
+    transition: all 0.2s ease;
+  }
+  .signup-link a:hover {
+    text-decoration: underline;
+  }
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .error-message {
+    color: #ef4444;
+    font-size: 0.9rem;
+    margin-top: 5px;
+    display: block;
+  }
+</style>
+
+<div class="login-container">
+  <div class="login-title">
+    <i class="fas fa-biking me-2"></i> AIS E-Bike Rental
+  </div>
+  
+  {% if form.errors %}
+  <div class="alert alert-danger" role="alert">
+    <i class="fas fa-exclamation-circle me-2"></i>
+    Your username and password didn't match. Please try again.
+  </div>
+  {% endif %}
+
+  {% if next %}
+    {% if user.is_authenticated %}
+    <div class="alert alert-warning" role="alert">
+      <i class="fas fa-exclamation-triangle me-2"></i>
+      Your account doesn't have access to this page. To proceed, please login with an account that has access.
+    </div>
+    {% else %}
+    <div class="alert alert-info" role="alert">
+      <i class="fas fa-info-circle me-2"></i>
+      Please login to see this page.
+    </div>
+    {% endif %}
+  {% endif %}
+
+  <form method="post" action="{% url 'login' %}">
+    {% csrf_token %}
+    
+    <div class="input-group">
+      <i class="fas fa-user"></i>
+      <input type="text" name="username" id="id_username" class="form-control" placeholder="Username" required autofocus>
+    </div>
+    
+    <div class="input-group">
+      <i class="fas fa-lock"></i>
+      <input type="password" name="password" id="id_password" class="form-control" placeholder="Password" required>
+    </div>
+    
+    <div class="forgot-password">
+      <a href="{% url 'password_reset' %}">Forgot password?</a>
+    </div>
+    
+    <button type="submit" class="btn-login">
+      <i class="fas fa-sign-in-alt me-2"></i> Sign In
+    </button>
+    
+    <input type="hidden" name="next" value="{{ next }}">
+  </form>
+  
+  <div class="signup-link">
+    Don't have an account? <a href="{% url 'signup' %}">Sign up</a>
+  </div>
+</div>
+
+<script>
+  // Add animation to form inputs on focus
+  document.querySelectorAll('.input-group input').forEach(input => {
+    input.addEventListener('focus', function() {
+      this.parentElement.querySelector('.fa-solid').style.opacity = '1';
+      this.parentElement.querySelector('.fa-solid').style.transform = 'translateY(-50%) scale(1.1)';
+    });
+    
+    input.addEventListener('blur', function() {
+      this.parentElement.querySelector('.fa-solid').style.opacity = '0.65';
+      this.parentElement.querySelector('.fa-solid').style.transform = 'translateY(-50%)';
+    });
+  });
+</script>
+{% endblock %}

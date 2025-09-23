@@ -21,13 +21,14 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('core.urls')),
-    path('riders/', include('riders.urls')),
-    path('vehicle-providers/', include('vehicle_providers.urls')),
+    path('rider/', include('riders.urls')),
+    path('provider/', include('vehicle_providers.urls')),
     path('admin-dashboard/', include('admin_dashboard.urls')),
-]
+    
+    # Auth URLs
+    path('accounts/', include('django.contrib.auth.urls')),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # Serve static and media files during development
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-

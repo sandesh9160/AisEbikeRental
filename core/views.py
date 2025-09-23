@@ -41,14 +41,28 @@ def custom_login(request):
             messages.error(request, 'Invalid username or password.')
     return render(request, 'core/login.html')
 
+from .forms import ReviewForm
+
 @csrf_protect
 def submit_review(request):
     if request.method == "POST":
-        name = request.POST.get("name")
-        rating = request.POST.get("rating")
-        message = request.POST.get("message")
-        Review.objects.create(name=name, rating=rating, message=message)
-        return redirect('home')
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)
+            if request.user.is_authenticated:
+                review.user = request.user
+            review.save()
+            messages.success(request, "Thank you for your review!")
+            return redirect('home')
+        else:
+            # If form is not valid, show error messages
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field}: {error}")
+            return redirect('home')
+    
+    # If not a POST request, redirect to home
+    return redirect('home')
 
 def about(request):
     return render(request, 'core/about.html')

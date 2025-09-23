@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, PasswordResetForm
 from django.contrib.auth import get_user_model
-from .models import User as CustomUser
+from .models import User as CustomUser, Review
 
 User = get_user_model()
 
@@ -51,6 +51,37 @@ class CustomPasswordResetForm(PasswordResetForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['email'].label = 'Email Address'
+
+
+class ReviewForm(forms.ModelForm):
+    class Meta:
+        model = Review
+        fields = ['name', 'rating', 'message']
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Your Name',
+                'required': True
+            }),
+            'rating': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': 1,
+                'max': 5,
+                'required': True
+            }),
+            'message': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 4,
+                'placeholder': 'Share your experience...',
+                'required': True
+            })
+        }
+
+    def clean_rating(self):
+        rating = self.cleaned_data.get('rating')
+        if rating is not None and (rating < 1 or rating > 5):
+            raise forms.ValidationError("Rating must be between 1 and 5")
+        return rating
 
 
 class PasswordResetConfirmForm(forms.Form):

@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 class User(AbstractUser):
     is_rider = models.BooleanField(default=False)
@@ -161,10 +162,22 @@ class ProviderDocument(models.Model):
 
 
 class Review(models.Model):
-    name = models.CharField(max_length=100)
-    rating = models.IntegerField()
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='reviews')
+    name = models.CharField(max_length=100, blank=True, null=True)
+    rating = models.PositiveIntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
     message = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    is_approved = models.BooleanField(default=False, help_text="Should this review be shown on the website?")
+
+    def save(self, *args, **kwargs):
+        # If user is authenticated and name is not provided, use user's username
+        if self.user and not self.name:
+            self.name = self.user.username
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"Review by {self.name or 'Anonymous'} - {self.rating} stars"
 
 
 class Notification(models.Model):
