@@ -1,6 +1,10 @@
+"""
+Views for the core application of the AisEbikeRental system.
+"""
+
+# Django imports
 from django.shortcuts import render, redirect
-from django.contrib.auth import login, authenticate
-from django.contrib.auth import logout as auth_logout
+from django.contrib.auth import login, authenticate, logout as auth_logout
 from django.contrib.auth.models import User as AuthUser
 from django.contrib import messages
 from django.http import HttpResponseRedirect, JsonResponse
@@ -12,17 +16,31 @@ from django.utils.encoding import force_bytes, force_str
 from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from .models import EBike, User, Review, ContactMessage
-from .forms import SignUpForm, ProfileUpdateForm, CustomPasswordResetForm, PasswordResetConfirmForm
-from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.template.loader import render_to_string
 
+# Local imports
+from .models import EBike, User, Review, ContactMessage, Favorite
+from .forms import SignUpForm, ProfileUpdateForm, CustomPasswordResetForm, PasswordResetConfirmForm, ReviewForm
+
 def home(request):
+    """
+    Home page view displaying featured available e-bikes.
+
+    Shows up to 5 available e-bikes on the main page.
+    """
     ebikes = EBike.objects.filter(is_available=True)[:5]
     return render(request, 'core/home.html', {'ebikes': ebikes})
 
+
 @csrf_protect
 def custom_login(request):
+    """
+    Custom login view with role-based redirection.
+
+    Authenticates user and redirects to appropriate dashboard
+    based on user role (rider, provider, or staff).
+    """
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -41,10 +59,15 @@ def custom_login(request):
             messages.error(request, 'Invalid username or password.')
     return render(request, 'core/login.html')
 
-from .forms import ReviewForm
 
 @csrf_protect
 def submit_review(request):
+    """
+    Handle review submission from users.
+
+    Validates review form and saves review to database,
+    associating with authenticated user if available.
+    """
     if request.method == "POST":
         form = ReviewForm(request.POST)
         if form.is_valid():
@@ -60,14 +83,27 @@ def submit_review(request):
                 for error in errors:
                     messages.error(request, f"{field}: {error}")
             return redirect('home')
-    
+
     # If not a POST request, redirect to home
     return redirect('home')
 
+
 def about(request):
+    """
+    About page view.
+
+    Displays information about the e-bike rental service.
+    """
     return render(request, 'core/about.html')
 
+
 def signup(request):
+    """
+    User registration view.
+
+    Creates new user account and automatically logs them in,
+    then redirects to appropriate dashboard based on user role.
+    """
     if request.method == 'POST':
         form = SignUpForm(request.POST)
         if form.is_valid():
@@ -81,9 +117,23 @@ def signup(request):
         form = SignUpForm()
     return render(request, 'core/signup.html', {'form': form})
 
+
 def ebikes(request):
+    """
+    E-bikes listing page view.
+
+    Displays all available e-bikes with user's favorite selections
+    highlighted for authenticated users.
+    """
     ebikes = EBike.objects.filter(is_available=True)
-    return render(request, 'core/ebikes.html', {'ebikes': ebikes})
+    # Get user's favorite bike IDs if logged in
+    favorite_ids = []
+    if request.user.is_authenticated:
+        favorite_ids = list(Favorite.objects.filter(user=request.user).values_list('ebike_id', flat=True))
+    return render(request, 'core/ebikes.html', {
+        'ebikes': ebikes,
+        'favorite_ids': favorite_ids
+    })
 
 @login_required
 def profile_update(request):
@@ -214,8 +264,52 @@ def password_reset_done(request):
     return render(request, 'core/password_reset_done.html')
 
 
+@csrf_exempt
+@login_required
+def toggle_favorite(request, ebike_id):
+    """Toggle favorite status for an e-bike"""
+    if request.method == 'POST':
+        try:
+            ebike = EBike.objects.get(id=ebike_id)
+            favorite, created = Favorite.objects.get_or_create(user=request.user, ebike=ebike)
+            
+            if not created:
+                # Already favorited, so remove it
+                favorite.delete()
+                is_favorite = False
+            else:
+                is_favorite = True
+            
+            return JsonResponse({
+                'success': True,
+                'is_favorite': is_favorite,
+                'message': 'Added to favorites' if is_favorite else 'Removed from favorites'
+            })
+        except EBike.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'E-bike not found'}, status=404)
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)}, status=500)
+    return JsonResponse({'success': False, 'error': 'Invalid request'}, status=400)
+
+
+@login_required
+def my_favorites(request):
+    """View user's favorite e-bikes"""
+    favorites = Favorite.objects.filter(user=request.user).select_related('ebike')
+    favorite_ebikes = [favorite.ebike for favorite in favorites]
+    return render(request, 'core/favorites.html', {
+        'favorite_ebikes': favorite_ebikes,
+        'favorites_count': len(favorite_ebikes)
+    })
+
+
 def contact(request):
-    """Contact Us page: saves message to DB and emails site owner."""
+    """
+    Contact Us page: saves message to DB and emails both admin and user.
+
+    Stores contact form submission in database, emails admin for processing,
+    and sends acknowledgment email to the person who submitted the form.
+    """
     if request.method == 'POST':
         name = request.POST.get('name', '').strip()
         email = request.POST.get('email', '').strip()
@@ -231,23 +325,55 @@ def contact(request):
         # Save to DB
         ContactMessage.objects.create(name=name, email=email, subject=subject, message=message)
 
-        # Send email to admin/owner
-        to_email = getattr(settings, 'CONTACT_RECEIVER_EMAIL', None) or getattr(settings, 'DEFAULT_FROM_EMAIL', None)
-        if to_email:
+        # Send email to admin/owner for processing
+        admin_email = getattr(settings, 'CONTACT_RECEIVER_EMAIL', None) or getattr(settings, 'DEFAULT_FROM_EMAIL', None)
+        if admin_email:
             try:
                 send_mail(
                     subject=f"[Contact] {subject}",
-                    message=f"From: {name} <{email}>\n\n{message}",
+                    message=f"From: {name} <{email}>\n\nSubject: {subject}\n\n{message}",
                     from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', email),
-                    recipient_list=[to_email],
+                    recipient_list=[admin_email],
                     fail_silently=True,
                 )
             except Exception:
-                # Silently ignore email failures but still accept the submission
+                # Silently ignore admin email failures but still accept the submission
                 pass
 
-        messages.success(request, 'Thanks for contacting us! We will get back to you soon.')
+        # Send acknowledgment email to the person who submitted the form
+        try:
+            acknowledgment_subject = f"We received your message: {subject}"
+            acknowledgment_message = f"""
+Dear {name},
+
+Thank you for contacting AIS E-bike Rental! We have received your message and appreciate you reaching out to us.
+
+Your inquiry details:
+Subject: {subject}
+Message: {message}
+
+Our team will review your message and get back to you within 24-48 hours. If you need immediate assistance, please call us at +91 XXXXX XXXXX.
+
+We look forward to helping you with your e-bike rental needs!
+
+Best regards,
+AIS E-bike Rental Team
+support@aisebikerental.com
++91 XXXXX XXXXX
+            """.strip()
+
+            send_mail(
+                subject=acknowledgment_subject,
+                message=acknowledgment_message,
+                from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', 'support@aisebikerental.com'),
+                recipient_list=[email],
+                fail_silently=True,
+            )
+        except Exception:
+            # Don't fail the submission if user acknowledgment email fails
+            pass
+
+        messages.success(request, 'Thanks for contacting us! We\'ve received your message and sent you an acknowledgment email.')
         return redirect('contact')
 
     return render(request, 'core/contact.html')
-

@@ -1,49 +1,368 @@
 {% extends 'core/base.html' %}
+{% load static %}
 {% block title %}Contact Us - AIS E-bike Rental{% endblock %}
+
 {% block content %}
-<div class="container-xxl py-4">
-  <div class="row justify-content-center">
-    <div class="col-lg-8">
-      <div class="card shadow-soft border-0 rounded-20">
-        <div class="card-header bg-dark text-white rounded-20">
-          <h3 class="mb-0"><i class="fas fa-envelope me-2"></i>Contact Us</h3>
-        </div>
-        <div class="card-body p-4">
-          {% if messages %}
-            {% for message in messages %}
-              <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
-            {% endfor %}
-          {% endif %}
-          <form method="post" novalidate>
-            {% csrf_token %}
-            <div class="row g-3">
-              <div class="col-md-6">
-                <label class="form-label fw-semibold"><i class="fas fa-user me-1"></i>Name</label>
-                <input type="text" name="name" class="form-control" required value="{{ prefill.name|default:'' }}" placeholder="Your full name">
-              </div>
-              <div class="col-md-6">
-                <label class="form-label fw-semibold"><i class="fas fa-at me-1"></i>Email</label>
-                <input type="email" name="email" class="form-control" required value="{{ prefill.email|default:'' }}" placeholder="you@example.com">
-              </div>
-              <div class="col-12">
-                <label class="form-label fw-semibold"><i class="fas fa-heading me-1"></i>Subject</label>
-                <input type="text" name="subject" class="form-control" required value="{{ prefill.subject|default:'' }}" placeholder="How can we help?">
-              </div>
-              <div class="col-12">
-                <label class="form-label fw-semibold"><i class="fas fa-comment-dots me-1"></i>Message</label>
-                <textarea name="message" class="form-control" rows="6" required placeholder="Write your message here...">{{ prefill.message|default:'' }}</textarea>
-              </div>
-            </div>
-            <div class="d-flex justify-content-end mt-4">
-              <button type="submit" class="btn btn-primary px-4"><i class="fas fa-paper-plane me-2"></i>Send Message</button>
-            </div>
-          </form>
-        </div>
-      </div>
-      <div class="mt-4 text-muted small">
-        <i class="fas fa-shield-alt me-1"></i>Your information will only be used to contact you regarding your inquiry.
-      </div>
+<style>
+  /* Modern Contact Page Styles */
+  :root {
+    --primary: #4a6bff;
+    --primary-light: #eef1ff;
+    --success: #10b981;
+    --gray: #6b7280;
+    --dark: #1f2937;
+    --gradient: linear-gradient(135deg, var(--primary), #6c63ff);
+    --shadow: 0 4px 20px rgba(74, 107, 255, 0.1);
+    --contact-bg: linear-gradient(to bottom right, #f3f4f6, #e5e7eb);
+  }
+
+  .contact-hero {
+    background: var(--gradient);
+    color: white;
+    padding: 6rem 0 4rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .contact-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    opacity: 0.3;
+  }
+
+  .contact-hero-content {
+    position: relative;
+    z-index: 2;
+  }
+
+  .contact-hero-title {
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+  }
+
+  .contact-hero-subtitle {
+    font-size: 1.25rem;
+    margin-bottom: 0;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    opacity: 0.9;
+  }
+
+  .contact-content {
+    background: var(--contact-bg);
+    padding: 5rem 0;
+  }
+
+  .contact-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border: none;
+    overflow: hidden;
+    margin-bottom: 2rem;
+  }
+
+  .contact-card-header {
+    background: var(--gradient);
+    color: white;
+    padding: 2rem;
+    text-align: center;
+  }
+
+  .contact-card-header h3 {
+    margin: 0;
+    font-weight: 700;
+    font-size: 1.5rem;
+  }
+
+  .contact-card-body {
+    padding: 2.5rem;
+  }
+
+  .contact-form .form-label {
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 0.5rem;
+  }
+
+  .contact-form .form-control {
+    border-radius: 12px;
+    padding: 0.875rem 1rem;
+    border: 2px solid #e2e8f0;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+  }
+
+  .contact-form .form-control:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(74, 107, 255, 0.1);
+  }
+
+  .contact-form .form-control:invalid {
+    border-color: #dc3545;
+  }
+
+  .contact-form textarea.form-control {
+    resize: vertical;
+    min-height: 120px;
+  }
+
+  .contact-submit-btn {
+    background: var(--gradient);
+    border: none;
+    padding: 0.875rem 2rem;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+  }
+
+  .contact-submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(74, 107, 255, 0.3);
+  }
+
+  .contact-info-section {
+    background: white;
+    border-radius: 20px;
+    padding: 3rem 2rem;
+    height: fit-content;
+  }
+
+  .contact-info-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    border-radius: 12px;
+    background: var(--primary-light);
+    transition: all 0.3s ease;
+  }
+
+  .contact-info-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(74, 107, 255, 0.15);
+  }
+
+  .contact-info-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--gradient);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    margin-right: 1rem;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+
+  .contact-info-content h5 {
+    margin-bottom: 0.25rem;
+    font-weight: 600;
+    color: var(--dark);
+  }
+
+  .contact-info-content p {
+    margin: 0;
+    color: var(--gray);
+  }
+
+  .security-notice {
+    text-align: center;
+    padding: 2rem 0;
+    color: var(--gray);
+    border-top: 1px solid #e2e8f0;
+    margin-top: 2rem;
+  }
+
+  .security-notice i {
+    color: var(--success);
+    margin-right: 0.5rem;
+  }
+
+  /* Responsive Adjustmen\ts */
+  @media (max-width: 768px) {
+    .contact-hero-title {
+      font-size: 2.5rem;
+    }
+
+    .contact-hero-subtitle {
+      font-size: 1.1rem;
+    }
+
+    .contact-card-body {
+      padding: 2rem 1.5rem;
+    }
+
+    .contact-info-section {
+      margin-top: 2rem;
+    }
+
+    .contact-info-item {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .contact-info-icon {
+      margin-bottom: 1rem;
+      margin-right: 0;
+    }
+  }
+</style>
+
+<!-- Contact Hero Section -->
+<section class="contact-hero">
+  <div class="container">
+    <div class="contact-hero-content">
+      <h1 class="contact-hero-title">
+        <i class="fas fa-envelope me-3"></i>Get In Touch
+      </h1>
+      <p class="contact-hero-subtitle">
+        Have questions about our e-bike rental service? We're here to help! Send us a message and we'll get back to you as soon as possible.
+      </p>
     </div>
   </div>
-</div>
+</section>
+
+<!-- Main Contact Content -->
+<section class="contact-content">
+  <div class="container">
+    <div class="row g-4">
+
+      <!-- Contact Form -->
+      <div class="col-lg-8">
+        <div class="contact-card">
+          <div class="contact-card-header">
+            <h3><i class="fas fa-paper-plane me-2"></i>Send us a Message</h3>
+          </div>
+          <div class="contact-card-body">
+
+            {% if messages %}
+              {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show mb-4" role="alert">
+                  {{ message }}
+                  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+              {% endfor %}
+            {% endif %}
+
+            <form method="post" class="contact-form" novalidate>
+              {% csrf_token %}
+              <div class="row g-3">
+
+                <div class="col-md-6">
+                  <label class="form-label"><i class="fas fa-user me-2"></i>Name</label>
+                  <input type="text" name="name" class="form-control"
+                         required value="{{ prefill.name|default:'' }}"
+                         placeholder="Enter your full name">
+                  <div class="invalid-feedback">Please provide your name.</div>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label"><i class="fas fa-envelope me-2"></i>Email</label>
+                  <input type="email" name="email" class="form-control"
+                         required value="{{ prefill.email|default:'' }}"
+                         placeholder="your.email@example.com">
+                  <div class="invalid-feedback">Please provide a valid email address.</div>
+                </div>
+
+                <div class="col-12">
+                  <label class="form-label"><i class="fas fa-tag me-2"></i>Subject</label>
+                  <input type="text" name="subject" class="form-control"
+                         required value="{{ prefill.subject|default:'' }}"
+                         placeholder="What's this about?">
+                  <div class="invalid-feedback">Please provide a subject.</div>
+                </div>
+
+                <div class="col-12">
+                  <label class="form-label"><i class="fas fa-comment me-2"></i>Message</label>
+                  <textarea name="message" class="form-control" rows="6" required
+                            placeholder="Tell us how we can help you...">{{ prefill.message|default:'' }}</textarea>
+                  <div class="invalid-feedback">Please provide your message.</div>
+                </div>
+
+              </div>
+
+              <div class="d-flex justify-content-end mt-4">
+                <button type="submit" class="contact-submit-btn">
+                  <i class="fas fa-paper-plane me-2"></i>Send Message
+                </button>
+              </div>
+            </form>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact Information -->
+      <div class="col-lg-4">
+        <div class="contact-info-section">
+
+          <h4 class="mb-4 text-center fw-bold" style="color: var(--dark);">
+            <i class="fas fa-info-circle me-2"></i>Contact Information
+          </h4>
+
+          <div class="contact-info-item">
+            <div class="contact-info-icon">
+              <i class="fas fa-envelope"></i>
+            </div>
+            <div class="contact-info-content">
+              <h5>Email Support</h5>
+              <p>support@aisebikerental.com</p>
+            </div>
+          </div>
+
+          <div class="contact-info-item">
+            <div class="contact-info-icon">
+              <i class="fas fa-phone"></i>
+            </div>
+            <div class="contact-info-content">
+              <h5>Phone Support</h5>
+              <p>+91 XXXXX XXXXX</p>
+            </div>
+          </div>
+
+          <div class="contact-info-item">
+            <div class="contact-info-icon">
+              <i class="fas fa-clock"></i>
+            </div>
+            <div class="contact-info-content">
+              <h5>Business Hours</h5>
+              <p>Mon-Fri: 9 AM - 6 PM<br>Weekend: 10 AM - 4 PM</p>
+            </div>
+          </div>
+
+          <div class="contact-info-item">
+            <div class="contact-info-icon">
+              <i class="fas fa-map-marker-alt"></i>
+            </div>
+            <div class="contact-info-content">
+              <h5>Office Address</h5>
+              <p>Tech Park, Whitefield<br>Bangalore, Karnataka - 560066</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Security Notice -->
+    <div class="security-notice">
+      <i class="fas fa-shield-alt"></i>
+      Your information is safe and secure with us. We respect your privacy and never share your personal details.
+    </div>
+  </div>
+</section>
+
 {% endblock %}

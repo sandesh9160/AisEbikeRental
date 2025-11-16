@@ -199,6 +199,130 @@
     position: relative;
     overflow: hidden;
   }
+  
+  /* Review Cards */
+  .review-card {
+    background: white;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.03);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .review-card::before {
+    content: '"';
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-family: Georgia, serif;
+    font-size: 80px;
+    color: rgba(74, 107, 255, 0.1);
+    line-height: 1;
+    z-index: 0;
+  }
+  
+  .review-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+  }
+  
+  .review-card .review-rating .badge {
+    font-weight: 500;
+    padding: 0.4rem 0.8rem;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    transition: all 0.3s ease;
+  }
+  
+  .review-card .review-rating .badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05);
+  }
+  
+  /* Star Rating */
+  .star-rating {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    margin-bottom: 1rem;
+  }
+  
+  .star-rating input {
+    display: none;
+  }
+  
+  .star-rating label {
+    color: #ddd;
+    font-size: 1.5rem;
+    padding: 0 2px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .star-rating input:not(:checked) ~ label:hover,
+  .star-rating input:not(:checked) ~ label:hover ~ label {
+    color: #ffd700;
+  }
+  
+  .star-rating input:checked ~ label {
+    color: #ffd700;
+  }
+  
+  /* Floating Button */
+  .btn-floating {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    transition: all 0.3s ease;
+    border: none;
+  }
+  
+  .btn-floating:hover {
+    transform: translateY(-5px) scale(1.1);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Animation */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .fade-in-up {
+    animation: fadeInUp 0.6s ease forwards;
+  }
+  
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    .review-card {
+      margin-bottom: 1.5rem;
+    }
+    
+    .btn-floating {
+      width: 50px;
+      height: 50px;
+      font-size: 1.2rem;
+      bottom: 20px;
+      right: 20px;
+    }
+  }
+  }
 
   .testimonial-card {
     background: white;
@@ -650,7 +774,7 @@
     </div>
     
     <div class="row g-4">
-      <div class="col-lg-4 col-md-6">
+      <div class="col-12 col-md-6 col-lg-4">
         <div class="testimonial-card">
           <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=200&h=200&q=80" 
                class="testimonial-img" 
@@ -690,6 +814,225 @@
     </div>
   </div>
 </section>
+
+<!-- Testimonials Section -->
+<section class="py-5 my-5 bg-light" id="testimonials">
+  <div class="container">
+    <div class="text-center mb-5">
+      <span class="text-primary fw-bold">TESTIMONIALS</span>
+      <h2 class="fw-bold">What Our Riders Say</h2>
+      <p class="text-muted">Hear from our community of happy e-bike enthusiasts</p>
+    </div>
+    
+    <div class="row g-4">
+      <!-- Review 1 -->
+      <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+        <div class="review-card p-4 rounded-4 h-100" data-aos="fade-up" data-aos-delay="100">
+          <div class="d-flex align-items-center mb-3">
+            <img src="https://randomuser.me/api/portraits/women/32.jpg" alt="Sarah M." class="rounded-circle me-3" width="60" height="60">
+            <div>
+              <h5 class="mb-0 fw-semibold">Sarah M.</h5>
+              <div class="d-flex text-warning mb-1">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+              </div>
+              <small class="text-muted">2 days ago</small>
+            </div>
+          </div>
+          <p class="mb-0">"The e-bike was in perfect condition and made exploring the city an absolute joy. The battery lasted all day and the app made the whole process seamless. Will definitely rent again!"</p>
+          <div class="review-rating mt-3">
+            <span class="badge bg-primary bg-opacity-10 text-primary"><i class="fas fa-bolt me-1"></i> Power: 5/5</span>
+            <span class="badge bg-primary bg-opacity-10 text-primary ms-2"><i class="fas fa-battery-full me-1"></i> Battery: 5/5</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Review 2 -->
+      <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+        <div class="review-card p-4 rounded-4 h-100" data-aos="fade-up" data-aos-delay="200">
+          <div class="d-flex align-items-center mb-3">
+            <img src="https://randomuser.me/api/portraits/men/45.jpg" alt="James L." class="rounded-circle me-3" width="60" height="60">
+            <div>
+              <h5 class="mb-0 fw-semibold">James L.</h5>
+              <div class="d-flex text-warning mb-1">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star-half-alt"></i>
+              </div>
+              <small class="text-muted">1 week ago</small>
+            </div>
+          </div>
+          <p class="mb-0">"Incredible experience! The bike was delivered right to my hotel. Customer service was excellent when I had questions about the different power modes. Made my business trip much more enjoyable."</p>
+          <div class="review-rating mt-3">
+            <span class="badge bg-primary bg-opacity-10 text-primary"><i class="fas fa-headset me-1"></i> Support: 5/5</span>
+            <span class="badge bg-primary bg-opacity-10 text-primary ms-2"><i class="fas fa-bicycle me-1"></i> Comfort: 4/5</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Review 3 -->
+      <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+        <div class="review-card p-4 rounded-4 h-100" data-aos="fade-up" data-aos-delay="300">
+          <div class="d-flex align-items-center mb-3">
+            <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Priya K." class="rounded-circle me-3" width="60" height="60">
+            <div>
+              <h5 class="mb-0 fw-semibold">Priya K.</h5>
+              <div class="d-flex text-warning mb-1">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+              </div>
+              <small class="text-muted">3 days ago</small>
+            </div>
+          </div>
+          <p class="mb-0">"As a daily commuter, I've tried many e-bike services. This one stands out for its reliability and quality of bikes. The app is intuitive and the pricing is very reasonable. Highly recommended!"</p>
+          <div class="review-rating mt-3">
+            <span class="badge bg-primary bg-opacity-10 text-primary"><i class="fas fa-mobile-alt me-1"></i> App: 5/5</span>
+            <span class="badge bg-primary bg-opacity-10 text-primary ms-2"><i class="fas fa-tag me-1"></i> Value: 5/5</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Review 4 -->
+      <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+        <div class="review-card p-4 rounded-4 h-100" data-aos="fade-up" data-aos-delay="400">
+          <div class="d-flex align-items-center mb-3">
+            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Rajesh P." class="rounded-circle me-3" width="60" height="60">
+            <div>
+              <h5 class="mb-0 fw-semibold">Rajesh P.</h5>
+              <div class="d-flex text-warning mb-1">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="far fa-star"></i>
+              </div>
+              <small class="text-muted">1 week ago</small>
+            </div>
+          </div>
+          <p class="mb-0">"Great service overall. The bike was comfortable and easy to ride. Only minor issue was the battery indicator wasn't very accurate."</p>
+          <div class="review-rating mt-3">
+            <span class="badge bg-primary bg-opacity-10 text-primary"><i class="fas fa-tachometer-alt me-1"></i> Speed: 4/5</span>
+            <span class="badge bg-primary bg-opacity-10 text-primary ms-2"><i class="fas fa-bell me-1"></i> Features: 4/5</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Review 5 -->
+      <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+        <div class="review-card p-4 rounded-4 h-100" data-aos="fade-up" data-aos-delay="500">
+          <div class="d-flex align-items-center mb-3">
+            <img src="https://randomuser.me/api/portraits/women/45.jpg" alt="Priya S." class="rounded-circle me-3" width="60" height="60">
+            <div>
+              <h5 class="mb-0 fw-semibold">Priya S.</h5>
+              <div class="d-flex text-warning mb-1">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+              </div>
+              <small class="text-muted">3 days ago</small>
+            </div>
+          </div>
+          <p class="mb-0">"Perfect for my daily commute! The bike is lightweight yet powerful, and the app makes unlocking and paying super convenient."</p>
+          <div class="review-rating mt-3">
+            <span class="badge bg-primary bg-opacity-10 text-primary"><i class="fas fa-clock me-1"></i> On Time: 5/5</span>
+            <span class="badge bg-primary bg-opacity-10 text-primary ms-2"><i class="fas fa-map-marker-alt me-1"></i> Availability: 5/5</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Review 6 - Featured Review -->
+      <div class="col-md-12 col-lg-6">
+        <div class="review-card featured-review p-4 rounded-4 h-100" data-aos="fade-up" data-aos-delay="600">
+          <div class="d-flex align-items-center mb-3">
+            <img src="https://randomuser.me/api/portraits/men/68.jpg" alt="Amit K." class="rounded-circle me-3" width="80" height="80">
+            <div>
+              <h4 class="mb-0 fw-bold">Amit K.</h4>
+              <div class="d-flex text-warning mb-1">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+              </div>
+              <small class="text-muted">Featured Review - 2 days ago</small>
+            </div>
+          </div>
+          <p class="mb-3">"As a regular user for the past 6 months, I can confidently say this is the best e-bike rental service in the city. The bikes are well-maintained, the customer support is responsive, and the pricing is very reasonable."</p>
+          <div class="review-highlights">
+            <div class="highlight-item">
+              <i class="fas fa-check-circle text-success me-2"></i>
+              <span>Used for daily 10km commute</span>
+            </div>
+            <div class="highlight-item">
+              <i class="fas fa-check-circle text-success me-2"></i>
+              <span>Saved ₹5000+ compared to alternatives</span>
+            </div>
+            <div class="highlight-item">
+              <i class="fas fa-check-circle text-success me-2"></i>
+              <span>24/7 customer support</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="text-center mt-5">
+      <button class="btn btn-outline-primary btn-lg" data-bs-toggle="modal" data-bs-target="#writeReviewModal">
+        <i class="fas fa-edit me-2"></i>Write a Review
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- Write Review Modal -->
+<div class="modal fade" id="writeReviewModal" tabindex="-1" aria-labelledby="writeReviewModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="writeReviewModalLabel">Write a Review</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="reviewForm">
+          <div class="mb-3">
+            <label for="reviewerName" class="form-label">Your Name</label>
+            <input type="text" class="form-control" id="reviewerName" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Rating</label>
+            <div class="star-rating">
+              <input type="radio" id="star5" name="rating" value="5" required>
+              <label for="star5" title="5 stars"><i class="fas fa-star"></i></label>
+              <input type="radio" id="star4" name="rating" value="4">
+              <label for="star4" title="4 stars"><i class="fas fa-star"></i></label>
+              <input type="radio" id="star3" name="rating" value="3">
+              <label for="star3" title="3 stars"><i class="fas fa-star"></i></label>
+              <input type="radio" id="star2" name="rating" value="2">
+              <label for="star2" title="2 stars"><i class="fas fa-star"></i></label>
+              <input type="radio" id="star1" name="rating" value="1">
+              <label for="star1" title="1 star"><i class="fas fa-star"></i></label>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="reviewText" class="form-label">Your Review</label>
+            <textarea class="form-control" id="reviewText" rows="4" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Submit Review</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- FAQ Section -->
 <section class="py-5 my-5" id="faq">
@@ -832,7 +1175,6 @@
       </div>
     </div>
   </div>
-</section>
 </section>
 
 <!-- CTA Section -->

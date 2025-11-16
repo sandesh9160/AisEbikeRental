@@ -1,6 +1,9 @@
 {% extends 'core/base.html' %}
 {% block navbar %}{% endblock %}
 {% block content %}
+<form id="dashboard-logout-form" method="post" action="{% url 'logout' %}" style="display:none;">
+  {% csrf_token %}
+</form>
 <!-- Sidebar Toggle Button -->
 <button class="dashboard-sidebar-toggle d-lg-none" id="sidebarToggle"><i class="fas fa-bars"></i></button>
 <!-- Sidebar and overlay -->
@@ -14,7 +17,7 @@
     <a class="nav-link text-white sidebar-link" href="#ebikes-section"><i class="fas fa-bicycle me-2"></i>Available E-bikes</a>
     <a class="nav-link text-white sidebar-link" href="#bookings-section"><i class="fas fa-calendar-check me-2"></i>Your Bookings</a>
     <a class="nav-link text-white sidebar-link" href="#transactions-section"><i class="fas fa-receipt me-2"></i>Transactions</a>
-    <a class="nav-link text-white sidebar-link" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a>
+    <a class="nav-link text-white sidebar-link" href="#" onclick="event.preventDefault(); document.getElementById('dashboard-logout-form').submit(); if (typeof closeSidebar === 'function') closeSidebar();"><i class="fas fa-sign-out-alt me-2"></i>Logout</a>
   </nav>
   <div class="sidebar-profile text-center mt-auto mb-4 px-3">
     <img id="sidebarProfileImage" src="{% if request.user.profile_image %}{{ request.user.profile_image.url }}{% else %}https://api.dicebear.com/7.x/avataaars/svg?seed={{ request.user.username }}{% endif %}"

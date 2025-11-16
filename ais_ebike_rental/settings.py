@@ -30,7 +30,7 @@ if os.path.exists(env_file):
 SECRET_KEY = env('SECRET_KEY', default='1xa3m_0xij=hrl71mww296skb-$%0&51dp8_tmku0s4g6tm69-')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DEBUG', default=False)
 
 ALLOWED_HOSTS = ['*']
 
@@ -44,6 +44,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
+
+    # Local apps
     'core.apps.CoreConfig',
     'riders',
     'admin_dashboard',
@@ -145,22 +148,26 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'core.User'
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
+LOGIN_URL = 'login'  # Use custom login page
 
 if DEBUG:  # Local development
     # Print emails to console during development
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 else:
-    # Email Configuration (Production)
+    # Email Configuration (Production) - Using environment variables for security
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-    EMAIL_HOST = 'smtp.gmail.com'
-    EMAIL_PORT = 587
-    EMAIL_USE_TLS = True
-    EMAIL_HOST_USER = 'ebikerental19@gmail.com'
-    EMAIL_HOST_PASSWORD = 'pknucnotleoslfna'
-    DEFAULT_FROM_EMAIL = 'AIS E-Bike Rental <ebikerental19@gmail.com>'
+    EMAIL_HOST = env('EMAIL_HOST', default='smtp.gmail.com')
+    EMAIL_PORT = env('EMAIL_PORT', default=587)
+    EMAIL_USE_TLS = env('EMAIL_USE_TLS', default=True)
+    EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+    EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+    DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default='AIS E-Bike Rental <ebikerental19@gmail.com>')
 
 # Default receiver for Contact Us submissions (can be overridden by env var)
 CONTACT_RECEIVER_EMAIL = os.environ.get('CONTACT_RECEIVER_EMAIL', 'ebikerental19@gmail.com')
+
+# Admin email for notifications (can be overridden by env var)
+ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL', CONTACT_RECEIVER_EMAIL)
 
 # Payments: Razorpay configuration (set these in your environment for production)
 RAZORPAY_KEY_ID = env('RAZORPAY_KEY_ID', default='')

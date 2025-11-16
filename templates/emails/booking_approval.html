@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Your Booking Has Been Approved - AIS E-Bike Rental</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 5px 5px 0 0;
+        }
+        .content {
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 5px 5px;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white !important;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #777;
+            text-align: center;
+        }
+        .booking-details {
+            background-color: #f9f9f9;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+            border-left: 4px solid #4CAF50;
+        }
+        .important-note {
+            background-color: #fff3cd;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+            border-left: 4px solid #ffc107;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Booking Confirmed! 🎉</h1>
+    </div>
+
+    <div class="content">
+        <p>Hello {{ booking.rider.first_name|default:booking.rider.username }},</p>
+
+        <p>Great news! Your booking has been approved and confirmed.</p>
+
+        <div class="booking-details">
+            <h3>Booking Details:</h3>
+            <p><strong>E-bike:</strong> {{ booking.ebike.name }}</p>
+            <p><strong>Pickup Date:</strong> {{ booking.start_date }} at {{ booking.start_time }}</p>
+            <p><strong>Return Date:</strong> {{ booking.end_date }} at {{ booking.end_time }}</p>
+            <p><strong>Duration:</strong> {{ booking.days }} days</p>
+            <p><strong>Total Amount:</strong> ₹{{ booking.total_price }}</p>
+            <p><strong>Booking Reference:</strong> #{{ booking.id }}</p>
+        </div>
+
+        <h3>Next Steps:</h3>
+        <ul>
+            <li>Visit our AIS Store location to collect your e-bike</li>
+            <li>Bring a valid ID proof (Aadhaar Card, Driving License, Passport)</li>
+            <li>Complete the vehicle handover process</li>
+            <li>Make sure your phone is charged for any navigation apps</li>
+        </ul>
+
+        <div class="important-note">
+            <h4>📍 Important:</h4>
+            <p>Please arrive at least 15 minutes before your pickup time. Make sure to bring your documents for verification and any additional KYC requirements if applicable.</p>
+        </div>
+
+        <div style="text-align: center; margin: 25px 0;">
+            <a href="/rider/booking/confirmation/{{ booking.id }}/" class="button">View Booking Details</a>
+        </div>
+
+        <p>If you have any questions or need to make changes to your booking, please contact our support team as soon as possible.</p>
+
+        <p>Safe and enjoyable riding!<br>
+        The AIS E-Bike Rental Team</p>
+    </div>
+
+    <div class="footer">
+        <p>© {% now "Y" %} AIS E-Bike Rental. All rights reserved.</p>
+        <p>For support, contact us at {{ CONTACT_RECEIVER_EMAIL }}</p>
+    </div>
+</body>
+</html>

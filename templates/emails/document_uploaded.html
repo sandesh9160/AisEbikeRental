@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>New Document Uploaded for Verification - AIS E-Bike Rental</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #007bff;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 5px 5px 0 0;
+        }
+        .content {
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 5px 5px;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white !important;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #777;
+            text-align: center;
+        }
+        .provider-info {
+            background-color: #f9f9f9;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+        }
+        .alert-info {
+            background-color: #d1ecf1;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+            border-left: 4px solid #17a2b8;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>New Document Upload Notification</h1>
+    </div>
+
+    <div class="content">
+        <p>Hello Admin,</p>
+
+        <p>A vehicle provider has uploaded a new document that requires your verification.</p>
+
+        <div class="provider-info">
+            <h3>Provider Information:</h3>
+            <p><strong>Name:</strong> {{ document.provider.get_full_name|default:document.provider.username }}</p>
+            <p><strong>Email:</strong> {{ document.provider.email }}</p>
+            <p><strong>Phone:</strong> {{ document.provider.mobile_number }}</p>
+            <p><strong>Username:</strong> {{ document.provider.username }}</p>
+        </div>
+
+        <div class="provider-info">
+            <h3>Document Details:</h3>
+            <p><strong>Document Type:</strong> {{ document.get_document_type_display }}</p>
+            <p><strong>Document Number:</strong> {{ document.document_number|default:'Not provided' }}</p>
+            <p><strong>Uploaded Date:</strong> {{ document.uploaded_at }}</p>
+            <p><strong>Status:</strong> <span style="color: #ffc107; font-weight: bold;">{{ document.get_status_display }}</span></p>
+        </div>
+
+        <div class="alert-info">
+            <p>This provider currently has <strong>{{ document.provider.providerdocument_set.count }}</strong> documents uploaded, with <strong>{{ document.provider.providerdocument_set.filter(status='pending').count }}</strong> pending verification.</p>
+        </div>
+
+        <p>Please review the uploaded document and either approve or reject it. If all required documents are approved, the provider will be automatically verified and can start adding e-bikes to the platform.</p>
+
+        <div style="text-align: center; margin: 25px 0;">
+            <a href="{% url 'review_documents' %}" class="button">Review Documents</a>
+            <a href="{% url 'admin_provider_detail' document.provider.id %}" class="button">View Provider Profile</a>
+        </div>
+
+        <p>Thank you for your prompt attention to this verification request.</p>
+
+        <p>Best regards,<br>
+        AIS E-Bike Rental System</p>
+    </div>
+
+    <div class="footer">
+        <p>© {% now "Y" %} AIS E-Bike Rental. All rights reserved.</p>
+        <p>This is an automated notification from the AIS E-Bike Rental platform.</p>
+    </div>
+</body>
+</html>

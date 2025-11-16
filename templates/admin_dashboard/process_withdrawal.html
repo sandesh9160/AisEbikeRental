@@ -1,0 +1,201 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Process Withdrawal{% endblock %}
+
+{% block content %}
+<style>
+  :root {
+    --primary: #6c63ff;
+    --primary-hover: #5a52e0;
+    --bg: #f7f8fa;
+    --text-dark: #1f2937;
+    --text-muted: #6b7280;
+    --card-bg: #ffffff;
+    --border: #e5e7eb;
+    --radius: 14px;
+  }
+
+  body {
+    background: var(--bg);
+    font-family: "Inter", sans-serif;
+  }
+
+  .admin-header {
+    background: linear-gradient(135deg, var(--primary), #a78bfa);
+    color: #fff;
+    padding: 1.8rem 0;
+    border-radius: 0 0 var(--radius) var(--radius);
+    box-shadow: 0 8px 24px -8px rgba(108, 99, 255, 0.4);
+  }
+
+  .info-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+    margin-bottom: 1.5rem;
+  }
+
+  .action-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+  }
+
+  .status-badge {
+    font-size: .85rem;
+    font-weight: 600;
+    border-radius: 999px;
+    padding: .35rem .9rem;
+  }
+
+  .status-pending {
+    background: rgba(255,193,7,0.15);
+    color: #b7791f;
+  }
+
+  .status-approved {
+    background: rgba(59,130,246,0.15);
+    color: #1e40af;
+  }
+
+  .status-completed {
+    background: rgba(16,185,129,0.15);
+    color: #059669;
+  }
+
+  .status-rejected {
+    background: rgba(239,68,68,0.15);
+    color: #dc2626;
+  }
+</style>
+
+<div class="container-xxl py-4">
+  <section class="admin-header mb-4">
+    <div class="container-xxl d-flex justify-content-between align-items-center">
+      <div>
+        <h1><i class="fas fa-cog me-2"></i>Process Withdrawal #{{ withdrawal.id }}</h1>
+        <p class="mb-0 opacity-75">Review and process provider withdrawal request</p>
+      </div>
+      <a href="{% url 'admin_withdrawal_list' %}" class="btn btn-light btn-sm fw-semibold">
+        <i class="fas fa-arrow-left me-1"></i> Back
+      </a>
+    </div>
+  </section>
+
+  <div class="row">
+    <div class="col-lg-8">
+      <!-- Withdrawal Details -->
+      <div class="info-card">
+        <h5 class="mb-3"><i class="fas fa-info-circle me-2"></i>Withdrawal Details</h5>
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <strong>Provider:</strong> {{ withdrawal.provider.username }}<br>
+            <strong>Email:</strong> {{ withdrawal.provider.email }}
+          </div>
+          <div class="col-md-6">
+            <strong>Amount:</strong> <span class="text-success fw-bold">₹{{ withdrawal.amount }}</span><br>
+            <strong>Status:</strong> 
+            <span class="status-badge status-{{ withdrawal.status }}">
+              {{ withdrawal.get_status_display }}
+            </span>
+          </div>
+        </div>
+        <hr>
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <strong>Account Holder:</strong> {{ withdrawal.account_holder_name }}<br>
+            <strong>Account Number:</strong> {{ withdrawal.account_number }}
+          </div>
+          <div class="col-md-6">
+            {% if withdrawal.upi_id %}
+              <strong>UPI ID:</strong> {{ withdrawal.upi_id }}
+            {% else %}
+              <strong>Bank Name:</strong> {{ withdrawal.bank_name }}<br>
+              <strong>IFSC Code:</strong> {{ withdrawal.ifsc_code }}
+            {% endif %}
+          </div>
+        </div>
+        <hr>
+        <div class="row">
+          <div class="col-md-6">
+            <strong>Requested:</strong> {{ withdrawal.created_at|date:"M d, Y H:i" }}
+          </div>
+          {% if withdrawal.processed_at %}
+          <div class="col-md-6">
+            <strong>Processed:</strong> {{ withdrawal.processed_at|date:"M d, Y H:i" }}<br>
+            <strong>By:</strong> {{ withdrawal.processed_by.username }}
+          </div>
+          {% endif %}
+        </div>
+        {% if withdrawal.transaction_id %}
+        <hr>
+        <div>
+          <strong>Transaction ID:</strong> <code>{{ withdrawal.transaction_id }}</code>
+        </div>
+        {% endif %}
+        {% if withdrawal.admin_notes %}
+        <hr>
+        <div>
+          <strong>Admin Notes:</strong>
+          <p class="mb-0 text-muted">{{ withdrawal.admin_notes }}</p>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Action Form -->
+      {% if withdrawal.status == 'pending' or withdrawal.status == 'approved' %}
+      <div class="action-card">
+        <h5 class="mb-3"><i class="fas fa-tasks me-2"></i>Actions</h5>
+        <form method="post">
+          {% csrf_token %}
+          
+          {% if withdrawal.status == 'pending' %}
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Action</label>
+            <div class="d-flex gap-2">
+              <button type="submit" name="action" value="approve" class="btn btn-info">
+                <i class="fas fa-check me-1"></i>Approve
+              </button>
+              <button type="submit" name="action" value="reject" class="btn btn-danger" onclick="return confirm('Are you sure you want to reject this withdrawal?');">
+                <i class="fas fa-times me-1"></i>Reject
+              </button>
+            </div>
+          </div>
+          {% elif withdrawal.status == 'approved' %}
+          <div class="mb-3">
+            <label for="transaction_id" class="form-label fw-semibold">
+              Transaction ID <span class="text-danger">*</span>
+            </label>
+            <input type="text" class="form-control" id="transaction_id" name="transaction_id" 
+                   placeholder="Enter transaction ID after transfer" required>
+            <small class="text-muted">Enter the transaction ID from your payment gateway or bank transfer.</small>
+          </div>
+          <div class="mb-3">
+            <button type="submit" name="action" value="complete" class="btn btn-success">
+              <i class="fas fa-check-circle me-1"></i>Mark as Completed
+            </button>
+          </div>
+          {% endif %}
+          
+          <div class="mb-3">
+            <label for="admin_notes" class="form-label fw-semibold">Admin Notes</label>
+            <textarea class="form-control" id="admin_notes" name="admin_notes" rows="3" 
+                      placeholder="Add any notes about this withdrawal (optional)">{% if withdrawal.admin_notes %}{{ withdrawal.admin_notes }}{% endif %}</textarea>
+          </div>
+        </form>
+      </div>
+      {% else %}
+      <div class="alert alert-info">
+        <i class="fas fa-info-circle me-2"></i>This withdrawal has been {{ withdrawal.get_status_display|lower }}.
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+
+
+

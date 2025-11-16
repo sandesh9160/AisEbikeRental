@@ -127,6 +127,7 @@ document.addEventListener('DOMContentLoaded', function() {
         };
         const r = await fetch(verifyUrl, {
           method: 'POST',
+          credentials: 'same-origin',
           headers: {
             'Content-Type': 'application/json',
             'X-Requested-With': 'XMLHttpRequest',
@@ -134,13 +135,22 @@ document.addEventListener('DOMContentLoaded', function() {
           },
           body: JSON.stringify(payload)
         });
-        const data = await r.json();
+        let data;
+        try {
+          data = await r.json();
+        } catch (jsonError) {
+          console.error('Failed to parse verification response:', jsonError);
+          statusEl.textContent = 'Verification failed: invalid server response.';
+          return;
+        }
         if (r.ok && data.success) {
           window.location.href = data.redirect_url;
         } else {
+          console.error('Verification failed response:', data);
           statusEl.textContent = (data && data.error) ? data.error : 'Verification failed.';
         }
       } catch (e) {
+        console.error('Verification request error:', e);
         statusEl.textContent = 'Verification error. Please contact support.';
       }
     },

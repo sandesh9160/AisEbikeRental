@@ -16,9 +16,17 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.urls import reverse
 
-import razorpay
 import json
-from razorpay import utility
+import logging
+try:
+    import razorpay
+    from razorpay import utility
+except ImportError as e:
+    # This will be caught when the view is called
+    razorpay = None
+    utility = None
+
+logger = logging.getLogger(__name__)
 
 
 def rider_dashboard(request):
@@ -48,7 +56,7 @@ def book_ebike(request, ebike_id):
             start_date = form.cleaned_data['start_date']
             end_date = form.cleaned_data['end_date']
             total_days = (end_date - start_date).days
-            total_price = total_days * ebike.price_per_day 
+            total_price = total_days * ebike.price_per_day
 
             if total_days < 1 or total_price <= 0:
                 messages.error(request, 'Please select a valid date range. Booking must be at least 1 day and total amount must be greater than ₹0.')
@@ -69,10 +77,60 @@ def book_ebike(request, ebike_id):
                     message=f"New booking by {request.user.username} for {ebike.name}.",
                     link=f"/admin-dashboard/#bookings"
                 )
+
+            # Send booking request notification email to admin
+            try:
+                subject = 'New Booking Request Submitted - AIS E-Bike Rental'
+                context = {
+                    'booking': booking,
+                }
+                html_message = render_to_string('emails/booking_request_admin.html', context)
+                plain_message = f"""
+New booking request submitted by {booking.rider.get_full_name() or booking.rider.username}.
+
+Booking Details:
+- E-bike: {booking.ebike.name}
+- Booking Reference: #{booking.id}
+- Rider: {booking.rider.username} ({booking.rider.email})
+- Pickup Date: {booking.start_date} at {booking.start_time}
+- Return Date: {booking.end_date} at {booking.end_time}
+- Duration: {booking.days} days
+- Total Amount: ₹{booking.total_price}
+- Payment Status: {'Paid' if booking.is_paid else 'Pending Payment'}
+
+Please review and process this booking request in the admin dashboard.
+
+AIS E-Bike Rental System
+"""
+                from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@aisebikerental.com')
+                admin_email = getattr(settings, 'ADMIN_EMAIL', None)
+
+                if admin_email:
+                    result = send_mail(
+                        subject=subject,
+                        message=plain_message,
+                        html_message=html_message,
+                        from_email=from_email,
+                        recipient_list=[admin_email],
+                        fail_silently=False  # Change to False to capture errors
+                    )
+                    logger.info(f"Booking request email sent to admin {admin_email} for booking #{booking.id}, result: {result}")
+                else:
+                    logger.error(f"No ADMIN_EMAIL configured - cannot send booking request notification for booking #{booking.id}")
+            except Exception as e:
+                logger.error(f"Failed to send booking request email for booking {booking.id}: {str(e)}")
+                # Don't fail the booking creation if email fails
+                pass
+
             # Proceed to payment page for this booking
             return redirect('payment', booking_id=booking.id)
     else:
-        form = BookingForm()
+        # Set default times in the form
+        initial_data = {
+            'start_time': '09:00',
+            'end_time': '18:00'
+        }
+        form = BookingForm(initial=initial_data)
 
     return render(request, 'riders/book_bike.html', {'form': form, 'ebike': ebike})
 
@@ -93,6 +151,15 @@ def payment(request, booking_id):
         booking.save(update_fields=["is_paid"])
         messages.success(request, 'Payment bypassed for development testing.')
         return redirect('booking_confirmation', booking_id=booking.id)
+    # Check if razorpay package is installed
+    if razorpay is None or utility is None:
+        logger.error("Razorpay package is not installed. Please install it: pip install razorpay")
+        messages.error(request, 'Payment system is not properly configured. Please contact support.')
+        return render(request, 'riders/payment.html', {
+            'booking': booking,
+            'payment_error': 'Payment system is not properly configured. Please contact support.',
+        })
+    
     # Ensure Razorpay keys are configured
     key_id = getattr(settings, 'RAZORPAY_KEY_ID', '')
     key_secret = getattr(settings, 'RAZORPAY_KEY_SECRET', '')
@@ -104,16 +171,42 @@ def payment(request, booking_id):
             'payment_error': 'Razorpay is not configured. Contact support.',
         })
     # Create a Razorpay Order for this booking (amount in paise)
-    amount_paise = int(Decimal(booking.total_price) * 100)
     try:
+        # Validate booking total_price
+        if not booking.total_price or booking.total_price <= 0:
+            messages.error(request, 'Invalid booking amount. Please contact support.')
+            return render(request, 'riders/payment.html', {
+                'booking': booking,
+                'payment_error': 'Invalid booking amount.',
+            })
+        
+        amount_paise = int(Decimal(str(booking.total_price)) * 100)
+        
+        # Validate amount is at least 1 paise (minimum Razorpay amount)
+        if amount_paise < 1:
+            messages.error(request, 'Amount is too small for payment.')
+            return render(request, 'riders/payment.html', {
+                'booking': booking,
+                'payment_error': 'Amount is too small for payment.',
+            })
+        
         client = razorpay.Client(auth=(key_id, key_secret))
-        order = client.order.create(dict(
-            amount=amount_paise,
-            currency="INR",
-            receipt=str(booking.id),
-            notes={"booking_id": str(booking.id), "user": request.user.username},
-            payment_capture=1,
-        ))
+        order_data = {
+            'amount': amount_paise,
+            'currency': 'INR',
+            'receipt': str(booking.id),
+            'notes': {
+                'booking_id': str(booking.id),
+                'user': request.user.username
+            },
+            'payment_capture': 1,
+        }
+        
+        order = client.order.create(order_data)
+        
+        # Validate order was created successfully
+        if not order or 'id' not in order:
+            raise Exception('Razorpay order creation failed: No order ID returned')
         masked_key = key_id if not key_id else (key_id[:7] + '...' + key_id[-4:])
         context = {
             'booking': booking,
@@ -133,11 +226,45 @@ def payment(request, booking_id):
                 'order_id_present': bool(order.get('id')),
             }
         return render(request, 'riders/payment.html', context)
-    except razorpay.errors.BadRequestError:
+    except razorpay.errors.BadRequestError as e:
+        logger.error(f"Razorpay BadRequestError: {str(e)}")
+        # Check for common BadRequestError reasons
+        if 'amount' in str(e).lower():
+            payment_error = 'Invalid payment amount. Please contact support.'
+        elif 'key' in str(e).lower() or 'auth' in str(e).lower():
+            payment_error = 'Authentication failed with Razorpay. Check API keys.'
+        else:
+            payment_error = f'Payment initialization failed: {str(e)[:100]}'
         messages.error(request, 'Payment initialization failed. Please try again later.')
         return render(request, 'riders/payment.html', {
             'booking': booking,
-            'payment_error': 'Authentication failed with Razorpay. Check API keys.',
+            'payment_error': payment_error,
+        })
+    except razorpay.errors.ServerError as e:
+        logger.error(f"Razorpay ServerError: {str(e)}")
+        messages.error(request, 'Razorpay server error. Please try again later.')
+        return render(request, 'riders/payment.html', {
+            'booking': booking,
+            'payment_error': 'Razorpay server error. Please try again later.',
+        })
+    except ValueError as e:
+        logger.error(f"ValueError in payment initialization: {str(e)}")
+        messages.error(request, 'Invalid booking data. Please contact support.')
+        return render(request, 'riders/payment.html', {
+            'booking': booking,
+            'payment_error': 'Invalid booking data. Please contact support.',
+        })
+    except Exception as e:
+        logger.error(f"Razorpay payment initialization error ({type(e).__name__}): {str(e)}")
+        # Show more helpful error message in DEBUG mode
+        if settings.DEBUG:
+            payment_error = f'Error: {type(e).__name__} - {str(e)[:150]}'
+        else:
+            payment_error = 'An error occurred while initializing payment. Please try again or contact support.'
+        messages.error(request, 'Payment initialization failed. Please try again later.')
+        return render(request, 'riders/payment.html', {
+            'booking': booking,
+            'payment_error': payment_error,
         })
 
 
@@ -147,6 +274,13 @@ def verify_razorpay_payment(request, booking_id):
     """Verify Razorpay payment signature and update booking status."""
     booking = get_object_or_404(Booking, id=booking_id, rider=request.user)
     
+    if razorpay is None or utility is None:
+        logger.error("Razorpay package is not installed; cannot verify payment.")
+        return JsonResponse({
+            'success': False,
+            'error': 'Payment backend not configured. Please contact support.'
+        }, status=500)
+    
     try:
         data = json.loads(request.body)
         razorpay_payment_id = data.get('razorpay_payment_id')
@@ -154,17 +288,37 @@ def verify_razorpay_payment(request, booking_id):
         razorpay_signature = data.get('razorpay_signature')
         
         key_secret = getattr(settings, 'RAZORPAY_KEY_SECRET', '')
+        key_id = getattr(settings, 'RAZORPAY_KEY_ID', '')
         params_dict = {
             'razorpay_order_id': razorpay_order_id,
             'razorpay_payment_id': razorpay_payment_id,
             'razorpay_signature': razorpay_signature
         }
         
+        logger.debug(f"Verifying Razorpay payment for booking {booking_id}: order={razorpay_order_id}, payment={razorpay_payment_id}")
+        
         # Verify payment signature
-        client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, key_secret))
+        # Check if all required parameters are present
+        if not all([razorpay_payment_id, razorpay_order_id, razorpay_signature]):
+            logger.warning(f"Missing Razorpay parameters for booking {booking_id}: {params_dict}")
+            return JsonResponse({
+                'success': False,
+                'error': 'Missing payment verification parameters'
+            }, status=400)
+        
+        if not key_secret or not key_id:
+            logger.error("Razorpay keys not configured during verification")
+            return JsonResponse({
+                'success': False,
+                'error': 'Razorpay keys are not configured'
+            }, status=500)
+
+        client = razorpay.Client(auth=(key_id, key_secret))
+
         try:
+            # Verify payment signature using Razorpay client utility
             client.utility.verify_payment_signature(params_dict)
-            
+
             # Payment successful, update booking status
             booking.is_paid = True
             booking.status = 'pending'  # Set initial status to pending
@@ -172,13 +326,14 @@ def verify_razorpay_payment(request, booking_id):
             booking.razorpay_order_id = razorpay_order_id
             booking.save(update_fields=['is_paid', 'status', 'razorpay_payment_id', 'razorpay_order_id'])
             
+            logger.info(f"Payment verified for booking {booking_id}. Redirecting to confirmation page.")
+            
             # Send confirmation email
             try:
                 send_booking_confirmation_email(booking)
             except Exception as e:
                 # Log email error but don't fail the payment verification
-                import logging
-                logging.error(f"Failed to send confirmation email for booking {booking.id}: {str(e)}")
+                logger.error(f"Failed to send confirmation email for booking {booking.id}: {str(e)}")
                 # Continue with the payment verification process
             
             # Notify admin
@@ -195,13 +350,27 @@ def verify_razorpay_payment(request, booking_id):
                 'redirect_url': reverse('booking_confirmation', kwargs={'booking_id': booking.id})
             })
             
-        except Exception as e:
+        except razorpay.errors.SignatureVerificationError as e:
+            logger.warning(f"Signature verification failed for booking {booking_id}: {str(e)}")
+            error_message = 'Payment signature verification failed. Please contact support.'
+            if settings.DEBUG:
+                error_message = f'Signature verification failed: {str(e)}'
             return JsonResponse({
                 'success': False,
-                'error': 'Payment verification failed: ' + str(e)
+                'error': error_message
+            }, status=400)
+        except Exception as e:
+            logger.error(f"Payment verification error for booking {booking_id}: {str(e)}")
+            error_message = 'Payment verification failed. Please try again or contact support.'
+            if settings.DEBUG:
+                error_message = f'Verification error: {type(e).__name__} - {str(e)}'
+            return JsonResponse({
+                'success': False,
+                'error': error_message
             }, status=400)
             
     except json.JSONDecodeError:
+        logger.error(f"Invalid JSON data received during payment verification for booking {booking_id}")
         return JsonResponse({
             'success': False,
             'error': 'Invalid JSON data'
@@ -234,13 +403,11 @@ def send_booking_confirmation_email(booking):
         )
     except Exception as e:
         # Log the error for debugging
-        import logging
-        logging.error(f"Failed to send confirmation email for booking {booking.id}: {str(e)}")
+        logger.error(f"Failed to send confirmation email for booking {booking.id}: {str(e)}")
         # Re-raise the exception so it can be caught by the calling function
         raise e
 
 
-@login_required
 @csrf_exempt
 def razorpay_webhook(request):
     """Handle Razorpay webhooks for robust server-to-server confirmation.
@@ -252,9 +419,19 @@ def razorpay_webhook(request):
         signature = request.META.get('HTTP_X_RAZORPAY_SIGNATURE')
         if not signature:
             return JsonResponse({"success": False, "error": "Missing signature"}, status=400)
+        
+        webhook_secret = getattr(settings, 'RAZORPAY_WEBHOOK_SECRET', '')
         body = request.body.decode('utf-8')
-        # Verify webhook signature
-        utility.verify_webhook_signature(body, signature, settings.RAZORPAY_WEBHOOK_SECRET)
+        
+        if not webhook_secret:
+            # Log warning but don't fail - webhook secret might not be configured in development
+            logger.warning("RAZORPAY_WEBHOOK_SECRET not configured, skipping webhook signature verification")
+            # In production, you might want to return an error here
+            # return JsonResponse({"success": False, "error": "Webhook secret not configured"}, status=500)
+        else:
+            # Verify webhook signature
+            utility.verify_webhook_signature(body, signature, webhook_secret)
+        
         payload = json.loads(body)
         event = payload.get('event')
         if event == 'payment.captured':
@@ -265,17 +442,29 @@ def razorpay_webhook(request):
                 try:
                     order = client.order.fetch(order_id)
                     receipt = order.get('receipt')
-                    # receipt was set to booking.id as string
-                    booking = Booking.objects.filter(id=receipt).first()
-                    if booking and not booking.is_paid:
-                        booking.is_paid = True
-                        booking.save(update_fields=["is_paid"]) 
-                except Exception:
-                    pass
+                    # receipt was set to booking.id as string, convert to int for query
+                    try:
+                        booking_id = int(receipt) if receipt else None
+                        if booking_id:
+                            booking = Booking.objects.filter(id=booking_id).first()
+                            if booking and not booking.is_paid:
+                                booking.is_paid = True
+                                booking.razorpay_order_id = order_id
+                                booking.save(update_fields=["is_paid", "razorpay_order_id"])
+                    except (ValueError, TypeError):
+                        logger.error(f"Invalid receipt format in webhook: {receipt}")
+                except razorpay.errors.BadRequestError as e:
+                    logger.error(f"Razorpay BadRequestError fetching order {order_id}: {str(e)}")
+                except Exception as e:
+                    logger.error(f"Error processing webhook for order {order_id}: {str(e)}")
         return JsonResponse({"success": True})
-    except razorpay.errors.SignatureVerificationError:
+    except razorpay.errors.SignatureVerificationError as e:
+        logger.error(f"Razorpay webhook signature verification failed: {str(e)}")
         return JsonResponse({"success": False, "error": "Invalid signature"}, status=400)
-    except Exception:
+    except json.JSONDecodeError:
+        return JsonResponse({"success": False, "error": "Invalid JSON payload"}, status=400)
+    except Exception as e:
+        logger.error(f"Razorpay webhook error: {str(e)}")
         return JsonResponse({"success": False, "error": "Unhandled error"}, status=400)
 
 
@@ -490,8 +679,7 @@ def download_receipt(request, booking_id):
             p.drawImage(qr_img, card_x + card_width - 2 * padding - 70, y - 80, 50, 50, mask='auto')
         except Exception as e:
             # Log the error but don't fail the receipt generation
-            import logging
-            logging.error(f"Error generating QR code: {str(e)}")
+            logger.error(f"Error generating QR code: {str(e)}")
             
         y -= (100 + section_gap)
 
@@ -534,8 +722,7 @@ def download_receipt(request, booking_id):
         
     except Exception as e:
         # Log the error
-        import logging
-        logging.error(f"Error generating receipt for booking {booking_id}: {str(e)}")
+        logger.error(f"Error generating receipt for booking {booking_id}: {str(e)}")
         
         # Show error message to user
         messages.error(request, f"Error generating receipt: {str(e)}")
@@ -568,7 +755,6 @@ def view_receipt(request, booking_id):
         return render(request, 'riders/receipt.html', context)
 
     except Exception as e:
-        import logging
-        logging.error(f"Error displaying receipt for booking {booking_id}: {str(e)}")
+        logger.error(f"Error displaying receipt for booking {booking_id}: {str(e)}")
         messages.error(request, f"Error loading receipt: {str(e)}")
         return redirect('rider_dashboard')

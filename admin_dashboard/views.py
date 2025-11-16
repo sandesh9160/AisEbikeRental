@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect,get_object_or_404, redirect, rever
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib import messages
 from django.utils import timezone
-from core.models import User, EBike, Booking, VehicleRegistration, Notification, ProviderDocument, ContactMessage, Review
+from core.models import User, EBike, Booking, VehicleRegistration, Notification, ProviderDocument, ContactMessage, Review, Withdrawal
 from django.db.models import Sum, Q
 from decimal import Decimal
 from django.db.models.functions import TruncMonth
@@ -11,6 +11,9 @@ from django.http import JsonResponse
 from django.core.paginator import Paginator
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.conf import settings
 import json
 from datetime import datetime, timedelta
 
@@ -91,6 +94,9 @@ def admin_dashboard(request):
     # Recent user reviews for dashboard feedback section
     recent_feedback = Review.objects.all()[:10]
     
+    # Pending withdrawals count
+    total_pending_withdrawals = Withdrawal.objects.filter(status='pending').count()
+    
     # Add availability sync date (placeholder for now)
     from datetime import datetime
     availability_last_sync_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -119,6 +125,7 @@ def admin_dashboard(request):
         'prov_q': prov_q,
         'recent_feedback': recent_feedback,
         'availability_last_sync_date': availability_last_sync_date,
+        'total_pending_withdrawals': total_pending_withdrawals,
     })
 
 
@@ -134,7 +141,49 @@ def approve_booking(request, booking_id):
     Notification.objects.create(
         recipient=booking.rider,
         message=f"Your booking for {booking.ebike.name} has been approved!",
-        link=f"/riders/booking/confirmation/{booking.id}/"
+        link=f"/rider/booking/confirmation/{booking.id}/"
+    )
+
+    # Send booking approval email to rider
+    subject = f'Booking Confirmed - Collect Your E-bike from AIS Store'
+    context = {
+        'booking': booking,
+        'CONTACT_RECEIVER_EMAIL': settings.CONTACT_RECEIVER_EMAIL,
+    }
+    html_message = render_to_string('emails/booking_approval.html', context)
+    plain_message = f"""
+    Hello {booking.rider.get_full_name() or booking.rider.username},
+
+    Great news! Your booking has been approved and confirmed.
+
+    Booking Details:
+    - E-bike: {booking.ebike.name}
+    - Pickup Date: {booking.start_date} 
+    - Return Date: {booking.end_date} 
+    - Duration: {booking.days} days
+    - Total Amount: ₹{booking.total_price}
+    - Booking Reference: #{booking.id}
+
+    Next Steps:
+    1. Visit our AIS Store location to collect your e-bike
+    2. Bring a valid ID proof (Aadhaar Card, Driving License, Passport)
+    3. Complete the vehicle handover process
+
+    Please arrive at least 15 minutes before your pickup time.
+
+    For support, contact us at {settings.CONTACT_RECEIVER_EMAIL}
+
+    Safe and enjoyable riding!
+    The AIS E-Bike Rental Team
+    """
+
+    send_mail(
+        subject=subject,
+        message=plain_message,
+        html_message=html_message,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=[booking.rider.email],
+        fail_silently=True
     )
 
     messages.success(request, f'Booking #{booking.id} has been approved successfully!')
@@ -523,12 +572,54 @@ def bulk_approve_bookings(request):
             booking.is_approved = True   # Also set is_approved for consistency
             booking.is_rejected = False  # Reset rejection status
             booking.save()
-            
+
             # Notify the user
             Notification.objects.create(
                 recipient=booking.rider,
                 message=f"Your booking for {booking.ebike.name} has been approved!",
-                link=f"/riders/booking/confirmation/{booking.id}/"
+                link=f"/rider/booking/confirmation/{booking.id}/"
+            )
+
+            # Send booking approval email to rider
+            subject = f'Booking Confirmed - Collect Your E-bike from AIS Store'
+            context = {
+                'booking': booking,
+                'CONTACT_RECEIVER_EMAIL': settings.CONTACT_RECEIVER_EMAIL,
+            }
+            html_message = render_to_string('emails/booking_approval.html', context)
+            plain_message = f"""
+            Hello {booking.rider.get_full_name() or booking.rider.username},
+
+            Great news! Your booking has been approved and confirmed.
+
+            Booking Details:
+            - E-bike: {booking.ebike.name}
+            - Pickup Date: {booking.start_date} at {booking.start_time}
+            - Return Date: {booking.end_date} at {booking.end_time}
+            - Duration: {booking.days} days
+            - Total Amount: ₹{booking.total_price}
+            - Booking Reference: #{booking.id}
+
+            Next Steps:
+            1. Visit our AIS Store location to collect your e-bike
+            2. Bring a valid ID proof (Aadhaar Card, Driving License, Passport)
+            3. Complete the vehicle handover process
+
+            Please arrive at least 15 minutes before your pickup time.
+
+            For support, contact us at {settings.CONTACT_RECEIVER_EMAIL}
+
+            Safe and enjoyable riding!
+            The AIS E-Bike Rental Team
+            """
+
+            send_mail(
+                subject=subject,
+                message=plain_message,
+                html_message=html_message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[booking.rider.email],
+                fail_silently=True
             )
             approved_count += 1
         
@@ -560,7 +651,7 @@ def bulk_reject_bookings(request):
             Notification.objects.create(
                 recipient=booking.rider,
                 message=f"Your booking for {booking.ebike.name} has been rejected. Reason: {rejection_reason}",
-                link=f"/riders/dashboard/"
+                link=f"/rider/dashboard/"
             )
             rejected_count += 1
 
@@ -747,3 +838,95 @@ def provider_detail(request, provider_id):
         'total_docs': docs.count(),
     }
     return render(request, 'admin_dashboard/provider_detail.html', context)
+
+
+@user_passes_test(is_admin)
+def withdrawal_list(request):
+    status_filter = request.GET.get('status', 'all')
+    search_query = request.GET.get('q', '')
+    
+    withdrawals = Withdrawal.objects.all().select_related('provider', 'processed_by')
+    
+    if status_filter != 'all':
+        withdrawals = withdrawals.filter(status=status_filter)
+    
+    if search_query:
+        withdrawals = withdrawals.filter(
+            Q(provider__username__icontains=search_query) |
+            Q(provider__email__icontains=search_query) |
+            Q(account_holder_name__icontains=search_query) |
+            Q(transaction_id__icontains=search_query)
+        )
+    
+    withdrawals = withdrawals.order_by('-created_at')
+    
+    # Pagination
+    paginator = Paginator(withdrawals, 20)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    # Statistics
+    total_pending = Withdrawal.objects.filter(status='pending').count()
+    total_approved = Withdrawal.objects.filter(status='approved').count()
+    total_completed = Withdrawal.objects.filter(status='completed').count()
+    total_rejected = Withdrawal.objects.filter(status='rejected').count()
+    
+    return render(request, 'admin_dashboard/withdrawal_list.html', {
+        'page_obj': page_obj,
+        'withdrawals': page_obj,
+        'current_status': status_filter,
+        'q': search_query,
+        'total_pending': total_pending,
+        'total_approved': total_approved,
+        'total_completed': total_completed,
+        'total_rejected': total_rejected,
+    })
+
+
+@user_passes_test(is_admin)
+def process_withdrawal(request, withdrawal_id):
+    withdrawal = get_object_or_404(Withdrawal, id=withdrawal_id)
+    
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        transaction_id = request.POST.get('transaction_id', '').strip()
+        admin_notes = request.POST.get('admin_notes', '').strip()
+        
+        if action == 'approve':
+            withdrawal.status = 'approved'
+            withdrawal.processed_by = request.user
+            withdrawal.processed_at = timezone.now()
+            if admin_notes:
+                withdrawal.admin_notes = admin_notes
+            withdrawal.save()
+            messages.success(request, f'Withdrawal #{withdrawal.id} approved successfully.')
+            
+        elif action == 'complete':
+            if not transaction_id:
+                messages.error(request, 'Transaction ID is required to complete withdrawal.')
+            else:
+                withdrawal.status = 'completed'
+                withdrawal.transaction_id = transaction_id
+                withdrawal.processed_by = request.user
+                withdrawal.processed_at = timezone.now()
+                if admin_notes:
+                    withdrawal.admin_notes = admin_notes
+                withdrawal.save()
+                messages.success(request, f'Withdrawal #{withdrawal.id} marked as completed.')
+                
+        elif action == 'reject':
+            if not admin_notes:
+                messages.error(request, 'Please provide a reason for rejection.')
+            else:
+                withdrawal.status = 'rejected'
+                withdrawal.processed_by = request.user
+                withdrawal.processed_at = timezone.now()
+                withdrawal.admin_notes = admin_notes
+                withdrawal.save()
+                messages.success(request, f'Withdrawal #{withdrawal.id} rejected.')
+        
+        return redirect('admin_withdrawal_list')
+    
+    return render(request, 'admin_dashboard/process_withdrawal.html', {
+        'withdrawal': withdrawal,
+    })

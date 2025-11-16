@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.views.generic import TemplateView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -25,8 +26,11 @@ urlpatterns = [
     path('provider/', include('vehicle_providers.urls')),
     path('admin-dashboard/', include('admin_dashboard.urls')),
     
-    # Auth URLs
-    path('accounts/', include('django.contrib.auth.urls')),
+    # Auth URLs - allauth (commented out to use custom login/signup pages)
+    # path('accounts/', include('allauth.urls')),
+    
+    # Custom pages for social account signup if needed
+    # path('accounts/social/signup/', TemplateView.as_view(template_name='account/socialaccount/signup.html'), name='socialaccount_signup'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # Serve static and media files during development

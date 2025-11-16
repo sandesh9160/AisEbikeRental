@@ -59,13 +59,33 @@
     <h2><i class="fas fa-bicycle"></i> Book E-Bike: {{ ebike.name }}</h2>
     <form method="post">
         {% csrf_token %}
-        <div class="mb-3">
-            <label for="start_date" class="form-label icon-label"><i class="fas fa-calendar-alt"></i> Start Date</label>
-            <input type="date" class="form-control" id="start_date" name="start_date" required>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="start_date" class="form-label icon-label"><i class="fas fa-calendar-alt"></i> Start Date</label>
+                    <input type="date" class="form-control" id="start_date" name="start_date" required>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="start_time" class="form-label icon-label"><i class="fas fa-clock"></i> Start Time</label>
+                    <input type="time" class="form-control" id="start_time" name="start_time" value="09:00" required>
+                </div>
+            </div>
         </div>
-        <div class="mb-3">
-            <label for="end_date" class="form-label icon-label"><i class="fas fa-calendar-check"></i> End Date</label>
-            <input type="date" class="form-control" id="end_date" name="end_date" required>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="end_date" class="form-label icon-label"><i class="fas fa-calendar-check"></i> End Date</label>
+                    <input type="date" class="form-control" id="end_date" name="end_date" required>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="end_time" class="form-label icon-label"><i class="fas fa-clock"></i> End Time</label>
+                    <input type="time" class="form-control" id="end_time" name="end_time" value="18:00" required>
+                </div>
+            </div>
         </div>
         <button type="submit" class="btn btn-book"><i class="fas fa-check-circle"></i> Book Now</button>
     </form>

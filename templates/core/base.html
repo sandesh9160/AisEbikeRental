@@ -79,6 +79,12 @@
     .navbar {
       background: var(--nav-bg) !important;
     }
+    .navbar.sticky-top {
+      position: sticky;
+      top: 0;
+      z-index: 1050;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
     .nav-link {
       color: white !important;
       transition: 0.3s;
@@ -189,6 +195,26 @@
     #chatModalFooter button:hover {
       background: #1e3c72;
     }
+    /* FIXED NAVBAR HEIGHT */
+    .navbar {
+      padding: 0.3rem 1rem !important;
+      min-height: 56px !important;
+    }
+    .navbar-brand {
+      padding: 0.3rem 0.5rem !important;
+      font-size: 1.2rem;
+    }
+    .navbar-brand img {
+      height: 32px !important;
+      width: 32px !important;
+    }
+    .navbar-nav .nav-link {
+      padding: 0.5rem 0.75rem !important;
+      font-size: 0.95rem;
+    }
+    .navbar-toggler {
+      padding: 0.25rem 0.5rem !important;
+    }
   </style>
 </head>
   <body>
@@ -198,7 +224,7 @@
     {# Do not render navbar for rider dashboard #}
   {% else %}
     {% block navbar %}
-    <nav class="navbar navbar-expand-lg navbar-dark shadow-sm">
+    <nav class="navbar navbar-expand-lg navbar-dark shadow-sm {% if 'dashboard' not in request.path|lower %}sticky-top{% endif %}">
       <div class="container">
         <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
           <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQOIc33M52GgLE3iqEXzHsjBA2n23GoZkc2mw&s" alt="Logo">
@@ -211,6 +237,9 @@
           <ul class="navbar-nav me-auto">
             <li class="nav-item"><a class="nav-link" href="{% url 'home' %}"><i class="fas fa-house-user"></i> Home</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'ebikes' %}"><i class="fas fa-bolt"></i> E-Bikes</a></li>
+            {% if user.is_authenticated %}
+            <li class="nav-item"><a class="nav-link" href="{% url 'my_favorites' %}"><i class="fas fa-heart"></i> Favorites</a></li>
+            {% endif %}
             <li class="nav-item"><a class="nav-link" href="{% url 'about' %}"><i class="fas fa-info-circle"></i> About</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}"><i class="fas fa-envelope"></i> Contact</a></li>
           </ul>

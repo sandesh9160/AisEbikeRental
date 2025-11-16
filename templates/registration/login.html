@@ -1,205 +1,245 @@
 {% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Login • AIS E-Bike Rental{% endblock %}
 
 {% block content %}
-<!-- Font Awesome CDN for icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" 
+      integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUvKlOEszYETJol6ZVeO4yZ2g==" 
+      crossorigin="anonymous" referrerpolicy="no-referrer" />
+
 <style>
+  :root {
+    --primary: #4f46e5;
+    --primary-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    --glass: rgba(255, 255, 255, 0.18);
+    --glass-border: rgba(255, 255, 255, 0.25);
+    --text: #ffffff;
+    --text-muted: rgba(255, 255, 255, 0.8);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
   body {
-    background: linear-gradient(120deg, #e0eafc 0%, #cfdef3 100%);
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, #1e1b4b 0%, #4c1d95 50%, #7c3aed 100%);
+    background-attachment: fixed;
     min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    color: white;
   }
+
   .login-container {
-    max-width: 400px;
-    margin: 60px auto;
-    background: rgba(255, 255, 255, 0.55);
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.10);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    border-radius: 20px;
-    padding: 36px 32px 28px 32px;
-    animation: fadeIn 0.5s ease-in-out;
-    border: 1px solid rgba(255,255,255,0.22);
+    width: 100%;
+    max-width: 440px;
+    animation: floatIn 0.9s cubic-bezier(0.175, 0.885, 0.32, 1.1) forwards;
   }
-  .login-title {
-    background: linear-gradient(90deg, #5a8dee 0%, #6fc3f7 100%);
-    color: #fff;
-    padding: 18px 0;
-    border-radius: 14px;
-    text-align: center;
-    font-weight: bold;
-    font-size: 1.6rem;
-    letter-spacing: 1px;
-    margin-bottom: 18px;
-    box-shadow: 0 4px 12px rgba(90, 141, 238, 0.13);
-  }
-  .input-group {
+
+  .login-card {
+    background: var(--glass);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-radius: 28px;
+    border: 1.5px solid var(--glass-border);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3), 0 0 100px rgba(139,92,246,0.15);
+    padding: 44px 36px;
     position: relative;
-    margin-bottom: 22px;
+    overflow: hidden;
   }
-  .input-group .fa-solid {
+
+  .login-card::before {
+    content: '';
     position: absolute;
-    left: 14px;
+    inset: 0;
+    background: var(--primary-gradient);
+    opacity: 0.07;
+    pointer-events: none;
+    border-radius: 28px;
+  }
+
+  .brand {
+    text-align: center;
+    margin-bottom: 36px;
+  }
+
+  .brand-icon {
+    font-size: 4.2rem;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 16px;
+    animation: pulseGlow 4s ease-in-out infinite;
+  }
+
+  .brand h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 8px;
+    background: linear-gradient(to right, #e0e7ff, #fff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .brand p {
+    color: var(--text-muted);
+    font-size: 1rem;
+  }
+
+  .input-wrapper {
+    position: relative;
+    margin-bottom: 24px;
+  }
+
+  .input-wrapper i {
+    position: absolute;
+    left: 18px;
     top: 50%;
     transform: translateY(-50%);
-    color: #5a8dee;
-    font-size: 1.1rem;
-    opacity: 0.65;
-    z-index: 2;
-    pointer-events: none;
-  }
-  .input-group input,
-  .input-group select,
-  .input-group textarea {
-    width: 100%;
-    padding: 12px 16px 12px 44px;
-    border: 1px solid #e0e6ed;
-    border-radius: 12px;
-    font-size: 0.95rem;
+    font-size: 1.2rem;
+    color: rgba(255,255,255,0.7);
+    z-index: 10;
     transition: all 0.3s ease;
-    background-color: #f8fafc;
-    color: #1e293b;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   }
-  .input-group input:focus,
-  .input-group select:focus,
-  .input-group textarea:focus {
-    border-color: #5a8dee;
-    box-shadow: 0 0 0 3px rgba(90, 141, 238, 0.2);
+
+  .form-control {
+    width: 100%;
+    padding: 18px 18px 18px 56px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1.5px solid rgba(255, 255, 255, 0.3);
+    border-radius: 18px;
+    color: white;
+    font-size: 1.05rem;
+    transition: all 0.4s ease;
+  }
+
+  .form-control::placeholder { color: rgba(255,255,255,0.6); }
+
+  .form-control:focus {
     outline: none;
+    border-color: #fff;
+    background: rgba(255,255,255,0.22);
+    box-shadow: 0 0 0 5px rgba(255,255,255,0.18);
   }
+
+  .form-control:focus + i {
+    color: white;
+    transform: translateY(-50%) scale(1.2);
+  }
+
   .btn-login {
-    background: linear-gradient(90deg, #5a8dee 0%, #6fc3f7 100%);
+    width: 100%;
+    padding: 18px;
+    background: var(--primary-gradient);
     color: white;
     border: none;
-    padding: 12px 24px;
-    border-radius: 12px;
+    border-radius: 18px;
+    font-size: 1.15rem;
     font-weight: 600;
-    font-size: 1rem;
-    width: 100%;
     cursor: pointer;
-    transition: all 0.3s ease;
-    margin-top: 10px;
-    box-shadow: 0 4px 12px rgba(90, 141, 238, 0.2);
+    margin-top: 12px;
+    transition: all 0.4s ease;
+    box-shadow: 0 10px 30px rgba(99,102,241,0.4);
   }
-  .btn-login:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(90, 141, 238, 0.3);
-  }
-  .forgot-password {
-    text-align: right;
-    margin: 12px 0 20px;
-  }
-  .forgot-password a {
-    color: #5a8dee;
-    text-decoration: none;
-    font-size: 0.9rem;
-    transition: all 0.2s ease;
-  }
-  .forgot-password a:hover {
-    text-decoration: underline;
-  }
-  .signup-link {
-    text-align: center;
-    margin-top: 20px;
-    color: #64748b;
+
+  .btn-login:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(99,102,241,0.5); }
+
+  .links a { color: var(--text-muted); text-decoration: none; }
+  .links a:hover { color: white; text-decoration: underline; }
+
+  .divider { color: rgba(255,255,255,0.6); margin: 24px 0; text-align: center; font-size: 0.9rem; }
+
+  .alert {
+    padding: 16px 20px;
+    border-radius: 16px;
+    margin-bottom: 24px;
     font-size: 0.95rem;
+    backdrop-filter: blur(12px);
   }
-  .signup-link a {
-    color: #5a8dee;
-    font-weight: 600;
-    text-decoration: none;
-    margin-left: 5px;
-    transition: all 0.2s ease;
-  }
-  .signup-link a:hover {
-    text-decoration: underline;
-  }
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  .error-message {
-    color: #ef4444;
-    font-size: 0.9rem;
-    margin-top: 5px;
-    display: block;
+
+  .alert-danger { background: rgba(239,68,68,0.22); color: #fda4af; border: 1px solid rgba(251,113,133,0.3); }
+  .alert-info    { background: rgba(99,162,255,0.18); color: #93c5fd; border: 1px solid rgba(147,197,253,0.3); }
+  .alert-warning { background: rgba(251,191,36,0.18); color: #fcd34d; border: 1px solid rgba(252,211,77,0.3); }
+
+  @keyframes floatIn { from { opacity: 0; transform: translateY(50px) scale(0.94); } to { opacity: 1; transform: translateY(0) scale(1); } }
+  @keyframes pulseGlow { 0%,100% { text-shadow: 0 0 20px rgba(139,92,246,0.5); } 50% { text-shadow: 0 0 40px rgba(139,92,246,0.8); } }
+
+  @media (max-width: 480px) {
+    .login-card { padding: 36px 28px; border-radius: 24px; }
+    .brand-icon { font-size: 3.5rem; }
+    .brand h1 { font-size: 1.75rem; }
   }
 </style>
 
 <div class="login-container">
-  <div class="login-title">
-    <i class="fas fa-biking me-2"></i> AIS E-Bike Rental
-  </div>
-  
-  {% if form.errors %}
-  <div class="alert alert-danger" role="alert">
-    <i class="fas fa-exclamation-circle me-2"></i>
-    Your username and password didn't match. Please try again.
-  </div>
-  {% endif %}
+  <div class="login-card">
+    <div class="brand">
+      <i class="fas fa-biking brand-icon"></i>
+      <h1>AIS E-Bike Rental</h1>
+      <p>India's Smart Electric Bike Platform</p>
+    </div>
 
-  {% if next %}
-    {% if user.is_authenticated %}
-    <div class="alert alert-warning" role="alert">
-      <i class="fas fa-exclamation-triangle me-2"></i>
-      Your account doesn't have access to this page. To proceed, please login with an account that has access.
-    </div>
-    {% else %}
-    <div class="alert alert-info" role="alert">
-      <i class="fas fa-info-circle me-2"></i>
-      Please login to see this page.
-    </div>
+    {% if form.errors %}
+      <div class="alert alert-danger">
+        Invalid username or password. Please try again.
+      </div>
     {% endif %}
-  {% endif %}
 
-  <form method="post" action="{% url 'login' %}">
-    {% csrf_token %}
-    
-    <div class="input-group">
-      <i class="fas fa-user"></i>
-      <input type="text" name="username" id="id_username" class="form-control" placeholder="Username" required autofocus>
+    {% if next %}
+      {% if user.is_authenticated %}
+        <div class="alert alert-warning">
+          You don't have access to this page.
+        </div>
+      {% else %}
+        <div class="alert alert-info">
+          Please login to continue.
+        </div>
+      {% endif %}
+    {% endif %}
+
+    <form method="post" action="{% url 'login' %}">
+      {% csrf_token %}
+
+      <div class="input-wrapper">
+        <input type="text" name="username" id="id_username" class="form-control"
+               placeholder="Mobile Number or Username" required autofocus>
+        <i class="fas fa-user"></i>
+      </div>
+
+      <div class="input-wrapper">
+        <input type="password" name="password" id="id_password" class="form-control"
+               placeholder="Enter your password" required>
+        <i class="fas fa-lock"></i>
+      </div>
+
+      <button type="submit" class="btn-login">
+        Login to Dashboard
+      </button>
+
+      <input type="hidden" name="next" value="{{ next }}">
+    </form>
+
+    <div class="links">
+      <a href="{% url 'password_reset' %}">Forgot Password?</a>
     </div>
-    
-    <div class="input-group">
-      <i class="fas fa-lock"></i>
-      <input type="password" name="password" id="id_password" class="form-control" placeholder="Password" required>
+
+    <div class="divider">New to AIS?</div>
+
+    <div class="links">
+      <a href="{% url 'signup' %}"><strong>Create Free Account</strong></a>
     </div>
-    
-    <div class="forgot-password">
-      <a href="{% url 'password_reset' %}">Forgot password?</a>
-    </div>
-    
-    <button type="submit" class="btn-login">
-      <i class="fas fa-sign-in-alt me-2"></i> Sign In
-    </button>
-    
-    <input type="hidden" name="next" value="{{ next }}">
-  </form>
-  
-  <div class="signup-link">
-    Don't have an account? <a href="{% url 'signup' %}">Sign up</a>
   </div>
 </div>
 
 <script>
-  // Add animation to form inputs on focus
-  document.querySelectorAll('.input-group input').forEach(input => {
-    input.addEventListener('focus', function() {
-      this.parentElement.querySelector('.fa-solid').style.opacity = '1';
-      this.parentElement.querySelector('.fa-solid').style.transform = 'translateY(-50%) scale(1.1)';
-    });
-    
-    input.addEventListener('blur', function() {
-      this.parentElement.querySelector('.fa-solid').style.opacity = '0.65';
-      this.parentElement.querySelector('.fa-solid').style.transform = 'translateY(-50%)';
-    });
+  document.querySelectorAll('.form-control').forEach(input => {
+    const icon = input.parentElement.querySelector('i');
+    input.addEventListener('focus', () => icon.style.color = 'white');
+    input.addEventListener('blur', () => icon.style.color = 'rgba(255,255,255,0.7)');
   });
 </script>
+
 {% endblock %}

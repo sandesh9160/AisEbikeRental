@@ -4,905 +4,617 @@
 {% block title %}Review Documents{% endblock %}
 
 {% block content %}
-<!-- Custom Styles -->
 <style>
-    .document-review-page {
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-        min-height: 100vh;
-    }
-    .section-nav .nav-link {
-        border-radius: 20px;
-        font-weight: 600;
-        padding: 0.5rem 1rem;
-    }
-    .section-nav .nav-link.active {
-        color: #fff;
-        background: linear-gradient(135deg, #74b9ff, #0984e3);
-        box-shadow: 0 6px 18px rgba(9, 132, 227, 0.25);
-    }
-    .section-nav-container {
-        position: sticky;
-        top: 12px;
-        z-index: 9;
-    }
-    /* Smooth anchor offset so headers are not hidden under sticky bar */
-    #pending-section, #approved-section, #rejected-section {
-        scroll-margin-top: 90px;
-    }
-    .main-header {
-        background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
-        color: white;
-        padding: 3rem 0;
-        margin-bottom: 2rem;
-        border-radius: 0 0 30px 30px;
-        box-shadow: 0 10px 40px rgba(116, 185, 255, 0.2);
-        position: relative;
-        overflow: hidden;
-    }
-    .main-header::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/><circle cx="10" cy="60" r="0.5" fill="white" opacity="0.1"/><circle cx="90" cy="40" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
-        opacity: 0.3;
-    }
-    .stats-card {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-        border-radius: 20px;
-        padding: 2rem;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        position: relative;
-        overflow: hidden;
-    }
-    .stats-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #74b9ff, #0984e3);
-    }
-    .stats-card:hover {
-        transform: translateY(-8px) scale(1.02);
-        box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-    }
-    .document-card {
-        border: none;
-        border-radius: 20px;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        overflow: hidden;
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-    }
-    .document-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-    }
-    .status-badge {
-        font-size: 0.8rem;
-        padding: 0.6rem 1.2rem;
-        border-radius: 25px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    }
-    .section-header {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-        border-radius: 20px;
-        padding: 2rem;
-        margin-bottom: 2rem;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-        border-left: 6px solid;
-        position: relative;
-        overflow: hidden;
-    }
-    .section-header::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        right: 0;
-        width: 100px;
-        height: 100px;
-        background: linear-gradient(45deg, rgba(255,255,255,0.1), transparent);
-        border-radius: 50%;
-        transform: translate(30px, -30px);
-    }
-    .pending-header { 
-        border-left-color: #fdcb6e; 
-        background: linear-gradient(135deg, rgba(253, 203, 110, 0.1), rgba(255, 255, 255, 0.95));
-    }
-    .approved-header { 
-        border-left-color: #00b894; 
-        background: linear-gradient(135deg, rgba(0, 184, 148, 0.1), rgba(255, 255, 255, 0.95));
-    }
-    .rejected-header { 
-        border-left-color: #e17055; 
-        background: linear-gradient(135deg, rgba(225, 112, 85, 0.1), rgba(255, 255, 255, 0.95));
-    }
-    
-    /* Modern Table Styling */
-    .modern-table {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-        border-radius: 20px;
-        overflow: hidden;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-    .modern-table thead {
-        background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
-        color: white;
-    }
-    .modern-table thead th {
-        border: none;
-        padding: 1.5rem 1rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        font-size: 0.85rem;
-    }
-    .modern-table tbody tr {
-        background-color: rgba(255, 255, 255, 0.8);
-        transition: all 0.3s ease;
-        border-bottom: 1px solid rgba(0,0,0,0.05);
-    }
-    .modern-table tbody tr:hover {
-        background: linear-gradient(135deg, rgba(116, 185, 255, 0.05), rgba(9, 132, 227, 0.05));
-        transform: scale(1.01);
-    }
-    .modern-table tbody td {
-        border: none;
-        padding: 1.5rem 1rem;
-        vertical-align: middle;
-    }
-    
-    /* Modern Badge Styling */
-    .modern-badge {
-        display: inline-block;
-        padding: 0.5rem 1rem;
-        border-radius: 20px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        transition: all 0.3s ease;
-    }
-    .modern-badge:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-    }
-    .badge-pending {
-        background: linear-gradient(135deg, #fdcb6e, #f39c12);
-        color: white;
-    }
-    .badge-approved {
-        background: linear-gradient(135deg, #00b894, #00cec9);
-        color: white;
-    }
-    .badge-rejected {
-        background: linear-gradient(135deg, #e17055, #d63031);
-        color: white;
-    }
-    
-    /* Modern Button Styling */
-    .modern-btn {
-        border-radius: 12px;
-        padding: 0.6rem 1.2rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        font-size: 0.75rem;
-        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        border: none;
-    }
-    .modern-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-    }
-    .modern-btn-primary {
-        background: linear-gradient(135deg, #74b9ff, #0984e3);
-        color: white;
-    }
-    .modern-btn-warning {
-        background: linear-gradient(135deg, #fdcb6e, #f39c12);
-        color: white;
-    }
-    .modern-btn-success {
-        background: linear-gradient(135deg, #00b894, #00cec9);
-        color: white;
-    }
-    .modern-btn-danger {
-        background: linear-gradient(135deg, #e17055, #d63031);
-        color: white;
-    }
-    
-    /* Modern Icon Styling */
-    .modern-icon {
-        width: 20px;
-        height: 20px;
-        margin-right: 0.5rem;
-        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
-    }
-    .modern-icon-lg {
-        width: 24px;
-        height: 24px;
-        margin-right: 0.75rem;
-        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
-    }
-    
-    /* Glassmorphism Effect */
-    .glass-effect {
-        background: rgba(255, 255, 255, 0.25);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.18);
-    }
-    
-    /* Animation for loading */
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    .fade-in-up {
-        animation: fadeInUp 0.6s ease-out;
-    }
+  .admin-modern {
+    background: radial-gradient(circle at top, #eef4ff 0%, #f7f9fc 55%, #eef2f7 100%);
+    min-height: 100vh;
+    padding-bottom: 4rem;
+  }
+  .admin-hero {
+    background: linear-gradient(135deg, #4c6ef5 0%, #6ac8ff 100%);
+    color: #fff;
+    border-radius: 0 0 36px 36px;
+    padding: 3.5rem 0 2.5rem;
+    box-shadow: 0 28px 60px -28px rgba(76, 110, 245, 0.5);
+    position: relative;
+    overflow: hidden;
+  }
+  .admin-hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse" patternTransform="rotate(35)"><rect width="1" height="24" fill="rgba(255,255,255,0.12)"/><rect width="24" height="1" fill="rgba(255,255,255,0.12)"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+    opacity: .25;
+  }
+  .admin-hero .content {
+    position: relative;
+    z-index: 1;
+  }
+  .hero-title {
+    font-weight: 700;
+    font-size: clamp(1.8rem, 3vw, 2.6rem);
+    margin-bottom: .65rem;
+  }
+  .hero-subtitle {
+    opacity: .85;
+  }
+  .hero-actions .btn {
+    border-radius: 14px;
+    font-weight: 600;
+    letter-spacing: .4px;
+    padding: .65rem 1.4rem;
+    box-shadow: 0 16px 40px -20px rgba(0, 0, 0, .35);
+  }
+  .hero-actions .btn-light {
+    color: #2d3748;
+  }
+  .metrics-grid {
+    margin-top: -60px;
+  }
+  .metric-card {
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(18px);
+    border-radius: 22px;
+    padding: 1.6rem 1.4rem;
+    box-shadow: 0 24px 60px -35px rgba(22, 33, 66, .5);
+    border: 1px solid rgba(255, 255, 255, .35);
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    transition: transform .35s ease, box-shadow .35s ease;
+  }
+  .metric-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 38px 70px -40px rgba(22, 33, 66, .7);
+  }
+  .metric-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 18px;
+    display: grid;
+    place-items: center;
+    font-size: 1.6rem;
+    color: #fff;
+  }
+  .metric-label {
+    font-size: .9rem;
+    text-transform: uppercase;
+    letter-spacing: .35px;
+    color: #6c7a91;
+    margin-bottom: .15rem;
+    font-weight: 600;
+  }
+  .metric-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #1f2933;
+  }
+  .modern-card {
+    background: rgba(255, 255, 255, 0.94);
+    border-radius: 22px;
+    box-shadow: 0 30px 80px -48px rgba(31, 45, 61, .6);
+    border: 1px solid rgba(255, 255, 255, .5);
+    overflow: hidden;
+  }
+  .section-chip {
+    background: rgba(76, 110, 245, .1);
+    color: #4c6ef5;
+    border-radius: 999px;
+    padding: .45rem 1.1rem;
+    font-size: .78rem;
+    text-transform: uppercase;
+    letter-spacing: .45px;
+    font-weight: 700;
+  }
+  .section-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .75rem 1.25rem;
+    align-items: center;
+  }
+  .filters-card {
+    display: none;
+    margin-bottom: 1.5rem;
+    animation: fadeIn .35s ease;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-8px);} to { opacity: 1; transform: translateY(0);} }
+  .filter-field label {
+    font-weight: 600;
+    color: #405169;
+    font-size: .85rem;
+    margin-bottom: .35rem;
+  }
+  .filter-field .form-control, .filter-field .form-select {
+    border-radius: 12px;
+    border: 1px solid rgba(64, 81, 105, .18);
+    padding: .6rem .85rem;
+  }
+  .filter-actions .btn {
+    border-radius: 12px;
+    padding: .6rem 1.3rem;
+    font-weight: 600;
+  }
+  .admin-table {
+    background: transparent;
+  }
+  .admin-table thead {
+    background: linear-gradient(135deg, #edf1ff 0%, #f7f9ff 100%);
+    border-bottom: 1px solid rgba(76, 110, 245, .12);
+  }
+  .admin-table thead th {
+    font-size: .78rem;
+    letter-spacing: .45px;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: #5b6f92;
+    border: none;
+    padding: 1rem .9rem;
+  }
+  .admin-table tbody tr {
+    transition: background .25s ease, transform .25s ease;
+  }
+  .admin-table tbody tr:hover {
+    background: rgba(76, 110, 245, .06);
+  }
+  .admin-table tbody td {
+    padding: 1.05rem .9rem;
+    vertical-align: middle;
+    border-top: 1px solid rgba(143, 155, 179, .12);
+  }
+  .badge-chip {
+    border-radius: 999px;
+    padding: .35rem .9rem;
+    font-size: .72rem;
+    font-weight: 600;
+    letter-spacing: .35px;
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    box-shadow: 0 12px 18px -14px rgba(0,0,0,.35);
+  }
+  .badge-pending { background: linear-gradient(135deg, #ffbf66 0%, #ff885d 100%); color: #fff; }
+  .badge-approved { background: linear-gradient(135deg, #4dd4ac 0%, #1ca7ec 100%); color: #fff; }
+  .badge-rejected { background: linear-gradient(135deg, #ff6b81 0%, #d93b6a 100%); color: #fff; }
+  .action-stack .btn {
+    border-radius: 12px;
+    padding: .55rem 1rem;
+    font-size: .78rem;
+    font-weight: 600;
+    letter-spacing: .3px;
+    border: none;
+    box-shadow: 0 12px 30px -20px rgba(38, 38, 38, .6);
+  }
+  .action-stack .btn + .btn { margin-left: .6rem; }
+  .bulk-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .bulk-toolbar .form-control {
+    border-radius: 12px;
+    padding: .55rem .85rem;
+  }
+  .empty-state {
+    padding: 4rem 1.5rem;
+    text-align: center;
+    color: #5c6c84;
+  }
 </style>
 
-<div class="document-review-page">
-    <!-- Main Header -->
-    <div class="main-header">
-        <div class="container-fluid">
-            <div class="row align-items-center">
-                <div class="col-md-8">
-                    <h1 class="mb-0 fade-in-up">
-                        <i class="fas fa-shield-check me-3 modern-icon-lg"></i>
-                        Document Verification Center
-                    </h1>
-                    <p class="mb-0 mt-3 opacity-75 fade-in-up" style="animation-delay: 0.2s;">
-                        <i class="fas fa-search me-2"></i>Review and verify provider documents with advanced security
-                    </p>
-                </div>
-                <div class="col-md-4 text-md-end">
-                    <div class="d-flex gap-2 justify-content-md-end">
-                        <button class="btn glass-effect text-white modern-btn fade-in-up" style="animation-delay: 0.3s;" onclick="toggleFilters()">
-                            <i class="fas fa-filter me-2"></i>Filters
-                        </button>
-                        <a href="{% url 'admin_dashboard' %}" class="btn glass-effect text-white modern-btn fade-in-up" style="animation-delay: 0.4s;">
-                            <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
-                        </a>
-                    </div>
-                </div>
-            </div>
+<div class="admin-modern">
+  <section class="admin-hero">
+    <div class="container-fluid content">
+      <div class="row align-items-center g-4">
+        <div class="col-lg-8">
+          <h1 class="hero-title">
+            <i class="fas fa-id-badge me-2"></i>
+            Provider Document Control
+          </h1>
+          <p class="hero-subtitle mb-0">
+            Monitor, approve and guide providers through a smooth verification journey.
+          </p>
         </div>
+        <div class="col-lg-4 d-flex justify-content-lg-end hero-actions gap-2 flex-wrap">
+          <button type="button" class="btn btn-light" onclick="toggleFilters()">
+            <i class="fas fa-sliders-h me-2"></i>Advanced Filters
+          </button>
+          <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-light">
+            <i class="fas fa-arrow-left me-2"></i>Dashboard
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="container-fluid">
+    <div id="filtersPanel" class="modern-card filters-card px-4 py-4 mt-4">
+      <form method="get" action="{% url 'review_documents' %}">
+        <div class="row g-3">
+          <div class="col-md-3 filter-field">
+            <label><i class="fas fa-user me-2"></i>Provider</label>
+            <select class="form-select" name="provider">
+              <option value="">All Providers</option>
+              {% for provider in all_providers %}
+                <option value="{{ provider.id }}" {% if current_provider == provider.id|stringformat:'s' %}selected{% endif %}>{{ provider.username }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-3 filter-field">
+            <label><i class="fas fa-file me-2"></i>Document Type</label>
+            <select class="form-select" name="document_type">
+              <option value="">All</option>
+              <option value="aadhar" {% if current_document_type == 'aadhar' %}selected{% endif %}>Aadhar Card</option>
+              <option value="pan" {% if current_document_type == 'pan' %}selected{% endif %}>PAN Card</option>
+              <option value="driving_license" {% if current_document_type == 'driving_license' %}selected{% endif %}>Driving License</option>
+              <option value="business_license" {% if current_document_type == 'business_license' %}selected{% endif %}>Business License</option>
+              <option value="insurance" {% if current_document_type == 'insurance' %}selected{% endif %}>Insurance Document</option>
+              <option value="other" {% if current_document_type == 'other' %}selected{% endif %}>Other</option>
+            </select>
+          </div>
+          <div class="col-md-3 filter-field">
+            <label><i class="fas fa-traffic-light me-2"></i>Status</label>
+            <select class="form-select" name="status">
+              <option value="" {% if not current_status %}selected{% endif %}>All</option>
+              <option value="pending" {% if current_status == 'pending' %}selected{% endif %}>Pending</option>
+              <option value="approved" {% if current_status == 'approved' %}selected{% endif %}>Approved</option>
+              <option value="rejected" {% if current_status == 'rejected' %}selected{% endif %}>Rejected</option>
+            </select>
+          </div>
+          <div class="col-md-3 filter-field">
+            <label><i class="fas fa-search me-2"></i>Search</label>
+            <input type="text" class="form-control" name="search" value="{{ current_search }}" placeholder="Provider or document number">
+          </div>
+          <div class="col-md-3 filter-field">
+            <label><i class="fas fa-calendar-plus me-2"></i>Date From</label>
+            <input type="date" class="form-control" name="date_from" value="{{ current_date_from }}">
+          </div>
+          <div class="col-md-3 filter-field">
+            <label><i class="fas fa-calendar-minus me-2"></i>Date To</label>
+            <input type="date" class="form-control" name="date_to" value="{{ current_date_to }}">
+          </div>
+          <div class="col-12 filter-actions text-end mt-3">
+            <button type="submit" class="btn btn-primary me-2">
+              <i class="fas fa-search me-1"></i>Apply
+            </button>
+            <a href="{% url 'review_documents' %}" class="btn btn-outline-secondary">
+              <i class="fas fa-undo me-1"></i>Reset
+            </a>
+          </div>
+        </div>
+      </form>
     </div>
 
-    <!-- Advanced Filters Panel (GET form) -->
-    <div class="container-fluid mb-4" id="filtersPanel" style="display: none;">
-        <div class="card document-card">
-            <div class="card-body">
-                <form method="get" action="{% url 'review_documents' %}">
-                    <div class="row align-items-end g-3">
-                        <div class="col-md-3">
-                            <label class="form-label fw-bold">
-                                <i class="fas fa-user me-2"></i>Provider
-                            </label>
-                            <select class="form-select" name="provider">
-                                <option value="">All Providers</option>
-                                {% for provider in all_providers %}
-                                    <option value="{{ provider.id }}" {% if current_provider == provider.id|stringformat:'s' %}selected{% endif %}>{{ provider.username }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label fw-bold">
-                                <i class="fas fa-file-alt me-2"></i>Document Type
-                            </label>
-                            <select class="form-select" name="document_type">
-                                <option value="">All Types</option>
-                                <option value="aadhar" {% if current_document_type == 'aadhar' %}selected{% endif %}>Aadhar Card</option>
-                                <option value="pan" {% if current_document_type == 'pan' %}selected{% endif %}>PAN Card</option>
-                                <option value="driving_license" {% if current_document_type == 'driving_license' %}selected{% endif %}>Driving License</option>
-                                <option value="business_license" {% if current_document_type == 'business_license' %}selected{% endif %}>Business License</option>
-                                <option value="insurance" {% if current_document_type == 'insurance' %}selected{% endif %}>Insurance Document</option>
-                                <option value="other" {% if current_document_type == 'other' %}selected{% endif %}>Other</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label fw-bold">
-                                <i class="fas fa-traffic-light me-2"></i>Status
-                            </label>
-                            <select class="form-select" name="status">
-                                <option value="" {% if not current_status %}selected{% endif %}>All</option>
-                                <option value="pending" {% if current_status == 'pending' %}selected{% endif %}>Pending</option>
-                                <option value="approved" {% if current_status == 'approved' %}selected{% endif %}>Approved</option>
-                                <option value="rejected" {% if current_status == 'rejected' %}selected{% endif %}>Rejected</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label fw-bold">
-                                <i class="fas fa-search me-2"></i>Search
-                            </label>
-                            <input type="text" class="form-control" name="search" value="{{ current_search }}" placeholder="Provider username or document number">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label fw-bold">
-                                <i class="fas fa-calendar-plus me-2"></i>Date From
-                            </label>
-                            <input type="date" class="form-control" name="date_from" value="{{ current_date_from }}">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label fw-bold">
-                                <i class="fas fa-calendar-minus me-2"></i>Date To
-                            </label>
-                            <input type="date" class="form-control" name="date_to" value="{{ current_date_to }}">
-                        </div>
-                        <div class="col-12 text-end">
-                            <button type="submit" class="btn modern-btn modern-btn-primary me-2">
-                                <i class="fas fa-search me-1"></i>Apply Filters
-                            </button>
-                            <a href="{% url 'review_documents' %}" class="btn modern-btn modern-btn-warning">
-                                <i class="fas fa-times me-1"></i>Clear
-                            </a>
-                        </div>
-                    </div>
-                </form>
-            </div>
+    <div class="row metrics-grid g-3">
+      <div class="col-sm-6 col-xl-3">
+        <div class="metric-card">
+          <div class="metric-icon" style="background: linear-gradient(135deg,#ffbf66,#ff885d);"><i class="fas fa-hourglass-half"></i></div>
+          <div>
+            <div class="metric-label">Pending</div>
+            <div class="metric-value">{{ pending_documents|length }}</div>
+          </div>
         </div>
+      </div>
+      <div class="col-sm-6 col-xl-3">
+        <div class="metric-card">
+          <div class="metric-icon" style="background: linear-gradient(135deg,#4dd4ac,#1ca7ec);"><i class="fas fa-shield-check"></i></div>
+          <div>
+            <div class="metric-label">Approved</div>
+            <div class="metric-value">{{ approved_documents|length }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-xl-3">
+        <div class="metric-card">
+          <div class="metric-icon" style="background: linear-gradient(135deg,#ff6b81,#d93b6a);"><i class="fas fa-times-circle"></i></div>
+          <div>
+            <div class="metric-label">Rejected</div>
+            <div class="metric-value">{{ rejected_documents|length }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-xl-3">
+        <div class="metric-card">
+          <div class="metric-icon" style="background: linear-gradient(135deg,#4c6ef5,#6ac8ff);"><i class="fas fa-database"></i></div>
+          <div>
+            <div class="metric-label">Total Files</div>
+            <div class="metric-value">{{ total_documents }}</div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div class="container-fluid">
-        <!-- Quick Section Navigation -->
-        <div class="section-header glass-effect fade-in-up section-nav-container">
-            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
-                <ul class="nav section-nav">
-                    <li class="nav-item"><a class="nav-link active" href="#pending-section"><i class="fas fa-hourglass-half me-2"></i>Pending ({{ pending_documents|length }})</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#approved-section"><i class="fas fa-check-double me-2"></i>Approved ({{ approved_documents|length }})</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#rejected-section"><i class="fas fa-times-circle me-2"></i>Rejected ({{ rejected_documents|length }})</a></li>
-                </ul>
-                <div class="text-muted small fw-semibold">
-                    <i class="fas fa-database me-1"></i>Total: {{ total_documents }}
-                </div>
-            </div>
+    <div class="modern-card mt-4 p-4">
+      <div class="section-toolbar mb-3">
+        <div class="d-flex flex-wrap align-items-center gap-2">
+          <span class="section-chip"><i class="fas fa-layer-group me-2"></i>Sections</span>
+          <a class="btn btn-sm btn-outline-primary" href="#pending-section"><i class="fas fa-hourglass-half me-1"></i>Pending</a>
+          <a class="btn btn-sm btn-outline-success" href="#approved-section"><i class="fas fa-check-double me-1"></i>Approved</a>
+          <a class="btn btn-sm btn-outline-danger" href="#rejected-section"><i class="fas fa-times me-1"></i>Rejected</a>
         </div>
-        <!-- Statistics Cards -->
-        <div class="row mb-4">
-            <div class="col-md-3 mb-3">
-                <div class="stats-card text-center fade-in-up">
-                    <div class="mb-3">
-                        <div class="d-inline-flex align-items-center justify-content-center rounded-circle" style="width: 80px; height: 80px; background: linear-gradient(135deg, #fdcb6e, #f39c12);">
-                            <i class="fas fa-hourglass-half fa-2x text-white"></i>
-                        </div>
-                    </div>
-                    <h2 class="mb-2 fw-bold" style="background: linear-gradient(135deg, #fdcb6e, #f39c12); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">{{ pending_documents|length }}</h2>
-                    <p class="mb-0 text-muted fw-semibold">Pending Review</p>
-                </div>
+        <div class="text-muted small fw-semibold">
+          <i class="fas fa-info-circle me-1"></i>
+          Use bulk actions to approve or reject multiple documents quickly.
+        </div>
+      </div>
+
+      {% if pending_documents %}
+      <section id="pending-section" class="mb-5">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-3">
+          <div>
+            <h4 class="mb-1 fw-bold text-dark"><i class="fas fa-hourglass-half text-warning me-2"></i>Pending Review</h4>
+            <p class="text-muted mb-0">{{ pending_documents|length }} documents awaiting your decision.</p>
+          </div>
+          <div class="d-flex align-items-center gap-3">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="selectAllPending" onchange="toggleSelectAll('pending')">
+              <label class="form-check-label fw-semibold" for="selectAllPending">Select all</label>
             </div>
-            <div class="col-md-3 mb-3">
-                <div class="stats-card text-center fade-in-up" style="animation-delay: 0.1s;">
-                    <div class="mb-3">
-                        <div class="d-inline-flex align-items-center justify-content-center rounded-circle" style="width: 80px; height: 80px; background: linear-gradient(135deg, #00b894, #00cec9);">
-                            <i class="fas fa-check-double fa-2x text-white"></i>
-                        </div>
-                    </div>
-                    <h2 class="mb-2 fw-bold" style="background: linear-gradient(135deg, #00b894, #00cec9); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">{{ approved_documents|length }}</h2>
-                    <p class="mb-0 text-muted fw-semibold">Approved</p>
-                </div>
-            </div>
-            <div class="col-md-3 mb-3">
-                <div class="stats-card text-center fade-in-up" style="animation-delay: 0.2s;">
-                    <div class="mb-3">
-                        <div class="d-inline-flex align-items-center justify-content-center rounded-circle" style="width: 80px; height: 80px; background: linear-gradient(135deg, #e17055, #d63031);">
-                            <i class="fas fa-exclamation-triangle fa-2x text-white"></i>
-                        </div>
-                    </div>
-                    <h2 class="mb-2 fw-bold" style="background: linear-gradient(135deg, #e17055, #d63031); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">{{ rejected_documents|length }}</h2>
-                    <p class="mb-0 text-muted fw-semibold">Rejected</p>
-                </div>
-            </div>
-            <div class="col-md-3 mb-3">
-                <div class="stats-card text-center fade-in-up" style="animation-delay: 0.3s;">
-                    <div class="mb-3">
-                        <div class="d-inline-flex align-items-center justify-content-center rounded-circle" style="width: 80px; height: 80px; background: linear-gradient(135deg, #74b9ff, #0984e3);">
-                            <i class="fas fa-folder-open fa-2x text-white"></i>
-                        </div>
-                    </div>
-                    <h2 class="mb-2 fw-bold" style="background: linear-gradient(135deg, #74b9ff, #0984e3); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">{{ total_documents }}</h2>
-                    <p class="mb-0 text-muted fw-semibold">Total Documents</p>
-                </div>
-            </div>
+            <span class="badge-chip badge-pending"><i class="fas fa-clock me-1"></i>{{ pending_documents|length }} Pending</span>
+          </div>
         </div>
 
-        <div class="row">
-            <div class="col-12">
-
-            <!-- Pending Documents -->
-            {% if pending_documents %}
-                <div id="pending-section" class="section-header pending-header fade-in-up">
-                    <div class="d-flex align-items-center justify-content-between">
-                        <div>
-                            <h4 class="mb-2 fw-bold">
-                                <i class="fas fa-hourglass-half me-3 modern-icon-lg"></i>
-                                Pending Review
-                            </h4>
-                            <p class="mb-0 text-muted">
-                                <i class="fas fa-file-alt me-2"></i>{{ pending_documents|length }} documents waiting for your review
-                            </p>
-                        </div>
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="selectAllPending" onchange="toggleSelectAll('pending')">
-                                <label class="form-check-label fw-bold" for="selectAllPending">
-                                    Select All
-                                </label>
-                            </div>
-                            <div class="btn-group" role="group">
-                                <button type="button" class="btn modern-btn modern-btn-success btn-sm" id="bulkApproveBtn" onclick="bulkApprove('pending')" disabled>
-                                    <i class="fas fa-check me-1"></i>Bulk Approve
-                                </button>
-                                <button type="button" class="btn modern-btn modern-btn-danger btn-sm" id="bulkRejectBtn" onclick="bulkReject('pending')" disabled>
-                                    <i class="fas fa-times me-1"></i>Bulk Reject
-                                </button>
-                            </div>
-                            <span class="status-badge badge-pending">{{ pending_documents|length }} Pending</span>
-                        </div>
+        <div class="table-responsive rounded-4 border border-light">
+          <table class="table admin-table">
+            <thead>
+              <tr>
+                <th style="width:48px;">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="selectAllPendingTable" onchange="toggleSelectAllTable('pending')">
+                  </div>
+                </th>
+                <th>Provider</th>
+                <th>Details</th>
+                <th>Uploaded</th>
+                <th class="text-center" style="width:200px;">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for provider, documents in pending_by_provider.items %}
+              <tr>
+                <td>
+                  <div class="form-check">
+                    <input class="form-check-input document-checkbox" type="checkbox" value="{% for document in documents %}{{ document.id }}{% if not forloop.last %},{% endif %}{% endfor %}" data-provider="{{ provider.username }}" onchange="updateBulkButtons()">
+                  </div>
+                </td>
+                <td>
+                  <div class="d-flex align-items-center gap-3">
+                    <div class="metric-icon" style="width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,#ffbf66,#ff885d);font-size:1.3rem;">
+                      <i class="fas fa-user"></i>
                     </div>
-                </div>
-                
-                <div class="document-card mb-4">
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-sm modern-table mb-0">
-                                <thead>
-                                    <tr>
-                                        <th class="py-3 px-4" style="width: 50px;">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" id="selectAllPendingTable" onchange="toggleSelectAllTable('pending')">
-                                            </div>
-                                        </th>
-                                        <th class="py-3 px-4">
-                                            <i class="fas fa-user-circle me-2 modern-icon"></i>Provider
-                                        </th>
-                                        <th class="py-3">
-                                            <i class="fas fa-file-contract me-2 modern-icon"></i>Documents
-                                        </th>
-                                        <th class="py-3">
-                                            <i class="fas fa-calendar-plus me-2 modern-icon"></i>Uploaded
-                                        </th>
-                                        <th class="py-3 text-center">
-                                            <i class="fas fa-cogs me-2 modern-icon"></i>Actions
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for provider, documents in pending_by_provider.items %}
-                                        <tr class="border-0">
-                                            <td class="py-3 px-4">
-                                                <div class="form-check">
-                                                    <input class="form-check-input document-checkbox" type="checkbox" 
-                                                           value="{% for document in documents %}{{ document.id }}{% if not forloop.last %},{% endif %}{% endfor %}"
-                                                           data-provider="{{ provider.username }}"
-                                                           onchange="updateBulkButtons()">
-                                                </div>
-                                            </td>
-                                            <td class="py-3 px-4">
-                                                <div class="d-flex align-items-center">
-                                                    <div class="rounded-circle p-3 me-3" style="background: linear-gradient(135deg, #fdcb6e, #f39c12);">
-                                                        <i class="fas fa-user-circle text-white modern-icon-lg"></i>
-                                        </div>
-                                        <div>
-                                                        <span class="fw-bold text-dark">{{ provider.username }}</span>
-                                                        <br>
-                                            <small class="text-muted">
-                                                            <i class="fas fa-file-alt me-1"></i>{{ documents|length }} document{{ documents|length|pluralize }}
-                                            </small>
-                                        </div>
-                                    </div>
-                                            </td>
-                                            <td class="py-3">
-                                                <div>
-                                    <div class="mb-3">
-                                                        <strong class="text-dark">
-                                                            <i class="fas fa-tags me-2"></i>Document Types:
-                                                        </strong>
-                                                        <div class="mt-2">
-                                                            {% for document in documents %}
-                                                                <span class="modern-badge badge-pending me-2 mb-2">
-                                                                    <i class="fas fa-file-alt me-1"></i>{{ document.get_document_type_display }}
-                                                                </span>
-                                                            {% endfor %}
-                                                        </div>
-                                        </div>
-                                                    <div>
-                                                        <strong class="text-dark">
-                                                            <i class="fas fa-hashtag me-2"></i>Document Numbers:
-                                                        </strong>
-                                                        <div class="mt-2">
-                                                            {% for document in documents %}
-                                                                {% if document.document_number %}
-                                                                    <span class="badge bg-light text-dark me-2 mb-1">
-                                                                        <i class="fas fa-id-card me-1"></i>#{{ document.document_number }}
-                                                                    </span>
-                                                                {% else %}
-                                                                    <span class="badge bg-secondary me-2 mb-1">
-                                                                        <i class="fas fa-question me-1"></i>No ID
-                                                                    </span>
-                                                                {% endif %}
-                                                            {% endfor %}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                            </td>
-                                            <td class="py-3">
-                                                <div class="d-flex align-items-center">
-                                                    <i class="fas fa-calendar-alt me-2 text-muted"></i>
-                                                    <small class="text-muted">{{ documents.0.uploaded_at|date:"M d, Y H:i" }}</small>
-                                                </div>
-                                            </td>
-                                            <td class="py-3 text-center">
-                                                <div class="btn-group-vertical" role="group">
-                                                    {% for document in documents %}
-                                                        <div class="btn-group mb-2" role="group">
-                                                            <a href="{{ document.document_file.url }}" target="_blank" class="btn modern-btn modern-btn-primary" 
-                                                               data-bs-toggle="tooltip" title="Preview {{ document.get_document_type_display }}">
-                                                                <i class="fas fa-eye me-1"></i>View
-                                                            </a>
-                                                            <a href="{% url 'verify_document' document.id %}" class="btn modern-btn modern-btn-warning" 
-                                                               data-bs-toggle="tooltip" title="Review & Verify {{ document.get_document_type_display }}">
-                                                                <i class="fas fa-check me-1"></i>Verify
-                                                            </a>
-                        </div>
+                    <div>
+                      <div class="fw-semibold text-dark">{{ provider.username }}</div>
+                      <small class="text-muted">{{ documents|length }} document{{ documents|length|pluralize }}</small>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="mb-2">
+                    <span class="text-muted text-uppercase fw-semibold small">Types</span>
+                    <div class="mt-2">
+                      {% for document in documents %}
+                        <span class="badge-chip badge-pending me-2 mb-2"><i class="fas fa-file-alt"></i>{{ document.get_document_type_display }}</span>
+                      {% endfor %}
+                    </div>
+                  </div>
+                  <div>
+                    <span class="text-muted text-uppercase fw-semibold small">Numbers</span>
+                    <div class="mt-2">
+                      {% for document in documents %}
+                        {% if document.document_number %}
+                          <span class="badge bg-light text-dark fw-semibold me-2 mb-1"><i class="fas fa-id-card me-1"></i>{{ document.document_number }}</span>
+                        {% else %}
+                          <span class="badge bg-secondary-subtle text-dark fw-semibold me-2 mb-1"><i class="fas fa-question me-1"></i>Not provided</span>
+                        {% endif %}
+                      {% endfor %}
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <small class="text-muted"><i class="fas fa-calendar-day me-2"></i>{{ documents.0.uploaded_at|date:"M d, Y H:i" }}</small>
+                </td>
+                <td class="text-center">
+                  <div class="action-stack d-inline-flex">
+                    {% for document in documents %}
+                    <a href="{{ document.document_file.url }}" target="_blank" class="btn btn-outline-primary btn-sm"><i class="fas fa-eye me-1"></i>View</a>
+                    <a href="{% url 'verify_document' document.id %}" class="btn btn-primary btn-sm"><i class="fas fa-check me-1"></i>Verify</a>
+                    {% if not forloop.last %}<div class="vr mx-2"></div>{% endif %}
                     {% endfor %}
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                <form id="bulkActionForm" method="post">
-                    {% csrf_token %}
-                    <input type="hidden" name="selected_ids" id="selectedIdsInput">
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <input type="text" class="form-control" name="admin_notes" placeholder="Notes (optional for approve/reject)">
-                        </div>
-                    </div>
-                </form>
-            {% endif %}
-
-            <!-- Approved Documents -->
-            {% if approved_documents %}
-                <div id="approved-section" class="section-header approved-header fade-in-up">
-                    <div class="d-flex align-items-center justify-content-between">
-                        <div>
-                            <h4 class="mb-2 fw-bold">
-                                <i class="fas fa-check-double me-3 modern-icon-lg"></i>
-                                Approved Documents
-                            </h4>
-                            <p class="mb-0 text-muted">
-                                <i class="fas fa-shield-check me-2"></i>{{ approved_documents|length }} documents have been verified and approved
-                            </p>
-                        </div>
-                        <span class="status-badge badge-approved">{{ approved_documents|length }} Approved</span>
-                    </div>
-                </div>
-                
-                <div class="document-card mb-4">
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-sm modern-table mb-0">
-                                <thead>
-                                    <tr>
-                                        <th class="py-3 px-4">
-                                            <i class="fas fa-user-circle me-2 modern-icon"></i>Provider
-                                        </th>
-                                        <th class="py-3">
-                                            <i class="fas fa-file-contract me-2 modern-icon"></i>Documents
-                                        </th>
-                                        <th class="py-3">
-                                            <i class="fas fa-user-check me-2 modern-icon"></i>Reviewed By
-                                        </th>
-                                        <th class="py-3">
-                                            <i class="fas fa-calendar-check me-2 modern-icon"></i>Reviewed At
-                                        </th>
-                                        <th class="py-3 text-center">
-                                            <i class="fas fa-cogs me-2 modern-icon"></i>Actions
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for provider, documents in approved_by_provider.items %}
-                                        <tr class="border-0">
-                                            <td class="py-3 px-4">
-                                                <div class="d-flex align-items-center">
-                                                    <div class="rounded-circle p-3 me-3" style="background: linear-gradient(135deg, #00b894, #00cec9);">
-                                                        <i class="fas fa-user-circle text-white modern-icon-lg"></i>
-                                                    </div>
-                                                    <div>
-                                                        <span class="fw-bold text-dark">{{ provider.username }}</span>
-                                                        <br>
-                                                        <small class="text-muted">
-                                                            <i class="fas fa-file-alt me-1"></i>{{ documents|length }} document{{ documents|length|pluralize }}
-                                                        </small>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="py-3">
-                                                <div>
-                                                    <div class="mb-3">
-                                                        <strong class="text-dark">
-                                                            <i class="fas fa-tags me-2"></i>Document Types:
-                                                        </strong>
-                                                        <div class="mt-2">
-                                                            {% for document in documents %}
-                                                                <span class="modern-badge badge-approved me-2 mb-2">
-                                                                    <i class="fas fa-file-alt me-1"></i>{{ document.get_document_type_display }}
-                                                                </span>
-                                                            {% endfor %}
-                                                        </div>
-                                                    </div>
-                                                    <div>
-                                                        <strong class="text-dark">
-                                                            <i class="fas fa-hashtag me-2"></i>Document Numbers:
-                                                        </strong>
-                                                        <div class="mt-2">
-                                                            {% for document in documents %}
-                                                                {% if document.document_number %}
-                                                                    <span class="badge bg-light text-dark me-2 mb-1">
-                                                                        <i class="fas fa-id-card me-1"></i>#{{ document.document_number }}
-                                                                    </span>
-                                                                {% else %}
-                                                                    <span class="badge bg-secondary me-2 mb-1">
-                                                                        <i class="fas fa-question me-1"></i>No ID
-                                                </span>
-                                                                {% endif %}
-                                                            {% endfor %}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="py-3">
-                                                <div class="d-flex align-items-center">
-                                                    <i class="fas fa-user-check me-2 text-success"></i>
-                                                    <span class="fw-bold text-dark">{{ documents.0.reviewed_by.username }}</span>
-                                                </div>
-                                            </td>
-                                            <td class="py-3">
-                                                <div class="d-flex align-items-center">
-                                                    <i class="fas fa-calendar-check me-2 text-success"></i>
-                                                    <small class="text-muted">{{ documents.0.reviewed_at|date:"M d, Y H:i" }}</small>
-                                                </div>
-                                            </td>
-                                            <td class="py-3 text-center">
-                                                <div class="btn-group-vertical" role="group">
-                                                    {% for document in documents %}
-                                                        <div class="btn-group mb-2" role="group">
-                                                            <a href="{{ document.document_file.url }}" target="_blank" class="btn modern-btn modern-btn-primary" 
-                                                               data-bs-toggle="tooltip" title="View {{ document.get_document_type_display }}">
-                                                                <i class="fas fa-eye me-1"></i>View
-                                                            </a>
-                                                            <a href="{% url 'edit_document_verification' document.id %}" class="btn modern-btn modern-btn-warning" 
-                                                               data-bs-toggle="tooltip" title="Edit {{ document.get_document_type_display }}">
-                                                                <i class="fas fa-edit me-1"></i>Edit
-                                                            </a>
-                                                            <a href="{% url 'remove_document_verification' document.id %}" class="btn modern-btn modern-btn-danger" 
-                                                               data-bs-toggle="tooltip" title="Remove {{ document.get_document_type_display }}"
-                                                               onclick="return confirm('Are you sure you want to remove verification for this document?')">
-                                                                <i class="fas fa-times me-1"></i>Remove
-                                                            </a>
-                                                        </div>
-                                                    {% endfor %}
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            {% endif %}
-
-            <!-- Rejected Documents -->
-            {% if rejected_documents %}
-                <div id="rejected-section" class="section-header rejected-header fade-in-up">
-                    <div class="d-flex align-items-center justify-content-between">
-                        <div>
-                            <h4 class="mb-2 fw-bold">
-                                <i class="fas fa-exclamation-triangle me-3 modern-icon-lg"></i>
-                                Rejected Documents
-                            </h4>
-                            <p class="mb-0 text-muted">
-                                <i class="fas fa-times-circle me-2"></i>{{ rejected_documents|length }} documents were rejected and need resubmission
-                            </p>
-                        </div>
-                        <span class="status-badge badge-rejected">{{ rejected_documents|length }} Rejected</span>
-                    </div>
-                </div>
-                
-                <div class="document-card mb-4">
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table modern-table mb-0">
-                                <thead>
-                                    <tr>
-                                        <th class="py-3 px-4">
-                                            <i class="fas fa-user-circle me-2 modern-icon"></i>Provider
-                                        </th>
-                                        <th class="py-3">
-                                            <i class="fas fa-file-contract me-2 modern-icon"></i>Documents
-                                        </th>
-                                        <th class="py-3">
-                                            <i class="fas fa-user-check me-2 modern-icon"></i>Reviewed By
-                                        </th>
-                                        <th class="py-3">
-                                            <i class="fas fa-calendar-times me-2 modern-icon"></i>Reviewed At
-                                        </th>
-                                        <th class="py-3">
-                                            <i class="fas fa-comment-alt me-2 modern-icon"></i>Admin Notes
-                                        </th>
-                                        <th class="py-3 text-center">
-                                            <i class="fas fa-cogs me-2 modern-icon"></i>Actions
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for provider, documents in rejected_by_provider.items %}
-                                        <tr class="border-0">
-                                            <td class="py-3 px-4">
-                                                <div class="d-flex align-items-center">
-                                                    <div class="rounded-circle p-3 me-3" style="background: linear-gradient(135deg, #fdcb6e, #f39c12);">
-                                                        <i class="fas fa-user-circle text-white modern-icon-lg"></i>
-                                                    </div>
-                                                    <div>
-                                                        <span class="fw-bold text-dark">{{ provider.username }}</span>
-                                                        <br>
-                                                        <small class="text-muted">
-                                                            <i class="fas fa-file-alt me-1"></i>{{ documents|length }} document{{ documents|length|pluralize }}
-                                                        </small>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="py-3">
-                                                <div>
-                                                    <div class="mb-3">
-                                                        <strong class="text-dark">
-                                                            <i class="fas fa-tags me-2"></i>Document Types:
-                                                        </strong>
-                                                        <div class="mt-2">
-                                                            {% for document in documents %}
-                                                                <span class="modern-badge badge-rejected me-2 mb-2">
-                                                                    <i class="fas fa-file-alt me-1"></i>{{ document.get_document_type_display }}
-                                                                </span>
-                                                            {% endfor %}
-                                                        </div>
-                                                    </div>
-                                                    <div>
-                                                        <strong class="text-dark">
-                                                            <i class="fas fa-hashtag me-2"></i>Document Numbers:
-                                                        </strong>
-                                                        <div class="mt-2">
-                                                            {% for document in documents %}
-                                                                {% if document.document_number %}
-                                                                    <span class="badge bg-light text-dark me-2 mb-1">
-                                                                        <i class="fas fa-id-card me-1"></i>#{{ document.document_number }}
-                                                                    </span>
-                                                                {% else %}
-                                                                    <span class="badge bg-secondary me-2 mb-1">
-                                                                        <i class="fas fa-question me-1"></i>No ID
-                                                </span>
-                                                                {% endif %}
-                                                            {% endfor %}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="py-3">
-                                                <div class="d-flex align-items-center">
-                                                    <i class="fas fa-user-check me-2 text-danger"></i>
-                                                    <span class="fw-bold text-dark">{{ documents.0.reviewed_by.username }}</span>
-                                                </div>
-                                            </td>
-                                            <td class="py-3">
-                                                <div class="d-flex align-items-center">
-                                                    <i class="fas fa-calendar-times me-2 text-danger"></i>
-                                                    <small class="text-muted">{{ documents.0.reviewed_at|date:"M d, Y H:i" }}</small>
-                                                </div>
-                                            </td>
-                                            <td class="py-3">
-                                                {% if documents.0.admin_notes %}
-                                                    <span class="badge bg-warning text-dark" data-bs-toggle="tooltip" title="{{ documents.0.admin_notes }}">
-                                                        <i class="fas fa-comment me-1"></i>Notes
-                                                    </span>
-                                                {% else %}
-                                                    <span class="text-muted">
-                                                        <i class="fas fa-minus me-1"></i>No Notes
-                                                    </span>
-                                                {% endif %}
-                                            </td>
-                                            <td class="py-3 text-center">
-                                                <div class="btn-group-vertical" role="group">
-                                                    {% for document in documents %}
-                                                        <div class="btn-group mb-2" role="group">
-                                                            <a href="{{ document.document_file.url }}" target="_blank" class="btn modern-btn modern-btn-primary" 
-                                                               data-bs-toggle="tooltip" title="View {{ document.get_document_type_display }}">
-                                                                <i class="fas fa-eye me-1"></i>View
-                                                            </a>
-                                                            <a href="{% url 'verify_document' document.id %}" class="btn modern-btn modern-btn-success" 
-                                                               data-bs-toggle="tooltip" title="Review {{ document.get_document_type_display }} Again">
-                                                                <i class="fas fa-redo me-1"></i>Review
-                                                            </a>
-                                                        </div>
-                                                    {% endfor %}
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            {% endif %}
-
-            <!-- Empty State -->
-            {% if not pending_documents and not approved_documents and not rejected_documents %}
-                <div class="text-center py-5 fade-in-up">
-                    <div class="glass-effect rounded-3 p-5">
-                        <div class="d-inline-flex align-items-center justify-content-center mb-4" style="width: 120px; height: 120px; background: linear-gradient(135deg, #74b9ff, #0984e3); border-radius: 50%;">
-                            <i class="fas fa-file-alt fa-3x text-white"></i>
-                        </div>
-                        <h4 class="text-dark mb-3 fw-bold">No Documents to Review</h4>
-                        <p class="text-muted mb-4">No provider documents have been uploaded yet. Check back later when providers start uploading their verification documents.</p>
-                        <a href="{% url 'admin_dashboard' %}" class="btn modern-btn modern-btn-primary">
-                            <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
-                        </a>
-                    </div>
-                </div>
-            {% endif %}
-            </div>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
         </div>
+
+        <form id="bulkActionForm" method="post" class="bulk-toolbar mt-3">
+          {% csrf_token %}
+          <input type="hidden" name="selected_ids" id="selectedIdsInput">
+          <div class="flex-grow-1">
+            <input type="text" class="form-control" name="admin_notes" placeholder="Notes to include with your decision (optional)">
+          </div>
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-success" id="bulkApproveBtn" onclick="bulkApprove('pending')" disabled>
+              <i class="fas fa-check me-1"></i>Bulk Approve
+            </button>
+            <button type="button" class="btn btn-danger" id="bulkRejectBtn" onclick="bulkReject('pending')" disabled>
+              <i class="fas fa-times me-1"></i>Bulk Reject
+            </button>
+          </div>
+        </form>
+      </section>
+      {% endif %}
+
+      {% if approved_documents %}
+      <section id="approved-section" class="mb-5">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-3">
+          <div>
+            <h4 class="mb-1 fw-bold text-dark"><i class="fas fa-check-double text-success me-2"></i>Approved Documents</h4>
+            <p class="text-muted mb-0">Audit and manage previously verified submissions.</p>
+          </div>
+          <span class="badge-chip badge-approved"><i class="fas fa-lock-open me-1"></i>{{ approved_documents|length }} Approved</span>
+        </div>
+        <div class="table-responsive rounded-4 border border-light">
+          <table class="table admin-table">
+            <thead>
+              <tr>
+                <th>Provider</th>
+                <th>Details</th>
+                <th>Reviewed By</th>
+                <th>Reviewed At</th>
+                <th class="text-center" style="width:200px;">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for provider, documents in approved_by_provider.items %}
+              <tr>
+                <td>
+                  <div class="d-flex align-items-center gap-3">
+                    <div class="metric-icon" style="width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,#4dd4ac,#1ca7ec);font-size:1.3rem;">
+                      <i class="fas fa-user"></i>
+                    </div>
+                    <div>
+                      <div class="fw-semibold text-dark">{{ provider.username }}</div>
+                      <small class="text-muted">{{ documents|length }} verified file{{ documents|length|pluralize }}</small>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="mb-2">
+                    <span class="text-muted small text-uppercase fw-semibold">Types</span>
+                    <div class="mt-2">
+                      {% for document in documents %}
+                        <span class="badge-chip badge-approved me-2 mb-2"><i class="fas fa-file-alt"></i>{{ document.get_document_type_display }}</span>
+                      {% endfor %}
+                    </div>
+                  </div>
+                  <div>
+                    <span class="text-muted small text-uppercase fw-semibold">Numbers</span>
+                    <div class="mt-2">
+                      {% for document in documents %}
+                        {% if document.document_number %}
+                          <span class="badge bg-light text-dark fw-semibold me-2 mb-1"><i class="fas fa-id-card me-1"></i>{{ document.document_number }}</span>
+                        {% else %}
+                          <span class="badge bg-secondary-subtle text-dark fw-semibold me-2 mb-1">No ID</span>
+                        {% endif %}
+                      {% endfor %}
+                    </div>
+                  </div>
+                </td>
+                <td class="fw-semibold text-dark"><i class="fas fa-user-check text-success me-2"></i>{{ documents.0.reviewed_by.username }}</td>
+                <td><small class="text-muted"><i class="fas fa-calendar-check me-2"></i>{{ documents.0.reviewed_at|date:"M d, Y H:i" }}</small></td>
+                <td class="text-center">
+                  <div class="action-stack d-inline-flex">
+                    {% for document in documents %}
+                    <a href="{{ document.document_file.url }}" target="_blank" class="btn btn-outline-primary btn-sm"><i class="fas fa-eye me-1"></i>View</a>
+                    <a href="{% url 'edit_document_verification' document.id %}" class="btn btn-warning btn-sm"><i class="fas fa-edit me-1"></i>Edit</a>
+                    <a href="{% url 'remove_document_verification' document.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Remove verification for this document?')"><i class="fas fa-ban me-1"></i>Remove</a>
+                    {% if not forloop.last %}<div class="vr mx-2"></div>{% endif %}
+                    {% endfor %}
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+      {% endif %}
+
+      {% if rejected_documents %}
+      <section id="rejected-section">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-3">
+          <div>
+            <h4 class="mb-1 fw-bold text-dark"><i class="fas fa-times-circle text-danger me-2"></i>Rejected Documents</h4>
+            <p class="text-muted mb-0">Follow up with providers on items needing revision.</p>
+          </div>
+          <span class="badge-chip badge-rejected"><i class="fas fa-times-circle me-1"></i>{{ rejected_documents|length }} Rejected</span>
+        </div>
+        <div class="table-responsive rounded-4 border border-light">
+          <table class="table admin-table">
+            <thead>
+              <tr>
+                <th>Provider</th>
+                <th>Details</th>
+                <th>Reviewed By</th>
+                <th>Reviewed At</th>
+                <th class="text-center" style="width:200px;">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for provider, documents in rejected_by_provider.items %}
+              <tr>
+                <td>
+                  <div class="d-flex align-items-center gap-3">
+                    <div class="metric-icon" style="width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,#ffbf66,#ff885d);font-size:1.3rem;">
+                      <i class="fas fa-user"></i>
+                    </div>
+                    <div>
+                      <div class="fw-semibold text-dark">{{ provider.username }}</div>
+                      <small class="text-muted">{{ documents|length }} document{{ documents|length|pluralize }}</small>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="mb-2">
+                    <span class="text-muted small text-uppercase fw-semibold">Types</span>
+                    <div class="mt-2">
+                      {% for document in documents %}
+                        <span class="badge-chip badge-rejected me-2 mb-2"><i class="fas fa-file-alt"></i>{{ document.get_document_type_display }}</span>
+                      {% endfor %}
+                    </div>
+                  </div>
+                  <div>
+                    <span class="text-muted small text-uppercase fw-semibold">Numbers</span>
+                    <div class="mt-2">
+                      {% for document in documents %}
+                        {% if document.document_number %}
+                          <span class="badge bg-light text-dark fw-semibold me-2 mb-1"><i class="fas fa-id-card me-1"></i>{{ document.document_number }}</span>
+                        {% else %}
+                          <span class="badge bg-secondary-subtle text-dark fw-semibold me-2 mb-1">No ID</span>
+                        {% endif %}
+                      {% endfor %}
+                    </div>
+                  </div>
+                </td>
+                <td class="fw-semibold text-dark"><i class="fas fa-user-check text-danger me-2"></i>{{ documents.0.reviewed_by.username }}</td>
+                <td><small class="text-muted"><i class="fas fa-calendar-times me-2"></i>{{ documents.0.reviewed_at|date:"M d, Y H:i" }}</small></td>
+                <td class="text-center">
+                  <div class="action-stack d-inline-flex">
+                    {% for document in documents %}
+                    <a href="{{ document.document_file.url }}" target="_blank" class="btn btn-outline-primary btn-sm"><i class="fas fa-eye me-1"></i>View</a>
+                    <a href="{% url 'verify_document' document.id %}" class="btn btn-success btn-sm"><i class="fas fa-redo me-1"></i>Review</a>
+                    {% if not forloop.last %}<div class="vr mx-2"></div>{% endif %}
+                    {% endfor %}
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+      {% endif %}
+
+      {% if not pending_documents and not approved_documents and not rejected_documents %}
+      <div class="empty-state">
+        <div class="d-inline-flex align-items-center justify-content-center mb-4" style="width: 120px; height: 120px; background: linear-gradient(135deg, #74b9ff, #0984e3); border-radius: 50%;">
+          <i class="fas fa-file-alt fa-3x text-white"></i>
+        </div>
+        <h4 class="text-dark mb-3 fw-bold">No Documents to Review</h4>
+        <p class="text-muted mb-4">No provider documents have been uploaded yet. Check back later when providers start uploading their verification documents.</p>
+        <a href="{% url 'admin_dashboard' %}" class="btn btn-primary">
+          <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+        </a>
+      </div>
+      {% endif %}
     </div>
+  </div>
 </div>
 
-<script>
-  // Smooth scroll for section nav
-  document.querySelectorAll('.section-nav .nav-link').forEach(link => {
-    link.addEventListener('click', function(e){
-      const href = this.getAttribute('href');
-      if (href && href.startsWith('#')) {
-        e.preventDefault();
-        const target = document.querySelector(href);
-        if (target) {
-          window.scrollTo({ top: target.offsetTop - 20, behavior: 'smooth' });
-          document.querySelectorAll('.section-nav .nav-link').forEach(l => l.classList.remove('active'));
-          this.classList.add('active');
-        }
-      }
-    });
-  });
-</script>
 <script>
 // Initialize tooltips
 var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
@@ -910,73 +622,49 @@ var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
     return new bootstrap.Tooltip(tooltipTriggerEl)
 })
 
-// Add smooth scrolling for better UX
+// Smooth scrolling for anchor links
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
+        const target = document.querySelector(this.getAttribute('href'));
+        if (!target) return;
         e.preventDefault();
-        document.querySelector(this.getAttribute('href')).scrollIntoView({
-            behavior: 'smooth'
-        });
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
 });
 
-// Filter functionality
 function toggleFilters() {
     const panel = document.getElementById('filtersPanel');
-    if (panel.style.display === 'none') {
-        panel.style.display = 'block';
-        panel.scrollIntoView({ behavior: 'smooth' });
-    } else {
+    const isVisible = panel.classList.contains('filters-visible');
+    if (isVisible) {
+        panel.classList.remove('filters-visible');
         panel.style.display = 'none';
+    } else {
+        panel.classList.add('filters-visible');
+        panel.style.display = 'block';
+        panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-}
-
-function applyFilters() {
-    const provider = document.getElementById('providerFilter').value;
-    const documentType = document.getElementById('documentTypeFilter').value;
-    const date = document.getElementById('dateFilter').value;
-    const search = document.getElementById('searchFilter').value;
-    
-    // Filter logic would be implemented here
-    console.log('Applying filters:', { provider, documentType, date, search });
-    
-    // For now, just show a message
-    alert('Filter functionality will be implemented with backend integration');
-}
-
-function clearFilters() {
-    document.getElementById('providerFilter').value = '';
-    document.getElementById('documentTypeFilter').value = '';
-    document.getElementById('dateFilter').value = '';
-    document.getElementById('searchFilter').value = '';
 }
 
 // Bulk selection functionality
 function toggleSelectAll(section) {
-    const checkboxes = document.querySelectorAll(`.document-checkbox`);
+    const checkboxes = document.querySelectorAll('.document-checkbox');
     const selectAllCheckbox = document.getElementById(`selectAll${section.charAt(0).toUpperCase() + section.slice(1)}`);
-    
     checkboxes.forEach(checkbox => {
         checkbox.checked = selectAllCheckbox.checked;
     });
-    
     updateBulkButtons();
 }
 
 function toggleSelectAllTable(section) {
-    const checkboxes = document.querySelectorAll(`.document-checkbox`);
+    const checkboxes = document.querySelectorAll('.document-checkbox');
     const selectAllCheckbox = document.getElementById(`selectAll${section.charAt(0).toUpperCase() + section.slice(1)}Table`);
-    
     checkboxes.forEach(checkbox => {
         checkbox.checked = selectAllCheckbox.checked;
     });
-    
-    // Update the main select all checkbox
     const mainSelectAll = document.getElementById(`selectAll${section.charAt(0).toUpperCase() + section.slice(1)}`);
     if (mainSelectAll) {
         mainSelectAll.checked = selectAllCheckbox.checked;
     }
-    
     updateBulkButtons();
 }
 
@@ -984,7 +672,7 @@ function updateBulkButtons() {
     const checkedBoxes = document.querySelectorAll('.document-checkbox:checked');
     const bulkApproveBtn = document.getElementById('bulkApproveBtn');
     const bulkRejectBtn = document.getElementById('bulkRejectBtn');
-    
+    if (!bulkApproveBtn || !bulkRejectBtn) return;
     if (checkedBoxes.length > 0) {
         bulkApproveBtn.disabled = false;
         bulkRejectBtn.disabled = false;
@@ -1013,7 +701,7 @@ function bulkApprove(section) {
     selectedInput.value = documentIds.join(',');
     form.action = "{% url 'bulk_approve_documents' %}";
     form.method = 'post';
-    if (confirm(`Are you sure you want to approve ${documentIds.length} document(s)?`)) {
+    if (confirm(`Approve ${documentIds.length} document(s)?`)) {
         form.submit();
     }
 }
@@ -1033,28 +721,22 @@ function bulkReject(section) {
     selectedInput.value = documentIds.join(',');
     form.action = "{% url 'bulk_reject_documents' %}";
     form.method = 'post';
-    if (confirm(`Are you sure you want to reject ${documentIds.length} document(s)?`)) {
+    if (confirm(`Reject ${documentIds.length} document(s)?`)) {
         form.submit();
     }
 }
 
 // Enhanced table interactions
 document.addEventListener('DOMContentLoaded', function() {
-    // Add hover effects to table rows
-    const tableRows = document.querySelectorAll('.modern-table tbody tr');
+    const tableRows = document.querySelectorAll('.admin-table tbody tr');
     tableRows.forEach(row => {
         row.addEventListener('mouseenter', function() {
             this.style.transform = 'scale(1.01)';
             this.style.transition = 'transform 0.2s ease';
         });
-        
         row.addEventListener('mouseleave', function() {
             this.style.transform = 'scale(1)';
         });
-    });
-    
-    // Add click-to-select functionality for rows
-    tableRows.forEach(row => {
         row.addEventListener('click', function(e) {
             if (e.target.type !== 'checkbox' && e.target.tagName !== 'A' && e.target.tagName !== 'BUTTON') {
                 const checkbox = this.querySelector('.document-checkbox');
