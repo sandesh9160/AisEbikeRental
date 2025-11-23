@@ -33,14 +33,11 @@ A comprehensive Django-based e-bike rental platform that connects electric bike 
 - Social login options
 - Responsive web interface
 - Document upload and verification system
-<<<<<<< HEAD
 - AI-powered chatbot for customer support
 - AI-powered bike search and recommendations using Gemini API
 - Automated availability synchronization
 - Cron job management for expired booking checks
 - Comprehensive admin dashboard with analytics
-=======
->>>>>>> bc478c3b2f51a242be15138610bac84cb0a5f46a
 
 ## Technology Stack
 
@@ -49,10 +46,7 @@ A comprehensive Django-based e-bike rental platform that connects electric bike 
 - **Frontend**: HTML, CSS, JavaScript, Bootstrap
 - **Authentication**: Django Allauth
 - **Payments**: Razorpay
-<<<<<<< HEAD
 - **AI**: Google Gemini API (Generative AI)
-=======
->>>>>>> bc478c3b2f51a242be15138610bac84cb0a5f46a
 - **Media Management**: Django's FileField system
 - **Email**: SMTP (Gmail)
 
@@ -103,15 +97,15 @@ ais_ebike_rental/
    DEBUG=True
    DATABASE_URL=sqlite:///db.sqlite3
    EMAIL_HOST_USER=your-email@gmail.com
-   EMAIL_HOST_PASSWORD=your-app-password
+   EMAIL_HOST_PASSWORD=your-email-app-password
+   DEFAULT_FROM_EMAIL=your-email@gmail.com
+   CONTACT_RECEIVER_EMAIL=your-admin-email@example.com
+   ADMIN_EMAIL=your-admin-email@example.com
+   SERVER_EMAIL=your-server-email@example.com
    RAZORPAY_KEY_ID=your-razorpay-key-id
    RAZORPAY_KEY_SECRET=your-razorpay-key-secret
-<<<<<<< HEAD
    RAZORPAY_WEBHOOK_SECRET=your-razorpay-webhook-secret
    GEMINI_API_KEY=your-google-gemini-api-key
-=======
->>>>>>> bc478c3b2f51a242be15138610bac84cb0a5f46a
-   CONTACT_RECEIVER_EMAIL=admin-email@example.com
    ```
 
 5. **Database Setup**

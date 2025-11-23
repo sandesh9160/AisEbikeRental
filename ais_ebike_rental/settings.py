@@ -161,24 +161,17 @@ else:
     EMAIL_USE_TLS = env('EMAIL_USE_TLS', default=True)
     EMAIL_HOST_USER = env('EMAIL_HOST_USER')
     EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
-<<<<<<< HEAD
     DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default='AIS E-Bike Rental <noreply@example.com>')
-=======
-    DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default='AIS E-Bike Rental <ebikerental19@gmail.com>')
->>>>>>> bc478c3b2f51a242be15138610bac84cb0a5f46a
 
 # Default receiver for Contact Us submissions (can be overridden by env var)
-CONTACT_RECEIVER_EMAIL = os.environ.get('CONTACT_RECEIVER_EMAIL', 'ebikerental19@gmail.com')
+CONTACT_RECEIVER_EMAIL = env('CONTACT_RECEIVER_EMAIL', default='')
 
 # Admin email for notifications (can be overridden by env var)
-ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL', CONTACT_RECEIVER_EMAIL)
+ADMIN_EMAIL = env('ADMIN_EMAIL', default=CONTACT_RECEIVER_EMAIL or '')
 
-<<<<<<< HEAD
 # Django Sites Framework
 SITE_ID = 1
 
-=======
->>>>>>> bc478c3b2f51a242be15138610bac84cb0a5f46a
 # Payments: Razorpay configuration (set these in your environment for production)
 RAZORPAY_KEY_ID = env('RAZORPAY_KEY_ID', default='')
 RAZORPAY_KEY_SECRET = env('RAZORPAY_KEY_SECRET', default='')
@@ -233,7 +226,7 @@ if not DEBUG:
     }
 
 # Server Email for notifications (like booking confirmations, cancellations)
-SERVER_EMAIL = env('SERVER_EMAIL', default='ebikerental19@gmail.com')
+SERVER_EMAIL = env('SERVER_EMAIL', default='')
 MANAGERS = [('Admin Team', CONTACT_RECEIVER_EMAIL)]
 
 # Email rate limiting (can be configured for production)
