@@ -21,7 +21,10 @@ class User(AbstractUser):
     profile_image = models.ImageField(upload_to='profile_images/', blank=True, null=True)
     is_verified_provider = models.BooleanField(default=False, help_text="Admin verification status for vehicle providers")
     verification_notes = models.TextField(blank=True, null=True, help_text="Admin notes about verification")
+<<<<<<< HEAD
     registration_fee_paid = models.BooleanField(default=False, help_text="One-time registration fee of ₹100 paid by vehicle providers")
+=======
+>>>>>>> bc478c3b2f51a242be15138610bac84cb0a5f46a
 
 
 class EBike(models.Model):
@@ -51,8 +54,12 @@ class Booking(models.Model):
     payment tracking, and approval status.
     """
     STATUS_CHOICES = [
+<<<<<<< HEAD
         ('pending', 'Booking Created - Payment Pending'),
         ('awaiting_approval', 'Payment Successful - Awaiting Admin Approval'),
+=======
+        ('pending', 'Pending Approval'),
+>>>>>>> bc478c3b2f51a242be15138610bac84cb0a5f46a
         ('approved', 'Approved'),
         ('rejected', 'Rejected'),
         ('cancelled', 'Cancelled'),
@@ -65,7 +72,11 @@ class Booking(models.Model):
     end_date = models.DateField(help_text="Format: YYYY-MM-DD")
     end_time = models.TimeField(default="18:00", help_text="Return time")
     total_price = models.DecimalField(max_digits=8, decimal_places=2)
+<<<<<<< HEAD
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+=======
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+>>>>>>> bc478c3b2f51a242be15138610bac84cb0a5f46a
     is_approved = models.BooleanField(default=False)
     is_rejected = models.BooleanField(default=False)
     is_paid = models.BooleanField(default=False)
@@ -280,6 +291,7 @@ class Review(models.Model):
         return f"Review by {self.name or 'Anonymous'} - {self.rating} stars"
 
 
+<<<<<<< HEAD
 class Testimonial(models.Model):
     """
     Model for customer testimonials displayed on the homepage.
@@ -308,6 +320,8 @@ class Testimonial(models.Model):
         return f"{self.name} - {self.role or 'Testimonial'}"
 
 
+=======
+>>>>>>> bc478c3b2f51a242be15138610bac84cb0a5f46a
 class Notification(models.Model):
     """
     Model for in-app notifications sent to users.

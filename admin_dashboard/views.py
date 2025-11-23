@@ -2,7 +2,11 @@ from django.shortcuts import render, redirect,get_object_or_404, redirect, rever
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib import messages
 from django.utils import timezone
+<<<<<<< HEAD
 from core.models import User, EBike, Booking, VehicleRegistration, ProviderDocument, ContactMessage, Notification, Review, Withdrawal, Favorite
+=======
+from core.models import User, EBike, Booking, VehicleRegistration, Notification, ProviderDocument, ContactMessage, Review, Withdrawal
+>>>>>>> bc478c3b2f51a242be15138610bac84cb0a5f46a
 from django.db.models import Sum, Q
 from decimal import Decimal
 from django.db.models.functions import TruncMonth
@@ -885,6 +889,7 @@ def provider_detail(request, provider_id):
 
 
 @user_passes_test(is_admin)
+<<<<<<< HEAD
 def rider_detail(request, rider_id):
     """Admin view: Show rider profile, bookings, and activity summary."""
     rider = get_object_or_404(User, id=rider_id, is_rider=True)
@@ -934,6 +939,8 @@ def rider_detail(request, rider_id):
 
 
 @user_passes_test(is_admin)
+=======
+>>>>>>> bc478c3b2f51a242be15138610bac84cb0a5f46a
 def withdrawal_list(request):
     status_filter = request.GET.get('status', 'all')
     search_query = request.GET.get('q', '')

@@ -13,7 +13,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
+<<<<<<< HEAD
 from django.utils import timezone
+=======
+>>>>>>> bc478c3b2f51a242be15138610bac84cb0a5f46a
 from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -21,6 +24,7 @@ from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.template.loader import render_to_string
 
 # Local imports
+<<<<<<< HEAD
 from .models import EBike, User, Review, Testimonial, ContactMessage, Favorite
 from .forms import SignUpForm, ProfileUpdateForm, CustomPasswordResetForm, PasswordResetConfirmForm, ReviewForm
 from .utils import chatbot_response, get_bike_recommendations, generate_role_based_questions
@@ -37,6 +41,19 @@ def home(request):
         'ebikes': ebikes,
         'testimonials': testimonials
     })
+=======
+from .models import EBike, User, Review, ContactMessage, Favorite
+from .forms import SignUpForm, ProfileUpdateForm, CustomPasswordResetForm, PasswordResetConfirmForm, ReviewForm
+
+def home(request):
+    """
+    Home page view displaying featured available e-bikes.
+
+    Shows up to 5 available e-bikes on the main page.
+    """
+    ebikes = EBike.objects.filter(is_available=True)[:5]
+    return render(request, 'core/home.html', {'ebikes': ebikes})
+>>>>>>> bc478c3b2f51a242be15138610bac84cb0a5f46a
 
 
 @csrf_protect
@@ -222,6 +239,7 @@ def password_reset_request(request):
                         message,
                         settings.DEFAULT_FROM_EMAIL,
                         [email],
+<<<<<<< HEAD
                         fail_silently=False,  # In production, raise exceptions for proper error handling
                     )
                     messages.success(request, 'Password reset email sent! Please check your inbox.')
@@ -237,6 +255,14 @@ def password_reset_request(request):
                     else:
                         # In production, show generic message but log the error
                         messages.error(request, 'Failed to send email. Please contact support if the problem persists.')
+=======
+                        fail_silently=False,
+                    )
+                    messages.success(request, 'Password reset email sent! Please check your inbox.')
+                except Exception as e:
+                    messages.error(request, 'Failed to send email. Please try again later.')
+                    print(f"Email error: {e}")
+>>>>>>> bc478c3b2f51a242be15138610bac84cb0a5f46a
                 
                 return redirect('password_reset_done')
                 
@@ -340,6 +366,7 @@ def contact(request):
         # Save to DB
         ContactMessage.objects.create(name=name, email=email, subject=subject, message=message)
 
+<<<<<<< HEAD
         # Send email to admin/owner for processing - PRODUCTION EMAIL LOGIC
         admin_email = getattr(settings, 'CONTACT_RECEIVER_EMAIL', None) or getattr(settings, 'DEFAULT_FROM_EMAIL', None)
         admin_email_sent = False
@@ -376,11 +403,36 @@ This message was submitted via the contact form on {timezone.now().strftime('%Y-
 Dear {name},
 
 Thank you for contacting AIS E-bike Rental! We have received your message and our team will respond within 24-48 hours.
+=======
+        # Send email to admin/owner for processing
+        admin_email = getattr(settings, 'CONTACT_RECEIVER_EMAIL', None) or getattr(settings, 'DEFAULT_FROM_EMAIL', None)
+        if admin_email:
+            try:
+                send_mail(
+                    subject=f"[Contact] {subject}",
+                    message=f"From: {name} <{email}>\n\nSubject: {subject}\n\n{message}",
+                    from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', email),
+                    recipient_list=[admin_email],
+                    fail_silently=True,
+                )
+            except Exception:
+                # Silently ignore admin email failures but still accept the submission
+                pass
+
+        # Send acknowledgment email to the person who submitted the form
+        try:
+            acknowledgment_subject = f"We received your message: {subject}"
+            acknowledgment_message = f"""
+Dear {name},
+
+Thank you for contacting AIS E-bike Rental! We have received your message and appreciate you reaching out to us.
+>>>>>>> bc478c3b2f51a242be15138610bac84cb0a5f46a
 
 Your inquiry details:
 Subject: {subject}
 Message: {message}
 
+<<<<<<< HEAD
 If you have any urgent questions, please call us at +91 XXXXX XXXXX.
 
 Best regards,
@@ -391,10 +443,22 @@ support@aisebikerental.com
 ---
 This is an automated response confirming receipt of your message sent on {timezone.now().strftime('%Y-%m-%d %H:%M:%S UTC')}.
 """.strip()
+=======
+Our team will review your message and get back to you within 24-48 hours. If you need immediate assistance, please call us at +91 XXXXX XXXXX.
+
+We look forward to helping you with your e-bike rental needs!
+
+Best regards,
+AIS E-bike Rental Team
+support@aisebikerental.com
++91 XXXXX XXXXX
+            """.strip()
+>>>>>>> bc478c3b2f51a242be15138610bac84cb0a5f46a
 
             send_mail(
                 subject=acknowledgment_subject,
                 message=acknowledgment_message,
+<<<<<<< HEAD
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[email],
                 fail_silently=False,  # DON'T silently fail user acknowledgments!
@@ -405,11 +469,21 @@ This is an automated response confirming receipt of your message sent on {timezo
             import logging
             logger = logging.getLogger(__name__)
             logger.error(f"Failed to send user acknowledgment email: {str(e)}")
+=======
+                from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', 'support@aisebikerental.com'),
+                recipient_list=[email],
+                fail_silently=True,
+            )
+        except Exception:
+            # Don't fail the submission if user acknowledgment email fails
+            pass
+>>>>>>> bc478c3b2f51a242be15138610bac84cb0a5f46a
 
         messages.success(request, 'Thanks for contacting us! We\'ve received your message and sent you an acknowledgment email.')
         return redirect('contact')
 
     return render(request, 'core/contact.html')
+<<<<<<< HEAD
 
 
 @csrf_exempt
@@ -527,3 +601,5 @@ def smart_search(request):
 
     # GET request or no recommendations - redirect to regular ebikes page
     return redirect('ebikes')
+=======
+>>>>>>> bc478c3b2f51a242be15138610bac84cb0a5f46a

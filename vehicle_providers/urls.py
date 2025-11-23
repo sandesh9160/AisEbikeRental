@@ -8,7 +8,14 @@ urlpatterns = [
     path('upload-documents/', views.upload_documents, name='upload_documents'),
     path('view-documents/', views.view_documents, name='view_documents'),
     path('request-withdrawal/', views.request_withdrawal, name='request_withdrawal'),
+<<<<<<< HEAD
 
     path('withdrawal-history/', views.withdrawal_history, name='withdrawal_history'),
     path('download-withdrawal-receipt/<int:withdrawal_id>/', views.download_withdrawal_receipt, name='download_withdrawal_receipt'),
+=======
+    path('withdrawal-history/', views.withdrawal_history, name='withdrawal_history'),
+    path('download-withdrawal-receipt/<int:withdrawal_id>/', views.download_withdrawal_receipt, name='download_withdrawal_receipt'),
+    path('download-withdrawal-slip/<int:withdrawal_id>/', views.download_withdrawal_slip, name='download_withdrawal_slip'),
+    path('download-statement/', views.download_statement, name='download_statement'),
+>>>>>>> bc478c3b2f51a242be15138610bac84cb0a5f46a
 ]

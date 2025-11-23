@@ -84,6 +84,61 @@ def book_ebike(request, ebike_id):
             booking.rider = request.user  # Set the rider to the currently logged-in user
             booking.save()
 
+<<<<<<< HEAD
+=======
+            # Notify all admins
+            admins = User.objects.filter(is_staff=True)
+            for admin in admins:
+                Notification.objects.create(
+                    recipient=admin,
+                    message=f"New booking by {request.user.username} for {ebike.name}.",
+                    link=f"/admin-dashboard/#bookings"
+                )
+
+            # Send booking request notification email to admin
+            try:
+                subject = 'New Booking Request Submitted - AIS E-Bike Rental'
+                context = {
+                    'booking': booking,
+                }
+                html_message = render_to_string('emails/booking_request_admin.html', context)
+                plain_message = f"""
+New booking request submitted by {booking.rider.get_full_name() or booking.rider.username}.
+
+Booking Details:
+- E-bike: {booking.ebike.name}
+- Booking Reference: #{booking.id}
+- Rider: {booking.rider.username} ({booking.rider.email})
+- Pickup Date: {booking.start_date} at {booking.start_time}
+- Return Date: {booking.end_date} at {booking.end_time}
+- Duration: {booking.days} days
+- Total Amount: ₹{booking.total_price}
+- Payment Status: {'Paid' if booking.is_paid else 'Pending Payment'}
+
+Please review and process this booking request in the admin dashboard.
+
+AIS E-Bike Rental System
+"""
+                from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@aisebikerental.com')
+                admin_email = getattr(settings, 'ADMIN_EMAIL', None)
+
+                if admin_email:
+                    result = send_mail(
+                        subject=subject,
+                        message=plain_message,
+                        html_message=html_message,
+                        from_email=from_email,
+                        recipient_list=[admin_email],
+                        fail_silently=False  # Change to False to capture errors
+                    )
+                    logger.info(f"Booking request email sent to admin {admin_email} for booking #{booking.id}, result: {result}")
+                else:
+                    logger.error(f"No ADMIN_EMAIL configured - cannot send booking request notification for booking #{booking.id}")
+            except Exception as e:
+                logger.error(f"Failed to send booking request email for booking {booking.id}: {str(e)}")
+                # Don't fail the booking creation if email fails
+                pass
+>>>>>>> bc478c3b2f51a242be15138610bac84cb0a5f46a
 
             # Proceed to payment page for this booking
             return redirect('payment', booking_id=booking.id)
@@ -288,15 +343,26 @@ def verify_razorpay_payment(request, booking_id):
             booking.razorpay_payment_id = razorpay_payment_id
             booking.razorpay_order_id = razorpay_order_id
             booking.save(update_fields=['is_paid', 'status', 'razorpay_payment_id', 'razorpay_order_id'])
+<<<<<<< HEAD
 
             logger.info(f"Payment verified for booking {booking_id}. Status set to awaiting approval.")
 
             # Send payment confirmation email
+=======
+            
+            logger.info(f"Payment verified for booking {booking_id}. Redirecting to confirmation page.")
+            
+            # Send confirmation email
+>>>>>>> bc478c3b2f51a242be15138610bac84cb0a5f46a
             try:
                 send_payment_confirmation_email(booking)
             except Exception as e:
                 # Log email error but don't fail the payment verification
+<<<<<<< HEAD
                 logger.error(f"Failed to send payment confirmation email for booking {booking.id}: {str(e)}")
+=======
+                logger.error(f"Failed to send confirmation email for booking {booking.id}: {str(e)}")
+>>>>>>> bc478c3b2f51a242be15138610bac84cb0a5f46a
                 # Continue with the payment verification process
 
 
@@ -359,6 +425,7 @@ def send_payment_confirmation_email(booking):
         )
     except Exception as e:
         # Log the error for debugging
+<<<<<<< HEAD
         logger.error(f"Failed to send payment confirmation email for booking {booking.id}: {str(e)}")
         # Re-raise the exception so it can be caught by the calling function
         raise e
@@ -391,6 +458,9 @@ def send_booking_confirmation_email(booking):
     except Exception as e:
         # Log the error for debugging
         logger.error(f"Failed to send booking approval email for booking {booking.id}: {str(e)}")
+=======
+        logger.error(f"Failed to send confirmation email for booking {booking.id}: {str(e)}")
+>>>>>>> bc478c3b2f51a242be15138610bac84cb0a5f46a
         # Re-raise the exception so it can be caught by the calling function
         raise e
 
@@ -436,6 +506,7 @@ def razorpay_webhook(request):
                             booking = Booking.objects.filter(id=booking_id).first()
                             if booking and not booking.is_paid:
                                 booking.is_paid = True
+<<<<<<< HEAD
                                 booking.status = 'awaiting_approval'  # Wait for admin approval
                                 booking.razorpay_order_id = order_id
                                 booking.save(update_fields=["is_paid", "status", "razorpay_order_id"])
@@ -445,6 +516,10 @@ def razorpay_webhook(request):
                                     send_payment_confirmation_email(booking)
                                 except Exception as e:
                                     logger.error(f"Failed to send payment confirmation email via webhook for booking {booking.id}: {str(e)}")
+=======
+                                booking.razorpay_order_id = order_id
+                                booking.save(update_fields=["is_paid", "razorpay_order_id"])
+>>>>>>> bc478c3b2f51a242be15138610bac84cb0a5f46a
                     except (ValueError, TypeError):
                         logger.error(f"Invalid receipt format in webhook: {receipt}")
                 except razorpay.errors.BadRequestError as e:
@@ -672,7 +747,11 @@ def download_receipt(request, booking_id):
         except Exception as e:
             # Log the error but don't fail the receipt generation
             logger.error(f"Error generating QR code: {str(e)}")
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> bc478c3b2f51a242be15138610bac84cb0a5f46a
         y -= (100 + section_gap)
 
         # Payment Section
@@ -715,7 +794,11 @@ def download_receipt(request, booking_id):
     except Exception as e:
         # Log the error
         logger.error(f"Error generating receipt for booking {booking_id}: {str(e)}")
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> bc478c3b2f51a242be15138610bac84cb0a5f46a
         # Show error message to user
         messages.error(request, f"Error generating receipt: {str(e)}")
         return redirect('booking_confirmation', booking_id=booking_id)

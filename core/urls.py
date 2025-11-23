@@ -18,9 +18,14 @@ urlpatterns = [
     path('password-reset/', views.password_reset_request, name='password_reset_request'),
     path('password-reset/done/', views.password_reset_done, name='password_reset_done'),
     path('password-reset/confirm/<uidb64>/<token>/', views.password_reset_confirm, name='password_reset_confirm'),
+<<<<<<< HEAD
 
     # AI Features
     path('chatbot/', views.chatbot_view, name='chatbot'),
     path('chatbot/initial-questions/', views.get_initial_questions, name='initial_questions'),
     path('smart-search/', views.smart_search, name='smart_search'),
 ]
+=======
+]
+
+>>>>>>> bc478c3b2f51a242be15138610bac84cb0a5f46a

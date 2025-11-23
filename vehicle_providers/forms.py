@@ -86,12 +86,16 @@ class WithdrawalForm(forms.ModelForm):
         model = Withdrawal
         fields = ['amount', 'account_holder_name', 'account_number', 'ifsc_code', 'bank_name', 'upi_id']
         widgets = {
+<<<<<<< HEAD
             'amount': forms.NumberInput(attrs={
                 'class': 'form-control',
                 'step': '0.01',
                 'placeholder': '0.00',
                 'min': '1'
             }),
+=======
+            'amount': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'placeholder': '0.00', 'min': '1'}),
+>>>>>>> bc478c3b2f51a242be15138610bac84cb0a5f46a
             'account_holder_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter account holder name'}),
             'account_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter account number'}),
             'ifsc_code': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'IFSC code', 'style': 'text-transform: uppercase;'}),
@@ -112,8 +116,19 @@ class WithdrawalForm(forms.ModelForm):
             bookings = Booking.objects.filter(ebike__provider=self.provider, is_approved=True)
             total_earnings = sum(float(b.total_price) for b in bookings)
             platform_charges = total_earnings * 0.1
+<<<<<<< HEAD
             # Allow withdrawals from current earnings regardless of past withdrawals
             self.available_balance = Decimal(str(total_earnings - platform_charges))
+=======
+            self.available_balance = Decimal(str(total_earnings - platform_charges))
+            
+            completed_withdrawals = Withdrawal.objects.filter(
+                provider=self.provider,
+                status__in=['approved', 'completed']
+            ).aggregate(total=Sum('amount'))['total'] or Decimal('0.0')
+            
+            self.available_balance -= completed_withdrawals
+>>>>>>> bc478c3b2f51a242be15138610bac84cb0a5f46a
     
     def clean_amount(self):
         amount = self.cleaned_data.get('amount')

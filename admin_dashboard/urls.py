@@ -30,8 +30,11 @@ urlpatterns = [
     path('reviews/', views.reviews_list, name='admin_reviews_list'),
     # Provider detail page
     path('provider/<int:provider_id>/', views.provider_detail, name='admin_provider_detail'),
+<<<<<<< HEAD
     # Rider detail page
     path('rider/<int:rider_id>/', views.rider_detail, name='admin_rider_detail'),
+=======
+>>>>>>> bc478c3b2f51a242be15138610bac84cb0a5f46a
     # Withdrawal management
     path('withdrawals/', views.withdrawal_list, name='admin_withdrawal_list'),
     path('withdrawals/<int:withdrawal_id>/process/', views.process_withdrawal, name='admin_process_withdrawal'),

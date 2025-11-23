@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from .models import (
+<<<<<<< HEAD
     User,
     EBike,
     Booking,
@@ -10,6 +11,16 @@ from .models import (
     Review,
     Testimonial,
     Notification,
+=======
+    User, 
+    EBike, 
+    Booking, 
+    VehicleRegistration, 
+    ProviderDocument, 
+    Favorite, 
+    Review, 
+    Notification, 
+>>>>>>> bc478c3b2f51a242be15138610bac84cb0a5f46a
     ContactMessage,
     Withdrawal
 )
@@ -117,6 +128,7 @@ class WithdrawalAdmin(admin.ModelAdmin):
         }),
     )
 
+<<<<<<< HEAD
 class TestimonialAdmin(admin.ModelAdmin):
     list_display = ('name', 'role', 'rating', 'is_active', 'is_highlighted', 'sort_order', 'created_at')
     list_filter = ('is_active', 'is_highlighted', 'rating', 'created_at')
@@ -144,6 +156,8 @@ class TestimonialAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         return super().get_queryset(request).order_by('sort_order', '-created_at')
 
+=======
+>>>>>>> bc478c3b2f51a242be15138610bac84cb0a5f46a
 # Register all models
 admin.site.register(User, UserAdmin)
 admin.site.register(EBike, EBikeAdmin)
@@ -152,7 +166,10 @@ admin.site.register(VehicleRegistration, VehicleRegistrationAdmin)
 admin.site.register(ProviderDocument, ProviderDocumentAdmin)
 admin.site.register(Favorite)
 admin.site.register(Review, ReviewAdmin)
+<<<<<<< HEAD
 admin.site.register(Testimonial, TestimonialAdmin)
+=======
+>>>>>>> bc478c3b2f51a242be15138610bac84cb0a5f46a
 admin.site.register(Notification, NotificationAdmin)
 admin.site.register(ContactMessage, ContactMessageAdmin)
 admin.site.register(Withdrawal, WithdrawalAdmin)

@@ -1,6 +1,26 @@
 {% extends 'core/base.html' %}
 
 {% block content %}
+<<<<<<< HEAD
+=======
+<style>
+.invoice-btn {
+  border-radius: 6px 0 0 6px !important;
+}
+.receipt-btn {
+  border-radius: 0 6px 6px 0 !important;
+  margin-left: 1px;
+}
+.action-col .btn-group {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.invoice-btn:hover {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+  color: white;
+}
+</style>
+>>>>>>> bc478c3b2f51a242be15138610bac84cb0a5f46a
 <div class="container py-5">
     <div class="row">
         <div class="col-12">
@@ -73,6 +93,7 @@
                                             <span class="text-muted">-</span>
                                         {% endif %}
                                     </td>
+<<<<<<< HEAD
                                     <td>
                                         {% if withdrawal.status == 'completed' %}
                                             <a href="{% url 'download_withdrawal_receipt' withdrawal.id %}" class="btn btn-sm btn-primary" title="Download Receipt">
@@ -81,6 +102,28 @@
                                         {% else %}
                                             <span class="text-muted">-</span>
                                         {% endif %}
+=======
+                                    <td class="action-col">
+                                        <div class="btn-group" role="group">
+                                            <a href="{% url 'download_withdrawal_slip' withdrawal.id %}"
+                                               class="btn btn-sm btn-outline-primary invoice-btn"
+                                               title="Download Invoice Slip"
+                                               data-bs-toggle="tooltip"
+                                               data-bs-placement="top"
+                                               data-bs-title="Download professional invoice like Flipkart">
+                                                <i class="fas fa-file-invoice"></i>
+                                                <span class="d-none d-sm-inline ms-1">Invoice</span>
+                                            </a>
+                                            {% if withdrawal.status == 'completed' %}
+                                                <a href="{% url 'download_withdrawal_receipt' withdrawal.id %}"
+                                                   class="btn btn-sm btn-success receipt-btn"
+                                                   title="Download Official Receipt">
+                                                    <i class="fas fa-receipt"></i>
+                                                    <span class="d-none d-sm-inline ms-1">Receipt</span>
+                                                </a>
+                                            {% endif %}
+                                        </div>
+>>>>>>> bc478c3b2f51a242be15138610bac84cb0a5f46a
                                     </td>
                                 </tr>
                                 {% if withdrawal.admin_notes %}
@@ -112,3 +155,7 @@
     </div>
 </div>
 {% endblock %}
+<<<<<<< HEAD
+=======
+
+>>>>>>> bc478c3b2f51a242be15138610bac84cb0a5f46a

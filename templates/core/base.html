@@ -19,10 +19,25 @@
       padding-bottom: 0.3rem !important;
       min-height: 52px !important;
     }
+<<<<<<< HEAD
     .navbar-brand {
       font-size: 1.1rem !important;
       padding-top: 0.25rem !important;
       padding-bottom: 0.25rem !important;
+=======
+    .navbar.sticky-top {
+      position: sticky;
+      top: 0;
+      z-index: 1050;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    .nav-link {
+      color: white !important;
+      transition: 0.3s;
+    }
+    .nav-link:hover {
+      color: #ffd54f !important;
+>>>>>>> bc478c3b2f51a242be15138610bac84cb0a5f46a
     }
     .navbar-brand img {
       height: 28px !important;
@@ -35,13 +50,37 @@
     .navbar-toggler {
       padding: 0.15rem 0.4rem !important;
     }
+    /* FIXED NAVBAR HEIGHT */
+    .navbar {
+      padding: 0.3rem 1rem !important;
+      min-height: 56px !important;
+    }
+    .navbar-brand {
+      padding: 0.3rem 0.5rem !important;
+      font-size: 1.2rem;
+    }
+    .navbar-brand img {
+      height: 32px !important;
+      width: 32px !important;
+    }
+    .navbar-nav .nav-link {
+      padding: 0.5rem 0.75rem !important;
+      font-size: 0.95rem;
+    }
+    .navbar-toggler {
+      padding: 0.25rem 0.5rem !important;
+    }
   </style>
 </head>
   <body>
     {% block navbar %}
+<<<<<<< HEAD
     {# Hide navbar on dashboard pages only #}
     {% if not request.resolver_match or "dashboard" not in request.resolver_match.url_name %}
     <nav class="navbar navbar-expand-lg navbar-dark shadow-sm sticky-top">
+=======
+    <nav class="navbar navbar-expand-lg navbar-dark shadow-sm {% if 'dashboard' not in request.path|lower %}sticky-top{% endif %}">
+>>>>>>> bc478c3b2f51a242be15138610bac84cb0a5f46a
       <div class="container">
         <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
           <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQOIc33M52GgLE3iqEXzHsjBA2n23GoZkc2mw&s" alt="Logo">
