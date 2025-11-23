@@ -7,5 +7,8 @@ urlpatterns = [
     path('register-vehicle/', views.register_vehicle, name='register_vehicle'),
     path('upload-documents/', views.upload_documents, name='upload_documents'),
     path('view-documents/', views.view_documents, name='view_documents'),
-]
+    path('request-withdrawal/', views.request_withdrawal, name='request_withdrawal'),
 
+    path('withdrawal-history/', views.withdrawal_history, name='withdrawal_history'),
+    path('download-withdrawal-receipt/<int:withdrawal_id>/', views.download_withdrawal_receipt, name='download_withdrawal_receipt'),
+]

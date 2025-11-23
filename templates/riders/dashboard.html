@@ -1,6 +1,9 @@
 {% extends 'core/base.html' %}
 {% block navbar %}{% endblock %}
 {% block content %}
+<form id="dashboard-logout-form" method="post" action="{% url 'logout' %}" style="display:none;">
+  {% csrf_token %}
+</form>
 <!-- Sidebar Toggle Button -->
 <button class="dashboard-sidebar-toggle d-lg-none" id="sidebarToggle"><i class="fas fa-bars"></i></button>
 <!-- Sidebar and overlay -->
@@ -13,8 +16,9 @@
     <a class="nav-link text-white sidebar-link" href="#dashboard-section"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a>
     <a class="nav-link text-white sidebar-link" href="#ebikes-section"><i class="fas fa-bicycle me-2"></i>Available E-bikes</a>
     <a class="nav-link text-white sidebar-link" href="#bookings-section"><i class="fas fa-calendar-check me-2"></i>Your Bookings</a>
+
     <a class="nav-link text-white sidebar-link" href="#transactions-section"><i class="fas fa-receipt me-2"></i>Transactions</a>
-    <a class="nav-link text-white sidebar-link" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a>
+    <a class="nav-link text-white sidebar-link" href="#" onclick="event.preventDefault(); document.getElementById('dashboard-logout-form').submit(); if (typeof closeSidebar === 'function') closeSidebar();"><i class="fas fa-sign-out-alt me-2"></i>Logout</a>
   </nav>
   <div class="sidebar-profile text-center mt-auto mb-4 px-3">
     <img id="sidebarProfileImage" src="{% if request.user.profile_image %}{{ request.user.profile_image.url }}{% else %}https://api.dicebear.com/7.x/avataaars/svg?seed={{ request.user.username }}{% endif %}"
@@ -40,31 +44,208 @@
     <div class="text-center welcome-banner" id="dashboard-section">
       👋 Hello {{ request.user.username }} — Welcome to your Dashboard
     </div>
-    <div class="row g-4 mb-4">
-      <div class="col-md-4 col-12">
-        <div class="card summary-card h-100 border-0 text-center">
-          <div class="card-body py-4 d-flex flex-column align-items-center justify-content-center">
-            <div class="icon-circle mb-3"><i class="bi bi-bicycle"></i></div>
-            <h6 class="fw-bold text-secondary mb-1">Available E-bikes</h6>
-            <h2 class="fw-bold mb-0">{{ available_ebikes|length }}</h2>
+    <!-- Enhanced Statistics Cards Row 1 -->
+    <div class="row g-3 mb-4">
+      <div class="col-lg-3 col-md-6 col-12">
+        <div class="card text-center h-100 border-0 shadow-lg rounded-4 overflow-hidden position-relative">
+          <div class="card-header bg-gradient-success text-white border-0 py-3 position-relative overflow-hidden">
+            <div class="position-absolute top-0 end-0 opacity-25" style="transform: rotate(15deg) translate(20px, -20px);">
+              <i class="fas fa-bicycle fa-3x"></i>
+            </div>
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white bg-opacity-25 me-2" style="width: 40px; height: 40px; z-index: 2; position: relative;">
+              <i class="fas fa-bicycle text-white"></i>
+            </div>
+            <span class="fw-bold fs-6 text-uppercase">Available Bikes</span>
+          </div>
+          <div class="card-body bg-light py-4 d-flex flex-column align-items-center justify-content-center position-relative">
+            <div class="fs-1 fw-bold text-success mb-1">{{ available_ebikes|length }}</div>
+            <div class="small text-muted fw-medium mb-2">Ready to Book</div>
+            <div class="progress w-75" style="height: 6px;">
+              <div class="progress-bar bg-success" role="progressbar" style="width: 100%"></div>
+            </div>
           </div>
         </div>
       </div>
-      <div class="col-md-4 col-12">
-        <div class="card summary-card h-100 border-0 text-center">
-          <div class="card-body py-4 d-flex flex-column align-items-center justify-content-center">
-            <div class="icon-circle mb-3"><i class="bi bi-bookmarks-fill"></i></div>
-            <h6 class="fw-bold text-secondary mb-1">Your Bookings</h6>
-            <h2 class="fw-bold mb-0">{{ bookings|length }}</h2>
+
+      <div class="col-lg-3 col-md-6 col-12">
+        <div class="card text-center h-100 border-0 shadow-lg rounded-4 overflow-hidden position-relative">
+          <div class="card-header bg-gradient-info text-white border-0 py-3 position-relative overflow-hidden">
+            <div class="position-absolute top-0 end-0 opacity-25" style="transform: rotate(15deg) translate(20px, -20px);">
+              <i class="fas fa-calendar-check fa-3x"></i>
+            </div>
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white bg-opacity-25 me-2" style="width: 40px; height: 40px; z-index: 2; position: relative;">
+              <i class="fas fa-calendar-check text-white"></i>
+            </div>
+            <span class="fw-bold fs-6 text-uppercase">Your Bookings</span>
+          </div>
+          <div class="card-body bg-light py-4 d-flex flex-column align-items-center justify-content-center">
+            <div class="fs-2 fw-bold text-info mb-1">{{ bookings|length }}</div>
+            <div class="small text-muted fw-medium mb-2">Active Rentals</div>
+            {% if approved_bookings %}
+              <div class="d-flex justify-content-center gap-2">
+                <span class="badge bg-success">{{ approved_bookings|length }} approved</span>
+              </div>
+            {% endif %}
           </div>
         </div>
       </div>
-      <div class="col-md-4 col-12">
-        <div class="card summary-card h-100 border-0 text-center">
-          <div class="card-body py-4 d-flex flex-column align-items-center justify-content-center">
-            <div class="icon-circle mb-3"><i class="bi bi-lock-fill"></i></div>
-            <h6 class="fw-bold text-secondary mb-1">Booked E-bikes</h6>
-            <h2 class="fw-bold mb-0">{{ already_booked_ebikes|length }}</h2>
+
+      <div class="col-lg-3 col-md-6 col-12">
+        <div class="card text-center h-100 border-0 shadow-lg rounded-4 overflow-hidden position-relative">
+          <div class="card-header bg-gradient-warning text-white border-0 py-3 position-relative overflow-hidden">
+            <div class="position-absolute top-0 end-0 opacity-25" style="transform: rotate(15deg) translate(20px, -20px);">
+              <i class="fas fa-rupee-sign fa-3x"></i>
+            </div>
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white bg-opacity-25 me-2" style="width: 40px; height: 40px; z-index: 2; position: relative;">
+              <i class="fas fa-receipt text-white"></i>
+            </div>
+            <span class="fw-bold fs-6 text-uppercase">Total Spent</span>
+          </div>
+          <div class="card-body bg-light py-4 d-flex flex-column align-items-center justify-content-center">
+            <div class="fs-3 fw-bold text-warning mb-1">
+              ₹{{ total_spent|floatformat:0 }}
+            </div>
+            <div class="small text-muted fw-medium mb-2">Amount Paid</div>
+            <div class="small text-success">
+              <i class="fas fa-check-circle me-1"></i>Rides Completed
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-md-6 col-12">
+        <div class="card text-center h-100 border-0 shadow-lg rounded-4 overflow-hidden position-relative">
+          <div class="card-header bg-gradient-danger text-white border-0 py-3 position-relative overflow-hidden">
+            <div class="position-absolute top-0 end-0 opacity-25" style="transform: rotate(15deg) translate(20px, -20px);">
+              <i class="fas fa-clock fa-3x"></i>
+            </div>
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white bg-opacity-25 me-2" style="width: 40px; height: 40px; z-index: 2; position: relative;">
+              <i class="fas fa-clock text-white"></i>
+            </div>
+            <span class="fw-bold fs-6 text-uppercase">Pending Bookings</span>
+          </div>
+          <div class="card-body bg-light py-4 d-flex flex-column align-items-center justify-content-center">
+            <div class="fs-2 fw-bold text-danger mb-1">{{ pending_bookings_count }}</div>
+            <div class="small text-muted fw-medium mb-2">Awaiting Approval</div>
+            {% if pending_bookings_count > 0 %}
+              <div class="small text-warning">
+                <i class="fas fa-hourglass-half me-1"></i>Processing
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Enhanced Usage Analytics Cards -->
+    <div class="row g-3 mb-4">
+      <div class="col-lg-6 col-12">
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+          <div class="card-header bg-gradient-secondary text-white border-0 py-3">
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white bg-opacity-25 me-3" style="width: 48px; height: 48px;">
+              <i class="fas fa-chart-pie text-white fa-lg"></i>
+            </div>
+            <span class="fw-bold fs-5">Booking Summary</span>
+          </div>
+          <div class="card-body bg-light p-4">
+            <div class="row text-center">
+              <div class="col-4">
+                <div class="fs-4 fw-bold text-primary">{{ bookings|length }}</div>
+                <div class="small text-muted">Total Bookings</div>
+              </div>
+              <div class="col-4">
+                <div class="fs-4 fw-bold text-success">{{ approved_bookings_count }}</div>
+                <div class="small text-muted">Approved</div>
+              </div>
+              <div class="col-4">
+                <div class="fs-4 fw-bold text-warning">{{ pending_bookings_count }}</div>
+                <div class="small text-muted">Pending</div>
+              </div>
+            </div>
+            <hr class="my-3">
+            <div class="row text-center">
+              <div class="col-6">
+                <div class="small text-muted mb-1">Favorite Day Rate</div>
+                <div class="fs-5 fw-bold text-info">₹{% if available_ebikes %}{% for ebike in available_ebikes|slice:":1" %}{{ ebike.price_per_day }}{% endfor %}{% else %}0{% endif %}</div>
+              </div>
+              <div class="col-6">
+                <div class="small text-muted mb-1">Most Popular Bike</div>
+                <div class="fs-6 fw-bold text-primary">
+                  {% if available_ebikes %}{% for ebike in available_ebikes|slice:":1" %}{{ ebike.name }}{% endfor %}{% else %}None{% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6 col-12">
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+          <div class="card-header bg-gradient-teal text-white border-0 py-3">
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white bg-opacity-25 me-3" style="width: 48px; height: 48px;">
+              <i class="fas fa-tachometer-alt text-white fa-lg"></i>
+            </div>
+            <span class="fw-bold fs-5">Riding Statistics</span>
+          </div>
+          <div class="card-body bg-light p-4">
+            <div class="row text-center mb-3">
+              <div class="col-6">
+                <div class="fs-3 fw-bold text-primary">{{ available_ebikes|length }}</div>
+                <div class="small text-muted">Available Options</div>
+              </div>
+              <div class="col-6">
+                <div class="fs-3 fw-bold text-info">{{ already_booked_ebikes|length }}</div>
+                <div class="small text-muted">Currently Unavailable</div>
+              </div>
+            </div>
+
+            {% with total=available_ebikes|length|add:already_booked_ebikes|length %}
+              {% if total > 0 %}
+                <div class="mb-3">
+                  <div class="small text-muted mb-2">Availability Rate</div>
+                  <div class="progress" style="height: 8px;">
+                    <div class="progress-bar bg-success" role="progressbar" style="
+                      width: {% widthratio available_ebikes|length total 100 %}%;
+                    "></div>
+                  </div>
+                  <div class="small text-center mt-1">
+                    {% widthratio available_ebikes|length total 100 %}% Available ({{ available_ebikes|length }}/{{ total }} bikes)
+                  </div>
+                </div>
+              {% endif %}
+            {% endwith %}
+
+            <div class="row text-center">
+              <div class="col-6">
+                <div class="fs-4 fw-bold text-success">
+                  {% if approved_bookings %}{{ approved_bookings|length }}{% else %}0{% endif %}
+                </div>
+                <div class="small text-muted">Completed Rides</div>
+              </div>
+              <div class="col-6">
+                <div class="fs-4 fw-bold text-primary">
+                  {% widthratio bookings|length 1 0 %}
+                </div>
+                <div class="small text-muted">Bookings Made</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modern Welcome Banner -->
+    <div class="row g-3 mb-4">
+      <div class="col-12">
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+          <div class="card-header bg-gradient-primary text-white border-0 py-3">
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white bg-opacity-25 me-3" style="width: 48px; height: 48px;">
+              <i class="fas fa-user-circle text-white fa-lg"></i>
+            </div>
+            <span class="fw-bold fs-4">Welcome back, {{ request.user.username }}!</span>
+          </div>
+          <div class="card-body bg-light p-4">
+            <p class="mb-0 fs-6 text-muted">Find your perfect e-bike and enjoy the ride. Browse available bikes below or check your current bookings.</p>
           </div>
         </div>
       </div>
@@ -179,7 +360,8 @@
         </div>
       </div>
     </div>
-    <!-- Transactions Section -->
+
+
     <div class="row g-4 mt-4" id="transactions-section">
       <div class="col-12">
         <div class="card card-glass">
@@ -377,5 +559,7 @@ sidebarLinks.forEach(link => {
       triggers.forEach(t => t.addEventListener('click', openRiderProfileModal));
     }
   })();
+
+
 </script>
 {% endblock %}

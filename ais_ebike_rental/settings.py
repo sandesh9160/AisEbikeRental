@@ -44,6 +44,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
+
+    # Local apps
     'core.apps.CoreConfig',
     'riders',
     'admin_dashboard',
@@ -145,24 +148,86 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'core.User'
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
+LOGIN_URL = 'login'  # Use custom login page
 
 if DEBUG:  # Local development
     # Print emails to console during development
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 else:
-    # Email Configuration (Production)
+    # Email Configuration (Production) - Using environment variables for security
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-    EMAIL_HOST = 'smtp.gmail.com'
-    EMAIL_PORT = 587
-    EMAIL_USE_TLS = True
-    EMAIL_HOST_USER = 'ebikerental19@gmail.com'
-    EMAIL_HOST_PASSWORD = 'pknucnotleoslfna'
-    DEFAULT_FROM_EMAIL = 'AIS E-Bike Rental <ebikerental19@gmail.com>'
+    EMAIL_HOST = env('EMAIL_HOST', default='smtp.gmail.com')
+    EMAIL_PORT = env('EMAIL_PORT', default=587)
+    EMAIL_USE_TLS = env('EMAIL_USE_TLS', default=True)
+    EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+    EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+    DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default='AIS E-Bike Rental <noreply@example.com>')
 
 # Default receiver for Contact Us submissions (can be overridden by env var)
 CONTACT_RECEIVER_EMAIL = os.environ.get('CONTACT_RECEIVER_EMAIL', 'ebikerental19@gmail.com')
+
+# Admin email for notifications (can be overridden by env var)
+ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL', CONTACT_RECEIVER_EMAIL)
+
+# Django Sites Framework
+SITE_ID = 1
 
 # Payments: Razorpay configuration (set these in your environment for production)
 RAZORPAY_KEY_ID = env('RAZORPAY_KEY_ID', default='')
 RAZORPAY_KEY_SECRET = env('RAZORPAY_KEY_SECRET', default='')
 RAZORPAY_WEBHOOK_SECRET = env('RAZORPAY_WEBHOOK_SECRET', default='')
+
+# AI Configuration: Gemini API (Google Generative AI)
+GEMINI_API_KEY = env('GEMINI_API_KEY', default='')
+
+# Production Email Configuration Enhancements
+# Configure email for better reliability in production
+EMAIL_TIMEOUT = 30  # Timeout for email sending operations
+EMAIL_USE_LOCALTIME = True  # Use local timezone in email timestamps
+
+# Additional SMTP settings for production reliability
+if not DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+    # Enhanced SMTP settings
+    EMAIL_SSL_CERTFILE = env('EMAIL_SSL_CERTFILE', default=None)
+    EMAIL_SSL_KEYFILE = env('EMAIL_SSL_KEYFILE', default=None)
+    EMAIL_USE_LOCALTIME = True
+
+    # Connection pooling for better performance
+    DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default='AIS E-Bike Rental <noreply@aisebikerental.com>')
+
+# Email logging for production monitoring
+if not DEBUG:
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'formatters': {
+            'verbose': {
+                'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+                'style': '{',
+            },
+        },
+        'handlers': {
+            'file': {
+                'level': 'ERROR',
+                'class': 'logging.FileHandler',
+                'filename': 'logs/email_errors.log',
+                'formatter': 'verbose',
+            },
+        },
+        'loggers': {
+            'django.core.mail': {
+                'handlers': ['file'],
+                'level': 'ERROR',
+                'propagate': False,
+            },
+        },
+    }
+
+# Server Email for notifications (like booking confirmations, cancellations)
+SERVER_EMAIL = env('SERVER_EMAIL', default='ebikerental19@gmail.com')
+MANAGERS = [('Admin Team', CONTACT_RECEIVER_EMAIL)]
+
+# Email rate limiting (can be configured for production)
+# EMAIL_RATE_LIMIT = env('EMAIL_RATE_LIMIT', default=100)  # emails per hour

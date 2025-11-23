@@ -10,11 +10,17 @@ urlpatterns = [
     path('login/', views.custom_login, name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('ebikes/', views.ebikes, name='ebikes'),
+    path('favorites/', views.my_favorites, name='my_favorites'),
+    path('favorites/toggle/<int:ebike_id>/', views.toggle_favorite, name='toggle_favorite'),
     path('submit-review/', views.submit_review, name='submit_review'),
     path('profile/update/', views.profile_update, name='profile_update'),
     # Password Reset URLs
     path('password-reset/', views.password_reset_request, name='password_reset_request'),
     path('password-reset/done/', views.password_reset_done, name='password_reset_done'),
     path('password-reset/confirm/<uidb64>/<token>/', views.password_reset_confirm, name='password_reset_confirm'),
-]
 
+    # AI Features
+    path('chatbot/', views.chatbot_view, name='chatbot'),
+    path('chatbot/initial-questions/', views.get_initial_questions, name='initial_questions'),
+    path('smart-search/', views.smart_search, name='smart_search'),
+]

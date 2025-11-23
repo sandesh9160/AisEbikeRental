@@ -2,6 +2,9 @@
 {% block navbar %}{% endblock %}
 
 {% block content %}
+<form id="dashboard-logout-form" method="post" action="{% url 'logout' %}" style="display:none;">
+  {% csrf_token %}
+</form>
 <!-- Sidebar Toggle Button -->
 <button class="dashboard-sidebar-toggle d-lg-none" id="sidebarToggle"><i class="fas fa-bars"></i></button>
 <!-- Sidebar and overlay -->
@@ -17,11 +20,12 @@
     <a class="nav-link text-white sidebar-link" href="#bookings-section"><i class="fas fa-calendar-check me-2"></i>Bookings</a>
     <a class="nav-link text-white sidebar-link" href="{% url 'upload_documents' %}"><i class="fas fa-file-upload me-2"></i>Upload Documents</a>
     <a class="nav-link text-white sidebar-link" href="{% url 'view_documents' %}"><i class="fas fa-file-alt me-2"></i>View Documents</a>
+
     <a class="nav-link text-white sidebar-link" href="{% url 'add_ebike' %}"><i class="fas fa-plus me-2"></i>Add E-bike</a>
-    <a class="nav-link text-white sidebar-link" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a>
+    <a class="nav-link text-white sidebar-link" href="#" onclick="event.preventDefault(); document.getElementById('dashboard-logout-form').submit(); if (typeof closeSidebar === 'function') closeSidebar();"><i class="fas fa-sign-out-alt me-2"></i>Logout</a>
   </nav>
   <div class="sidebar-profile text-center mt-auto mb-4 px-3">
-    <img id="sidebarProfileImage" src="{% if request.user.profile_image %}{{ request.user.profile_image.url }}{% else %}https://api.dicebear.com/7.x/avataaars/svg?seed={{ request.user.username }}{% endif %}"
+    <img id="sidebarProfileImage" src="{% if request.user.profile_image %}{{ request.user.profile_image.url }}{% else %}https://api.dicebear.com/7.x/avataars/svg?seed={{ request.user.username }}{% endif %}"
          alt="Profile" class="rounded-circle mb-2 open-profile-modal" style="width:60px; height:60px; object-fit:cover; cursor:pointer;">
     <div id="sidebarUsername" class="fw-semibold">{{ request.user.username }}</div>
     <div id="sidebarEmail" class="text-muted small">{{ request.user.email }}</div>
@@ -43,7 +47,7 @@
     <h2 class="text-center text-white bg-primary py-3 px-2 rounded shadow-sm mb-4">
       👋 Hello {{ request.user.username }} — Welcome to your Dashboard
     </h2>
-    
+
     <!-- Verification Status Card -->
     {% if request.user.is_verified_provider %}
       <div class="alert alert-success text-center mb-4" role="alert">
@@ -66,28 +70,252 @@
         </div>
       </div>
     {% endif %}
-    
-    <div class="row g-4 mb-4">
-      <div class="col-md-6 col-12">
-        <div class="card summary-card h-100 border-0 text-center">
-          <div class="card-body py-4 d-flex flex-column align-items-center justify-content-center">
-            <div class="icon-circle mb-3" style="background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);"><i class="fas fa-bicycle"></i></div>
-            <h6 class="fw-bold text-secondary mb-1">Your E-bikes</h6>
-            <h2 class="fw-bold mb-0">{{ ebikes|length }}</h2>
+
+    <!-- Enhanced Statistics Cards Row 1 -->
+    <div class="row g-3 mb-4">
+      <div class="col-lg-3 col-md-6 col-12">
+        <div class="card text-center h-100 border-0 shadow-lg rounded-4 overflow-hidden position-relative">
+          <div class="card-header bg-gradient-primary text-white border-0 py-3 position-relative overflow-hidden">
+            <div class="position-absolute top-0 end-0 opacity-25" style="transform: rotate(15deg) translate(20px, -20px);">
+              <i class="fas fa-bicycle fa-3x"></i>
+            </div>
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white bg-opacity-25 me-2" style="width: 40px; height: 40px; z-index: 2; position: relative;">
+              <i class="fas fa-bicycle text-white"></i>
+            </div>
+            <span class="fw-bold fs-6 text-uppercase">Active Fleet</span>
+          </div>
+          <div class="card-body bg-light py-4 d-flex flex-column align-items-center justify-content-center position-relative">
+            <div class="fs-1 fw-bold text-primary mb-1">{{ ebikes|length }}</div>
+            <div class="small text-muted fw-medium mb-2">E-bikes Listed</div>
+            <div class="progress w-75" style="height: 6px;">
+              <div class="progress-bar bg-primary" role="progressbar" style="width: 100%"></div>
+            </div>
           </div>
         </div>
       </div>
-      <div class="col-md-6 col-12">
-        <div class="card summary-card h-100 border-0 text-center">
-          <div class="card-body py-4 d-flex flex-column align-items-center justify-content-center">
-            <div class="icon-circle mb-3" style="background: linear-gradient(135deg, #f7971e 0%, #ffd200 100%);"><i class="fas fa-wallet"></i></div>
-            <h6 class="fw-bold text-secondary mb-1">Total Earnings</h6>
-            <h2 class="fw-bold mb-0">₹{{ total_earnings }}</h2>
-            <div class="small text-muted mt-2">Platform Charges: ₹{{ platform_charges }}</div>
+
+      <div class="col-lg-3 col-md-6 col-12">
+        <div class="card text-center h-100 border-0 shadow-lg rounded-4 overflow-hidden position-relative">
+          <div class="card-header bg-gradient-success text-white border-0 py-3 position-relative overflow-hidden">
+            <div class="position-absolute top-0 end-0 opacity-25" style="transform: rotate(15deg) translate(20px, -20px);">
+              <i class="fas fa-money-bill-wave fa-3x"></i>
+            </div>
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white bg-opacity-25 me-2" style="width: 40px; height: 40px; z-index: 2; position: relative;">
+              <i class="fas fa-chart-line text-white"></i>
+            </div>
+            <span class="fw-bold fs-6 text-uppercase">Total Earnings</span>
+          </div>
+          <div class="card-body bg-light py-4 d-flex flex-column align-items-center justify-content-center">
+            <div class="fs-2 fw-bold text-success mb-1">₹{{ total_earnings|floatformat:0 }}</div>
+            <div class="small text-muted fw-medium mb-2">Revenue Generated</div>
+            <div class="small text-success">
+              <i class="fas fa-arrow-up me-1"></i>{{ platform_charges|floatformat:0 }} deducted
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-md-6 col-12">
+        <div class="card text-center h-100 border-0 shadow-lg rounded-4 overflow-hidden position-relative">
+          <div class="card-header bg-gradient-info text-white border-0 py-3 position-relative overflow-hidden">
+            <div class="position-absolute top-0 end-0 opacity-25" style="transform: rotate(15deg) translate(20px, -20px);">
+              <i class="fas fa-calendar-check fa-3x"></i>
+            </div>
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white bg-opacity-25 me-2" style="width: 40px; height: 40px; z-index: 2; position: relative;">
+              <i class="fas fa-calendar-check text-white"></i>
+            </div>
+            <span class="fw-bold fs-6 text-uppercase">Total Bookings</span>
+          </div>
+          <div class="card-body bg-light py-4 d-flex flex-column align-items-center justify-content-center">
+            <div class="fs-2 fw-bold text-info mb-1">{{ bookings|length }}</div>
+            <div class="small text-muted fw-medium mb-2">Booking Requests</div>
+            <div class="d-flex justify-content-center gap-2">
+              <span class="badge bg-success">Approved: {{ approved_bookings|length }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-md-6 col-12">
+        <div class="card text-center h-100 border-0 shadow-lg rounded-4 overflow-hidden position-relative">
+          <div class="card-header bg-gradient-warning text-white border-0 py-3 position-relative overflow-hidden">
+            <div class="position-absolute top-0 end-0 opacity-25" style="transform: rotate(15deg) translate(20px, -20px);">
+              <i class="fas fa-wallet fa-3x"></i>
+            </div>
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white bg-opacity-25 me-2" style="width: 40px; height: 40px; z-index: 2; position: relative;">
+              <i class="fas fa-wallet text-white"></i>
+            </div>
+            <span class="fw-bold fs-6 text-uppercase">Available Balance</span>
+          </div>
+          <div class="card-body bg-light py-4 d-flex flex-column align-items-center justify-content-center">
+            <div class="fs-3 fw-bold text-warning mb-1">₹{{ available_balance|floatformat:0 }}</div>
+            <div class="small text-muted fw-medium mb-2">Ready for Withdrawal</div>
+            {% if can_withdraw %}
+              <a href="{% url 'request_withdrawal' %}" class="btn btn-warning btn-sm rounded-pill px-3">
+                <i class="fas fa-money-bill-wave me-1"></i> Withdraw
+              </a>
+            {% else %}
+              <div class="small text-muted">Balance too low</div>
+            {% endif %}
           </div>
         </div>
       </div>
     </div>
+
+    <!-- Enhanced Earnings Breakdown Cards -->
+    <div class="row g-3 mb-4">
+      <div class="col-lg-6 col-12">
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+          <div class="card-header bg-gradient-secondary text-white border-0 py-3">
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white bg-opacity-25 me-3" style="width: 48px; height: 48px;">
+              <i class="fas fa-chart-pie text-white fa-lg"></i>
+            </div>
+            <span class="fw-bold fs-5">Balance Status</span>
+          </div>
+          <div class="card-body bg-light p-4">
+            <div class="row text-center">
+              <div class="col-4">
+                <div class="fs-4 fw-bold text-primary">₹{{ total_earnings|floatformat:0 }}</div>
+                <div class="small text-muted">Total Revenue</div>
+              </div>
+              <div class="col-4">
+                <div class="fs-4 fw-bold text-danger">₹{{ platform_charges|floatformat:0 }}</div>
+                <div class="small text-muted">Platform Fee (10%)</div>
+              </div>
+              <div class="col-4">
+                <div class="fs-4 fw-bold text-success">₹{{ net_earnings|floatformat:0 }}</div>
+                <div class="small text-muted">Net Earnings</div>
+              </div>
+            </div>
+            <hr class="my-3">
+            <div class="row text-center">
+              <div class="col-6">
+                <div class="small text-muted mb-1">Registration Fee</div>
+                <div class="fs-5 fw-bold text-primary">
+                  ₹100
+                  {% if registration_fee_paid %}
+                    <i class="fas fa-check-circle text-success"></i>
+                  {% else %}
+                    <i class="fas fa-clock text-warning"></i>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="small text-muted mb-1">Status</div>
+                <div class="fs-6 fw-bold {% if can_withdraw %}text-success{% else %}text-warning{% endif %}">{{ status_message }}</div>
+                <div class="small mt-1 {% if can_withdraw %}text-success{% else %}text-danger{% endif %}">{{ status_detail }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6 col-12">
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+          <div class="card-header bg-gradient-dark text-white border-0 py-3">
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white bg-opacity-25 me-3" style="width: 48px; height: 48px;">
+              <i class="fas fa-tachometer-alt text-white fa-lg"></i>
+            </div>
+            <span class="fw-bold fs-5">Performance Metrics</span>
+          </div>
+          <div class="card-body bg-light p-4">
+            <div class="row text-center mb-3">
+              <div class="col-6">
+                <div class="fs-3 fw-bold text-primary">{{ ebikes|length }}</div>
+                <div class="small text-muted">E-bikes</div>
+              </div>
+              <div class="col-6">
+                <div class="fs-3 fw-bold text-info">{{ approved_bookings|length }}</div>
+                <div class="small text-muted">Active Rentals</div>
+              </div>
+            </div>
+
+            {% if ebikes %}
+              <div class="mb-3">
+                <div class="small text-muted mb-2">Fleet Utilization</div>
+                <div class="progress" style="height: 8px;">
+                  {% widthratio approved_bookings|length ebikes|length 100 as utilization %}
+                  <div class="progress-bar bg-success" role="progressbar" style="width: {{ utilization }}%"></div>
+                </div>
+                <div class="small text-center mt-1">{{ utilization|floatformat:1 }}% Active</div>
+              </div>
+            {% endif %}
+
+            <div class="row text-center">
+              <div class="col-6">
+                <div class="fs-4 fw-bold text-warning">
+                  ₹{{ per_bike_earnings|floatformat:0 }}
+                </div>
+                <div class="small text-muted">Per Bike</div>
+              </div>
+              <div class="col-6">
+                <div class="fs-4 fw-bold text-success">
+                  ₹{{ per_booking_earnings|floatformat:0 }}
+                </div>
+                <div class="small text-muted">Per Booking</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modern Welcome Card -->
+    <div class="row g-3 mb-4">
+      <div class="col-12">
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+          <div class="card-header bg-gradient-primary text-white border-0 py-3">
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white bg-opacity-25 me-3" style="width: 48px; height: 48px;">
+              <i class="fas fa-charging-station text-white fa-lg"></i>
+            </div>
+            <span class="fw-bold fs-4">Welcome back, {{ request.user.username }}! 🚀</span>
+          </div>
+          <div class="card-body bg-light p-4">
+            <p class="mb-0 fs-6 text-muted">
+              {% if request.user.is_verified_provider %}
+                Manage your e-bike fleet, track earnings, and monitor bookings. Your account is verified - happy riding!
+              {% else %}
+                Your account needs verification. Please upload your documents to start earning from your e-bikes.
+              {% endif %}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% if recent_withdrawals_status %}
+    <div class="row g-3 mb-4">
+      <div class="col-12">
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+          <div class="card-header bg-gradient-info text-white border-0 py-3">
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white bg-opacity-25 me-3" style="width: 48px; height: 48px;">
+              <i class="fas fa-exchange-alt text-white fa-lg"></i>
+            </div>
+            <span class="fw-bold fs-4">Recent Transaction Status</span>
+          </div>
+          <div class="card-body bg-light p-4">
+            {% for withdrawal in recent_withdrawals_status %}
+            <div class="d-flex justify-content-between align-items-center mb-3 p-3 bg-white rounded">
+              <div>
+                <span class="fw-bold">₹{{ withdrawal.amount }}</span>
+                <small class="text-muted d-block">{{ withdrawal.created_at|date:"M d, Y H:i" }}</small>
+              </div>
+              <span class="badge {% if withdrawal.status == 'completed' %}bg-success{% elif withdrawal.status == 'approved' %}bg-info{% elif withdrawal.status == 'pending' %}bg-warning text-dark{% else %}bg-danger{% endif %}">
+                {{ withdrawal.status|title }}
+              </span>
+            </div>
+            {% empty %}
+            <p class="mb-0 text-muted">No recent transactions</p>
+            {% endfor %}
+            <div class="mt-3">
+              <a href="{% url 'withdrawal_history' %}" class="btn btn-info btn-sm">View All Transactions</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
     <div class="row g-4 w-100 mx-0" id="ebikes-section">
       <div class="card shadow-lg border-0 w-100 px-0" style="border-radius: 1.5rem;">
         <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center sticky-ebike-header">
@@ -130,7 +358,16 @@
                 </div>
               </div>
             {% empty %}
-            <p class="text-muted">No E-bikes registered yet.</p>
+            <div class="text-center py-5">
+              <div class="mb-4">
+                <i class="fas fa-bicycle fa-4x text-muted"></i>
+              </div>
+              <h4 class="text-muted mb-3">No E-bikes Yet</h4>
+              <p class="text-muted mb-4">You haven't registered any e-bikes in your fleet yet.</p>
+              <a href="{% url 'add_ebike' %}" class="btn btn-primary btn-lg">
+                <i class="fas fa-plus me-2"></i>Add Your First E-bike
+              </a>
+            </div>
             {% endfor %}
           </div>
         </div>
@@ -165,162 +402,29 @@
                 </div>
               </div>
             {% empty %}
-            <p class="text-muted">You have no current bookings.</p>
+            <div class="text-center py-5">
+              <div class="mb-4">
+                <i class="fas fa-calendar-times fa-4x text-muted"></i>
+              </div>
+              <h4 class="text-muted mb-3">No Active Bookings</h4>
+              <p class="text-muted mb-4">You don't have any active bookings at the moment. Your e-scooters will appear here once riders book them.</p>
+              <div class="d-flex justify-content-center gap-3">
+                <a href="{% url 'add_ebike' %}" class="btn btn-primary">
+                  <i class="fas fa-plus me-2"></i>Add More E-bikes
+                </a>
+                <a href="{% url 'request_withdrawal' %}" class="btn btn-outline-success">
+                  <i class="fas fa-wallet me-2"></i>Check Earnings
+                </a>
+              </div>
+            </div>
             {% endfor %}
           </div>
         </div>
       </div>
     </div>
+
+
   </div>
 </div>
 
-<script>
-// Sidebar toggle for mobile and desktop
-const sidebar = document.getElementById('sidebar');
-const sidebarOverlay = document.getElementById('sidebarOverlay');
-const sidebarCloseBtn = document.getElementById('sidebarCloseBtn');
-const sidebarToggle = document.getElementById('sidebarToggle');
-
-function openSidebar() {
-  sidebar.classList.add('open');
-  sidebarOverlay.classList.add('show');
-}
-function closeSidebar() {
-  sidebar.classList.remove('open');
-  sidebarOverlay.classList.remove('show');
-}
-if (sidebarCloseBtn) sidebarCloseBtn.onclick = closeSidebar;
-if (sidebarOverlay) sidebarOverlay.onclick = closeSidebar;
-if (sidebarToggle) sidebarToggle.onclick = function() {
-  if (window.innerWidth < 992) {
-    openSidebar();
-  } else {
-    sidebar.classList.toggle('collapsed');
-    document.querySelector('.main-content-with-sidebar').classList.toggle('collapsed');
-  }
-};
-// Smooth scroll for sidebar links
-const sidebarLinks = document.querySelectorAll('.sidebar-link');
-sidebarLinks.forEach(link => {
-  link.addEventListener('click', function(e) {
-    const href = this.getAttribute('href');
-    if (href.startsWith('#')) {
-      e.preventDefault();
-      const target = document.querySelector(href);
-      if (target) {
-        window.scrollTo({
-          top: target.offsetTop - 20,
-          behavior: 'smooth'
-        });
-        if (window.innerWidth < 992) closeSidebar();
-      }
-    }
-  });
-});
-</script>
-<!-- Provider Profile Edit Modal (Local) -->
-<div class="modal fade" id="providerProfileModal" tabindex="-1" aria-labelledby="providerProfileModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="providerProfileModalLabel">Edit Profile</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body" id="providerProfileModalBody">
-        <div class="text-center py-4" id="providerProfileModalLoader">
-          <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Loading...</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  </div>
-
-<script>
-  // Local AJAX modal for Provider Dashboard
-  (function(){
-    function getCookie(name) {
-      let cookieValue = null;
-      if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-          const cookie = cookies[i].trim();
-          if (cookie.substring(0, name.length + 1) === (name + '=')) {
-            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-            break;
-          }
-        }
-      }
-      return cookieValue;
-    }
-
-    const modalEl = document.getElementById('providerProfileModal');
-    const modalBody = document.getElementById('providerProfileModalBody');
-    const modalLoader = document.getElementById('providerProfileModalLoader');
-    const triggers = document.querySelectorAll('.open-profile-modal');
-
-    async function openProviderProfileModal(e){
-      if (e) e.preventDefault();
-      if (!modalEl) return;
-      const modal = new bootstrap.Modal(modalEl);
-      modalBody.innerHTML = modalLoader ? modalLoader.outerHTML : '';
-      modal.show();
-      try {
-        const resp = await fetch("{% url 'profile_update' %}", { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
-        const data = await resp.json();
-        if (data.success && data.html) {
-          modalBody.innerHTML = data.html;
-          const form = document.getElementById('profile-update-form');
-          if (form) {
-            form.addEventListener('submit', async function (ev) {
-              ev.preventDefault();
-              const formData = new FormData(form);
-              const btn = form.querySelector('button[type=\"submit\"]');
-              if (btn) btn.disabled = true;
-              try {
-                const r = await fetch(form.getAttribute('action'), {
-                  method: 'POST',
-                  headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRFToken': getCookie('csrftoken') },
-                  body: formData
-                });
-                if (r.ok) {
-                  const ok = await r.json();
-                  // Update sidebar values in-place (no reload)
-                  const uEl = document.getElementById('sidebarUsername');
-                  const eEl = document.getElementById('sidebarEmail');
-                  const mEl = document.getElementById('sidebarMobile');
-                  const imgEl = document.getElementById('sidebarProfileImage');
-                  if (uEl && ok.username) uEl.textContent = ok.username;
-                  if (eEl && ok.email) eEl.textContent = ok.email;
-                  if (mEl && ok.mobile_number) mEl.textContent = ok.mobile_number;
-                  if (imgEl && ok.profile_image_url) imgEl.src = ok.profile_image_url;
-                  modalBody.insertAdjacentHTML('afterbegin', `<div class=\"alert alert-success\">${ok.message || 'Profile updated successfully!'}</div>`);
-                  setTimeout(() => { const inst = bootstrap.Modal.getInstance(modalEl); if (inst) inst.hide(); }, 700);
-                } else {
-                  const err = await r.json();
-                  modalBody.innerHTML = err.html || '<div class=\"alert alert-danger\">Failed to update profile.</div>';
-                  // Rebind after re-render
-                  openProviderProfileModal();
-                }
-              } catch (ex) {
-                modalBody.insertAdjacentHTML('afterbegin', '<div class=\"alert alert-danger\">Unexpected error. Please try again.</div>');
-              } finally {
-                if (btn) btn.disabled = false;
-              }
-            });
-          }
-        } else {
-          modalBody.innerHTML = '<div class=\"alert alert-danger\">Failed to load form.</div>';
-        }
-      } catch (e) {
-        modalBody.innerHTML = '<div class=\"alert alert-danger\">Failed to load form.</div>';
-      }
-    }
-
-    if (triggers.length) {
-      triggers.forEach(t => t.addEventListener('click', openProviderProfileModal));
-    }
-  })();
-</script>
 {% endblock %}

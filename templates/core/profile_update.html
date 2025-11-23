@@ -1,58 +1,276 @@
 {% extends 'core/base.html' %}
+{% load static %}
 {% block content %}
-<div class="container py-4">
-  <div class="row justify-content-center">
-    <div class="col-md-6">
-      <div class="card shadow">
-        <div class="card-header bg-primary text-white fw-bold">Edit Profile</div>
-        <div class="card-body">
-          <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            {% if form.non_field_errors %}
-              <div class="alert alert-danger">
-                {{ form.non_field_errors }}
+<style>
+.profile-container {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+.profile-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: none;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+.profile-header {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  color: white;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  position: relative;
+}
+.profile-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+  opacity: 0.1;
+}
+.profile-avatar-container {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 1rem;
+}
+.profile-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 5px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease;
+}
+.profile-avatar:hover {
+  transform: scale(1.05);
+}
+.avatar-overlay {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+.avatar-overlay:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+.form-group-modern {
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+.form-group-modern label {
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  font-size: 0.95rem;
+}
+.form-group-modern i {
+  margin-right: 0.5rem;
+  color: #4facfe;
+  width: 18px;
+}
+.form-control-modern {
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.9);
+}
+.form-control-modern:focus {
+  border-color: #4facfe;
+  box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+  background: white;
+  transform: translateY(-2px);
+}
+.btn-modern-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  border-radius: 12px;
+  padding: 0.875rem 2rem;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+.btn-modern-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+.alert-modern {
+  border: none;
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+.current-image-info {
+  background: rgba(79, 172, 254, 0.1);
+  border: 1px solid rgba(79, 172, 254, 0.2);
+  border-radius: 8px;
+  padding: 0.75rem;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: #374151;
+}
+</style>
+<div class="profile-container">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 col-md-10">
+        <div class="profile-card">
+          <div class="profile-header">
+            <h2 class="mb-0 fw-bold">
+              <i class="fas fa-user-edit me-2"></i>
+              Edit Profile
+            </h2>
+            <p class="mb-0 mt-2 opacity-75">Update your personal information</p>
+          </div>
+          <div class="card-body p-4">
+            <form method="post" enctype="multipart/form-data">
+              {% csrf_token %}
+              {% if form.non_field_errors %}
+                <div class="alert alert-danger alert-modern">
+                  {% for error in form.non_field_errors %}
+                    <i class="fas fa-exclamation-triangle me-2"></i>{{ error }}
+                  {% endfor %}
+                </div>
+              {% endif %}
+
+              <!-- Profile Image Section -->
+              <div class="text-center mb-4">
+                <div class="profile-avatar-container">
+                  {% if user.profile_image %}
+                    <img src="{{ user.profile_image.url }}" alt="Profile Image" class="profile-avatar" id="profile-avatar-preview">
+                  {% else %}
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed={{ user.username }}" alt="Profile Image" class="profile-avatar" id="profile-avatar-preview">
+                  {% endif %}
+                  <div class="avatar-overlay" onclick="document.getElementById('id_profile_image').click()">
+                    <i class="fas fa-camera text-white"></i>
+                  </div>
+                </div>
+                <div class="current-image-info">
+                  <small>
+                    <i class="fas fa-image me-1"></i>
+                    Currently: {% if user.profile_image %}{{ user.profile_image.name }}{% else %}Default avatar{% endif %}
+                    <button type="button" class="btn btn-sm btn-outline-danger ms-2" onclick="clearProfileImage()">
+                      <i class="fas fa-trash me-1"></i>Clear
+                    </button>
+                  </small>
+                </div>
+                <div class="form-group-modern mt-3">
+                  <input type="file" name="profile_image" accept="image/*" id="id_profile_image" class="form-control-modern d-none" onchange="previewImage(event)">
+                  {% if form.profile_image.errors %}
+                    <div class="text-danger small mt-1">
+                      {% for error in form.profile_image.errors %}
+                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                </div>
               </div>
-            {% endif %}
-            <div class="mb-3 text-center">
-              {% if user.profile_image %}
-                <img src="{{ user.profile_image.url }}" alt="Profile Image" class="rounded-circle mb-2" style="width: 80px; height: 80px; object-fit: cover;">
-              {% else %}
-                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed={{ user.username }}" alt="Profile Image" class="rounded-circle mb-2" style="width: 80px; height: 80px; object-fit: cover;">
-              {% endif %}
-            </div>
-            <div class="mb-3">
-              <label for="id_username" class="form-label">Username</label>
-              {{ form.username }}
-              {% if form.username.errors %}
-                <div class="text-danger small">{{ form.username.errors }}</div>
-              {% endif %}
-            </div>
-            <div class="mb-3">
-              <label for="id_email" class="form-label">Email</label>
-              {{ form.email }}
-              {% if form.email.errors %}
-                <div class="text-danger small">{{ form.email.errors }}</div>
-              {% endif %}
-            </div>
-            <div class="mb-3">
-              <label for="id_mobile_number" class="form-label">Mobile Number</label>
-              {{ form.mobile_number }}
-              {% if form.mobile_number.errors %}
-                <div class="text-danger small">{{ form.mobile_number.errors }}</div>
-              {% endif %}
-            </div>
-            <div class="mb-3">
-              <label for="id_profile_image" class="form-label">Profile Image</label>
-              {{ form.profile_image }}
-              {% if form.profile_image.errors %}
-                <div class="text-danger small">{{ form.profile_image.errors }}</div>
-              {% endif %}
-            </div>
-            <button type="submit" class="btn btn-primary w-100">Save Changes</button>
-          </form>
+
+              <!-- Form Fields -->
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group-modern">
+                    <label for="id_username">
+                      <i class="fas fa-user"></i>Username
+                    </label>
+                    {{ form.username }}
+                    {% if form.username.errors %}
+                      <div class="text-danger small mt-1">
+                        {% for error in form.username.errors %}
+                          <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                        {% endfor %}
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group-modern">
+                    <label for="id_email">
+                      <i class="fas fa-envelope"></i>Email Address
+                    </label>
+                    {{ form.email }}
+                    {% if form.email.errors %}
+                      <div class="text-danger small mt-1">
+                        {% for error in form.email.errors %}
+                          <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                        {% endfor %}
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group-modern">
+                <label for="id_mobile_number">
+                  <i class="fas fa-phone"></i>Mobile Number
+                </label>
+                {{ form.mobile_number }}
+                {% if form.mobile_number.errors %}
+                  <div class="text-danger small mt-1">
+                    {% for error in form.mobile_number.errors %}
+                      <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                    {% endfor %}
+                  </div>
+                {% endif %}
+              </div>
+
+              <!-- Submit Button -->
+              <div class="text-center mt-4">
+                <button type="submit" class="btn btn-modern-primary px-5">
+                  <i class="fas fa-save me-2"></i>Save Changes
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </div>
+
+<script>
+function clearProfileImage() {
+  document.getElementById('id_profile_image').value = '';
+  document.getElementById('profile-avatar-preview').src = 'https://api.dicebear.com/7.x/avataaars/svg?seed={{ user.username }}';
+}
+
+function previewImage(event) {
+  const file = event.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      document.getElementById('profile-avatar-preview').src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
+// Add modern styling to form controls
+document.addEventListener('DOMContentLoaded', function() {
+  const inputs = document.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"]');
+  inputs.forEach(input => {
+    input.classList.add('form-control-modern');
+  });
+});
+</script>
 {% endblock %}

@@ -2,118 +2,318 @@
 {% block navbar %}{% endblock %}
 {% block title %}Contact Messages - Admin{% endblock %}
 {% block content %}
-<button class="dashboard-sidebar-toggle d-lg-none" id="sidebarToggle"><i class="fas fa-bars"></i></button>
-<div id="sidebar" class="dashboard-sidebar bg-dark text-white">
-  <div class="sidebar-header d-flex align-items-center justify-content-between px-3 py-3">
-    <span class="fw-bold fs-4"><i class="fas fa-user-shield me-2"></i>Admin</span>
-    <button class="btn btn-sm btn-outline-light d-md-none" id="sidebarCloseBtn" onclick="closeAdminSidebar()"><i class="fas fa-times"></i></button>
-  </div>
-  <nav class="nav flex-column px-2">
-    <a class="nav-link text-white sidebar-link" href="{% url 'admin_dashboard' %}"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a>
-    <a class="nav-link text-white sidebar-link active" href="{% url 'admin_feedback_list' %}"><i class="fas fa-envelope me-2"></i>Contact Messages</a>
-  </nav>
-</div>
-<div id="sidebarOverlay" class="sidebar-overlay d-md-none"></div>
+<style>
+  :root {
+    --primary: #6c63ff;
+    --primary-hover: #5a52e0;
+    --bg: #f7f8fa;
+    --text-dark: #1f2937;
+    --text-muted: #6b7280;
+    --card-bg: #ffffff;
+    --border: #e5e7eb;
+    --radius: 14px;
+  }
 
-<div class="main-content-with-sidebar">
-  <div class="container-xxl py-4">
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3 gap-3">
-      <h3 class="mb-0"><i class="fas fa-envelope me-2"></i>Contact Messages</h3>
-      <form class="d-flex gap-2" method="get" action="">
-        <input type="hidden" name="status" value="{{ current_status }}">
-        <input type="text" name="q" class="form-control" placeholder="Search name, email, subject, or message" value="{{ q }}" style="min-width:280px;">
-        <button class="btn btn-outline-primary" type="submit"><i class="fas fa-search me-1"></i>Search</button>
-      </form>
-      <div class="btn-group">
-        <a href="?status=all{% if q %}&q={{ q }}{% endif %}" class="btn btn-sm {% if current_status == 'all' %}btn-primary{% else %}btn-outline-primary{% endif %}">All</a>
-        <a href="?status=new{% if q %}&q={{ q }}{% endif %}" class="btn btn-sm {% if current_status == 'new' %}btn-primary{% else %}btn-outline-primary{% endif %}">New</a>
-        <a href="?status=responded{% if q %}&q={{ q }}{% endif %}" class="btn btn-sm {% if current_status == 'responded' %}btn-primary{% else %}btn-outline-primary{% endif %}">Responded</a>
+  body {
+    background: var(--bg);
+    font-family: "Inter", sans-serif;
+    color: var(--text-dark);
+  }
+
+  .admin-header {
+    background: linear-gradient(135deg, var(--primary), #a78bfa);
+    color: #fff;
+    padding: 1.8rem 0;
+    border-radius: 0 0 var(--radius) var(--radius);
+    box-shadow: 0 8px 24px -8px rgba(108, 99, 255, 0.4);
+  }
+
+  .admin-header h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: .25rem;
+  }
+
+  .filters-bar {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    box-shadow: 0 8px 24px -10px rgba(0,0,0,0.06);
+    margin-top: -1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .filters-bar form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .6rem;
+    flex: 1;
+  }
+
+  .filters-bar input {
+    flex: 1;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: .55rem .9rem;
+    font-size: .9rem;
+  }
+
+  .filters-bar button {
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    padding: .55rem 1.2rem;
+    font-weight: 600;
+    transition: 0.2s;
+  }
+  .filters-bar button:hover {
+    background: var(--primary-hover);
+  }
+
+  .status-tabs a {
+    border: 1px solid var(--border);
+    padding: .45rem 1rem;
+    border-radius: 999px;
+    font-size: .85rem;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--text-muted);
+    transition: 0.2s;
+  }
+
+  .status-tabs a.active,
+  .status-tabs a:hover {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+  }
+
+  .message-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+    padding: 1rem 1.25rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .message-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px -10px rgba(108,99,255,0.2);
+  }
+
+  .message-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .subject {
+    font-weight: 600;
+    color: var(--primary);
+    font-size: .9rem;
+  }
+
+  .status-pill {
+    font-size: .75rem;
+    font-weight: 600;
+    border-radius: 999px;
+    padding: .25rem .7rem;
+  }
+
+  .status-new {
+    background: rgba(255,193,7,0.15);
+    color: #b7791f;
+  }
+
+  .status-responded {
+    background: rgba(16,185,129,0.15);
+    color: #059669;
+  }
+
+  .message-body {
+    color: var(--text-muted);
+    font-size: .9rem;
+    margin: .8rem 0;
+    line-height: 1.5;
+    flex: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .meta {
+    font-size: .8rem;
+    color: var(--text-muted);
+  }
+
+  .message-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: .6rem;
+    margin-top: .8rem;
+  }
+
+  .message-actions .btn {
+    font-size: .8rem;
+    border-radius: var(--radius);
+    padding: .4rem .9rem;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    background: transparent;
+    transition: 0.2s;
+  }
+  .message-actions .btn:hover {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+  }
+  .message-actions .btn-success {
+    background: #10b981;
+    color: #fff;
+    border: none;
+  }
+  .message-actions .btn-success:hover {
+    background: #059669;
+  }
+
+  .empty-state {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 4rem 0;
+  }
+  .empty-state i {
+    color: var(--primary);
+    opacity: .6;
+    margin-bottom: .5rem;
+  }
+
+  .pagination-modern {
+    margin-top: 2rem;
+  }
+  .pagination-modern .page-link {
+    border: none;
+    background: var(--card-bg);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    border-radius: var(--radius);
+    margin: 0 .2rem;
+    padding: .45rem .9rem;
+    color: var(--text-muted);
+    transition: 0.2s;
+  }
+  .pagination-modern .page-item.active .page-link {
+    background: var(--primary);
+    color: #fff;
+  }
+  .pagination-modern .page-link:hover {
+    background: rgba(108,99,255,0.1);
+  }
+</style>
+
+<div class="container-xxl py-3">
+  <section class="admin-header mb-4">
+    <div class="container-xxl d-flex justify-content-between align-items-center">
+      <div>
+        <h1><i class="fas fa-inbox me-2"></i>Contact Messages</h1>
+        <p class="mb-0 opacity-75">View and respond to customer messages efficiently.</p>
       </div>
+      <a href="{% url 'admin_dashboard' %}" class="btn btn-light btn-sm fw-semibold">
+        <i class="fas fa-arrow-left me-1"></i> Dashboard
+      </a>
     </div>
+  </section>
 
-    <div class="card card-glass">
-      <div class="card-header d-flex align-items-center justify-content-between header-gradient-blue">
-        <h5 class="mb-0">Messages</h5>
-      </div>
-      <div class="card-body p-0">
-        <div class="table-responsive">
-          <table class="table table-hover align-middle modern-table mb-0">
-            <thead>
-              <tr>
-                <th>Subject</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Status</th>
-                <th>Received</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for m in messages_qs %}
-              <tr>
-                <td class="fw-semibold">{{ m.subject }}</td>
-                <td>{{ m.name }}</td>
-                <td><a href="mailto:{{ m.email }}">{{ m.email }}</a></td>
-                <td>
-                  {% if m.responded %}
-                  <span class="badge bg-success">Responded</span>
-                  {% else %}
-                  <span class="badge bg-warning text-dark">New</span>
-                  {% endif %}
-                </td>
-                <td><small class="text-muted">{{ m.created_at|date:"M d, Y H:i" }}</small></td>
-                <td class="text-end">
-                  <a href="{% url 'admin_feedback_detail' m.pk %}" class="btn btn-sm btn-outline-primary me-1">View</a>
-                  {% if not m.responded %}
-                  <form method="post" action="{% url 'admin_feedback_mark_responded' m.pk %}" style="display:inline;">
-                    {% csrf_token %}
-                    <input type="hidden" name="next" value="{% url 'admin_feedback_list' %}?status={{ current_status }}{% if q %}&q={{ q }}{% endif %}">
-                    <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Mark this message as responded?');">Mark Responded</button>
-                  </form>
-                  {% endif %}
-                </td>
-              </tr>
-              {% empty %}
-              <tr>
-                <td colspan="6" class="text-center text-muted">No messages found.</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+  <!-- Filters -->
+  <div class="filters-bar">
+    <form method="get" action="">
+      <input type="hidden" name="status" value="{{ current_status }}">
+      <input type="text" name="q" placeholder="Search messages..." value="{{ q }}">
+      <button type="submit"><i class="fas fa-search me-1"></i>Search</button>
+    </form>
+    <div class="status-tabs d-flex gap-2">
+      <a href="?status=all{% if q %}&q={{ q }}{% endif %}" class="{% if current_status == 'all' %}active{% endif %}">All</a>
+      <a href="?status=new{% if q %}&q={{ q }}{% endif %}" class="{% if current_status == 'new' %}active{% endif %}">New</a>
+      <a href="?status=responded{% if q %}&q={{ q }}{% endif %}" class="{% if current_status == 'responded' %}active{% endif %}">Responded</a>
+    </div>
+  </div>
+
+  <!-- Messages -->
+  <div class="row g-3 mt-3">
+    {% for m in messages_qs %}
+    <div class="col-12 col-md-6 col-xl-4">
+      <div class="message-card">
+        <div class="message-header">
+          <div class="subject"><i class="fas fa-tag me-1"></i>{{ m.subject }}</div>
+          {% if m.responded %}
+          <div class="status-pill status-responded">Responded</div>
+          {% else %}
+          <div class="status-pill status-new">New</div>
+          {% endif %}
+        </div>
+        <div class="mt-2">
+          <h6 class="fw-bold mb-1">{{ m.name }}</h6>
+          <a href="mailto:{{ m.email }}" class="text-muted small text-decoration-none">
+            <i class="fas fa-envelope me-1"></i>{{ m.email }}
+          </a>
+        </div>
+        <p class="message-body">{{ m.message }}</p>
+        <div class="message-actions">
+          <span class="meta"><i class="far fa-clock me-1"></i>{{ m.created_at|date:"M d, Y H:i" }}</span>
+          <div class="d-flex gap-2">
+            <a href="{% url 'admin_feedback_detail' m.pk %}" class="btn btn-sm">View</a>
+            {% if not m.responded %}
+            <form method="post" action="{% url 'admin_feedback_mark_responded' m.pk %}" onsubmit="return confirm('Mark as responded?');">
+              {% csrf_token %}
+              <input type="hidden" name="next" value="{% url 'admin_feedback_list' %}?status={{ current_status }}{% if q %}&q={{ q }}{% endif %}">
+              <button type="submit" class="btn btn-success btn-sm">✔ Responded</button>
+            </form>
+            {% endif %}
+          </div>
         </div>
       </div>
     </div>
-
-    {% if page_obj %}
-    <nav class="mt-3" aria-label="Feedback pagination">
-      <ul class="pagination justify-content-end">
-        <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
-          <a class="page-link" href="{% if page_obj.has_previous %}?status={{ current_status }}&q={{ q }}&page={{ page_obj.previous_page_number }}{% else %}#{% endif %}" tabindex="-1">Previous</a>
-        </li>
-        {% for num in page_obj.paginator.page_range %}
-          <li class="page-item {% if page_obj.number == num %}active{% endif %}"><a class="page-link" href="?status={{ current_status }}&q={{ q }}&page={{ num }}">{{ num }}</a></li>
-        {% endfor %}
-        <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
-          <a class="page-link" href="{% if page_obj.has_next %}?status={{ current_status }}&q={{ q }}&page={{ page_obj.next_page_number }}{% else %}#{% endif %}">Next</a>
-        </li>
-      </ul>
-    </nav>
-    {% endif %}
+    {% empty %}
+    <div class="col-12">
+      <div class="empty-state">
+        <i class="fas fa-comment-dots fa-3x"></i>
+        <h5 class="fw-bold mt-2">No messages yet</h5>
+        <p>Messages from users will appear here once received.</p>
+      </div>
+    </div>
+    {% endfor %}
   </div>
-</div>
 
-<script>
-function closeAdminSidebar(){
-  document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('sidebarOverlay').classList.remove('show');
-}
-const sidebar = document.getElementById('sidebar');
-const sidebarOverlay = document.getElementById('sidebarOverlay');
-const sidebarToggle = document.getElementById('sidebarToggle');
-if (sidebarToggle) sidebarToggle.onclick = function(){
-  if (window.innerWidth < 992) { sidebar.classList.add('open'); sidebarOverlay.classList.add('show'); }
-  else { sidebar.classList.toggle('collapsed'); document.querySelector('.main-content-with-sidebar').classList.toggle('collapsed'); }
-};
-if (sidebarOverlay) sidebarOverlay.onclick = closeAdminSidebar;
-</script>
+  <!-- Pagination -->
+  {% if page_obj %}
+  <nav class="pagination-modern d-flex justify-content-end">
+    <ul class="pagination">
+      <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
+        <a class="page-link" href="{% if page_obj.has_previous %}?status={{ current_status }}&q={{ q }}&page={{ page_obj.previous_page_number }}{% else %}#{% endif %}">
+          <i class="fas fa-chevron-left"></i>
+        </a>
+      </li>
+      {% for num in page_obj.paginator.page_range %}
+      <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+        <a class="page-link" href="?status={{ current_status }}&q={{ q }}&page={{ num }}">{{ num }}</a>
+      </li>
+      {% endfor %}
+      <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
+        <a class="page-link" href="{% if page_obj.has_next %}?status={{ current_status }}&q={{ q }}&page={{ page_obj.next_page_number }}{% else %}#{% endif %}">
+          <i class="fas fa-chevron-right"></i>
+        </a>
+      </li>
+    </ul>
+  </nav>
+  {% endif %}
+</div>
 {% endblock %}

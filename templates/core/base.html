@@ -10,195 +10,38 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
   <link rel="icon" href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQOIc33M52GgLE3iqEXzHsjBA2n23GoZkc2mw&s">
+
   <style>
-    .chat-icon {
-        position: fixed;
-        bottom: 40px;
-        right: 20px;
-        background-color: #28a745;
-        color: white;
-        border-radius: 50%;
-        width: 50px;
-        height: 50px;
-        font-size: 24px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        cursor: pointer;
-        z-index: 998;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    }
-    .chat-popup {
-        position: fixed;
-        bottom: 100px;
-        right: 20px;
-        background: white;
-        width: 300px;
-        max-height: 400px;
-        border-radius: 10px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-        z-index: 1000;
-        display: none;
-        flex-direction: column;
-    }
-    .chat-popup-header {
-        background: #007bff;
-        color: white;
-        padding: 10px;
-        border-radius: 10px 10px 0 0;
-        font-weight: bold;
-    }
-    .chat-popup-body {
-        padding: 10px;
-        flex-grow: 1;
-        overflow-y: auto;
-        font-size: 14px;
-    }
-    .chat-popup-footer {
-        padding: 8px;
-        border-top: 1px solid #ccc;
-    }
-    .chat-popup-footer input {
-        width: 100%;
-        padding: 5px;
-        border-radius: 5px;
-        border: 1px solid #ccc;
-    }
-    :root {
-      --main-bg: linear-gradient(to bottom right, #e0f7fa, #e3f2fd);
-      --main-text: #000;
-      --nav-bg: linear-gradient(to right, #1e3c72, #2a5298);
-      --footer-bg: #1e3c72;
-    }
-    body {
-      background: var(--main-bg);
-      color: var(--main-text);
-      font-family: 'Segoe UI', sans-serif;
-      transition: all 0.4s ease-in-out;
-    }
+    /* Make navbar more compact and keep blue */
     .navbar {
-      background: var(--nav-bg) !important;
+      background: linear-gradient(#0a63ab) !important;
+      padding-top: 0.3rem !important;
+      padding-bottom: 0.3rem !important;
+      min-height: 52px !important;
     }
-    .nav-link {
-      color: white !important;
-      transition: 0.3s;
-    }
-    .nav-link:hover {
-      color: #ffd54f !important;
+    .navbar-brand {
+      font-size: 1.1rem !important;
+      padding-top: 0.25rem !important;
+      padding-bottom: 0.25rem !important;
     }
     .navbar-brand img {
-      height: 40px;
-      width: 40px;
-      border-radius: 50%;
-      transition: transform 0.3s;
+      height: 28px !important;
+      width: 28px !important;
     }
-    .navbar-brand img:hover {
-      transform: rotate(5deg) scale(1.1);
+    .navbar-nav .nav-link {
+      padding: 0.375rem 0.5rem !important;
+      font-size: 0.9rem !important;
     }
-    footer {
-      background: var(--footer-bg);
-      color: white;
-      padding: 1rem 0;
-    }
-    .footer-icon {
-      color: white;
-      margin: 0 10px;
-      transition: 0.3s;
-    }
-    .footer-icon:hover {
-      color: #ffd54f;
-      transform: scale(1.2);
-    }
-    .chat-icon {
-      position: fixed;
-      bottom: 25px;
-      right: 25px;
-      background: #2a5298;
-      color: white;
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 22px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-      cursor: pointer;
-      z-index: 999;
-      transition: background 0.3s;
-    }
-    .chat-icon:hover {
-      background: #1e3c72;
-    }
-    .form-check.form-switch {
-      margin-left: 10px;
-    }
-    .toggle-label {
-      color: white;
-      margin-left: 8px;
-      font-size: 0.9rem;
-    }
-    #chatModal {
-      position: fixed;
-      bottom: 90px;
-      right: 30px;
-      background: white;
-      width: 300px;
-      max-height: 400px;
-      border-radius: 10px;
-      box-shadow: 0 0 12px rgba(0, 0, 0, 0.3);
-      display: none;
-      flex-direction: column;
-      z-index: 9999;
-      overflow: hidden;
-    }
-    #chatModal.dark {
-      background: #1e1e1e;
-      color: white;
-    }
-    #chatModalHeader {
-      background: #2a5298;
-      color: white;
-      padding: 0.75rem;
-      font-weight: bold;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    #chatModalBody {
-      padding: 1rem;
-      flex: 1;
-      font-size: 0.9rem;
-    }
-    #chatModalBody textarea {
-      width: 100%;
-      height: 80px;
-      resize: none;
-    }
-    #chatModalFooter {
-      padding: 0.5rem;
-      text-align: right;
-    }
-    #chatModalFooter button {
-      background: #2a5298;
-      color: white;
-      border: none;
-      padding: 5px 10px;
-      border-radius: 4px;
-    }
-    #chatModalFooter button:hover {
-      background: #1e3c72;
+    .navbar-toggler {
+      padding: 0.15rem 0.4rem !important;
     }
   </style>
 </head>
   <body>
-  {% if user.is_authenticated and user.is_vehicle_provider and 'provider_dashboard' in request.path %}
-    {# Do not render navbar #}
-  {% elif user.is_authenticated and user.is_rider and '/dashboard/' in request.path %}
-    {# Do not render navbar for rider dashboard #}
-  {% else %}
     {% block navbar %}
-    <nav class="navbar navbar-expand-lg navbar-dark shadow-sm">
+    {# Hide navbar on dashboard pages only #}
+    {% if not request.resolver_match or "dashboard" not in request.resolver_match.url_name %}
+    <nav class="navbar navbar-expand-lg navbar-dark shadow-sm sticky-top">
       <div class="container">
         <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
           <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQOIc33M52GgLE3iqEXzHsjBA2n23GoZkc2mw&s" alt="Logo">
@@ -211,6 +54,9 @@
           <ul class="navbar-nav me-auto">
             <li class="nav-item"><a class="nav-link" href="{% url 'home' %}"><i class="fas fa-house-user"></i> Home</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'ebikes' %}"><i class="fas fa-bolt"></i> E-Bikes</a></li>
+            {% if user.is_authenticated %}
+            <li class="nav-item"><a class="nav-link" href="{% url 'my_favorites' %}"><i class="fas fa-heart"></i> Favorites</a></li>
+            {% endif %}
             <li class="nav-item"><a class="nav-link" href="{% url 'about' %}"><i class="fas fa-info-circle"></i> About</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}"><i class="fas fa-envelope"></i> Contact</a></li>
           </ul>
@@ -231,7 +77,7 @@
                   </a>
                 </li>
               {% endif %}
-              
+
               <li class="nav-item">
                 <form method="post" action="{% url 'logout' %}">
                   {% csrf_token %}
@@ -239,23 +85,16 @@
                 </form>
               </li>
             {% else %}
-              <!-- Show bell for staff even before login (if possible) -->
-                <li class="nav-item">
-                  <a class="nav-link position-relative" href="{% url 'login' %}">
-                    <i class="fas fa-bell"></i>
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{{ unread_notification_count|default:0 }}</span>
-                  </a>
-                </li>
               <li class="nav-item"><a class="nav-link" href="{% url 'login' %}"><i class="fas fa-sign-in-alt"></i> Login</a></li>
               <li class="nav-item"><a class="nav-link" href="{% url 'signup' %}"><i class="fas fa-user-plus"></i> Signup</a></li>
             {% endif %}
           </ul>
         </div>
-  
+
       </div>
     </nav>
+    {% endif %}
     {% endblock %}
-  {% endif %}
   <div class="container mt-4">
     {% if messages %}
       <div class="mb-3">
@@ -280,29 +119,9 @@
       <p class="mb-0">&copy; 2025 AIS E-bike Rental</p>
     </div>
   </footer>
-  <div class="chat-icon" onclick="toggleChat()">
-    <i class="fas fa-comments"></i>
-  </div>
-  <div id="chatModal">
-    <div id="chatModalHeader">
-      Chat Support
-      <span style="cursor:pointer;" onclick="toggleChat()">&times;</span>
-    </div>
-    <div id="chatModalBody">
-      <p>Hi! How can we help you today?</p>
-      <textarea placeholder="Type your message..."></textarea>
-    </div>
-    <div id="chatModalFooter">
-      <button onclick="alert('Message sent!')">Send</button>
-    </div>
-  </div>
+  <!-- Gemini AI Chat Widget -->
+  {% include 'core/_chat_widget.html' %}
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    const chatModal = document.getElementById("chatModal");
-    function toggleChat() {
-      if (!chatModal) return;
-      chatModal.style.display = chatModal.style.display === "flex" ? "none" : "flex";
-    }
-  </script>
 </body>
 </html>

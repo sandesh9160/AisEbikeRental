@@ -7,157 +7,174 @@
     <a href="{% url 'admin_dashboard' %}#providers" class="btn btn-outline-secondary btn-sm"><i class="fas fa-arrow-left me-1"></i>Back</a>
   </div>
 
+  <!-- Statistics Row -->
   <div class="row g-3 mb-4">
-    <div class="col-md-4">
-      <div class="card h-100">
-        <div class="card-body d-flex">
-          <img src="{% if provider.profile_image %}{{ provider.profile_image.url }}{% else %}https://api.dicebear.com/7.x/avataaars/svg?seed={{ provider.username }}{% endif %}"
-               class="rounded me-3" style="width:72px;height:72px;object-fit:cover;" alt="{{ provider.username }}"/>
-          <div>
-            <div class="fw-bold fs-5">{{ provider.username }}</div>
-            <div class="text-muted">{{ provider.email }}</div>
-            <div class="text-muted">Mobile: {{ provider.mobile_number|default:'—' }}</div>
-            <div class="mt-2">
-              {% if provider.is_verified_provider %}
-                <span class="badge bg-success"><i class="fas fa-check me-1"></i>Verified</span>
-              {% else %}
-                <span class="badge bg-warning text-dark"><i class="fas fa-clock me-1"></i>Unverified</span>
-              {% endif %}
-            </div>
+    <div class="col-md-2">
+      <div class="card text-center h-100 border-0 shadow-lg rounded-4 overflow-hidden">
+        <div class="card-header bg-gradient-success text-white border-0 py-2">
+          <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white bg-opacity-25 me-2" style="width: 32px; height: 32px;">
+            <i class="fas fa-coins text-white fa-sm"></i>
           </div>
+          <span class="fw-bold fs-6 text-uppercase">Earnings</span>
         </div>
-        <div class="card-footer d-flex gap-2">
-          {% if provider.is_verified_provider %}
-            <form method="post" action="{% url 'verify_provider' provider.id %}">
-              {% csrf_token %}
-              <input type="hidden" name="action" value="reject" />
-              <input type="hidden" name="verification_notes" value="Unverified via admin panel" />
-              <button class="btn btn-outline-danger btn-sm"><i class="fas fa-user-slash me-1"></i>Unverify</button>
-            </form>
-          {% else %}
-            <form method="post" action="{% url 'verify_provider' provider.id %}">
-              {% csrf_token %}
-              <input type="hidden" name="action" value="verify" />
-              <input type="hidden" name="verification_notes" value="Verified via admin panel" />
-              <button class="btn btn-success btn-sm"><i class="fas fa-user-check me-1"></i>Verify</button>
-            </form>
-          {% endif %}
-          <a href="{% url 'review_documents' %}?provider={{ provider.id }}" class="btn btn-primary btn-sm">
-            <i class="fas fa-file-alt me-1"></i>Review Documents
-          </a>
+        <div class="card-body bg-light py-3 d-flex align-items-center justify-content-center" style="min-height: 80px;">
+          <div>
+            <div class="fs-3 fw-bold text-success">₹{{ total_earnings|floatformat:0 }}</div>
+            <div class="small text-muted fw-medium">Total Revenue</div>
+          </div>
         </div>
       </div>
     </div>
-
-    <div class="col-md-8">
-      <div class="card h-100">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="mb-0"><i class="fas fa-folder-open me-2"></i>Documents ({{ total_docs }})</h5>
-            <div class="small text-muted">Pending {{ pending_docs|length }} · Approved {{ approved_docs|length }} · Rejected {{ rejected_docs|length }}</div>
+    <div class="col-md-2">
+      <div class="card text-center h-100 border-0 shadow-lg rounded-4 overflow-hidden">
+        <div class="card-header bg-gradient-primary text-white border-0 py-2">
+          <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white bg-opacity-25 me-2" style="width: 32px; height: 32px;">
+            <i class="fas fa-bicycle text-white fa-sm"></i>
           </div>
-
-          {% if total_docs == 0 %}
-            <div class="text-center text-muted py-5">
-              <i class="fas fa-inbox fa-2x mb-2"></i>
-              <div>No documents submitted yet.</div>
-            </div>
-          {% else %}
-            <div class="row g-3">
-              {% if pending_docs %}
-              <div class="col-12">
-                <h6 class="fw-bold text-warning"><i class="fas fa-hourglass-half me-1"></i>Pending</h6>
-                <div class="table-responsive">
-                  <table class="table table-sm align-middle">
-                    <thead class="table-light">
-                      <tr>
-                        <th>Type</th><th>Number</th><th>Uploaded</th><th class="text-end">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {% for d in pending_docs %}
-                      <tr>
-                        <td>{{ d.get_document_type_display }}</td>
-                        <td>{{ d.document_number|default:'—' }}</td>
-                        <td>{{ d.uploaded_at|date:'M d, Y H:i' }}</td>
-                        <td class="text-end">
-                          <a class="btn btn-outline-primary btn-sm" href="{{ d.document_file.url }}" target="_blank"><i class="fas fa-eye me-1"></i>View</a>
-                          <a class="btn btn-warning btn-sm" href="{% url 'verify_document' d.id %}"><i class="fas fa-check me-1"></i>Review</a>
-                        </td>
-                      </tr>
-                      {% endfor %}
-                    </tbody>
-                  </table>
-                </div>
+          <span class="fw-bold fs-6 text-uppercase">Fleet</span>
+        </div>
+        <div class="card-body bg-light py-2 d-flex align-items-center justify-content-center" style="min-height: 80px;">
+          <div class="d-flex flex-wrap gap-1 justify-content-center">
+            {% for ebike in provider.ebikes.all|slice:":2" %}
+              <div class="text-center" style="min-width: 50px;">
+                {% if ebike.image %}
+                  <img src="{{ ebike.image.url }}" alt="{{ ebike.name }}" class="rounded-3 mb-1 border" style="width: 38px; height: 26px; object-fit: cover;" />
+                {% else %}
+                  <img src="https://api.dicebear.com/7.x/icons/svg?seed={{ ebike.name }}" alt="{{ ebike.name }}" class="rounded-3 mb-1 border" style="width: 38px; height: 26px; object-fit: cover;" />
+                {% endif %}
+                <div class="small text-muted fw-medium" style="font-size: 0.65rem; line-height: 1;">{{ ebike.name }}</div>
               </div>
-              {% endif %}
-
-              {% if approved_docs %}
-              <div class="col-12">
-                <h6 class="fw-bold text-success"><i class="fas fa-check-circle me-1"></i>Approved</h6>
-                <div class="table-responsive">
-                  <table class="table table-sm align-middle">
-                    <thead class="table-light">
-                      <tr>
-                        <th>Type</th><th>Number</th><th>Reviewed By</th><th>Reviewed At</th><th class="text-end">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {% for d in approved_docs %}
-                      <tr>
-                        <td>{{ d.get_document_type_display }}</td>
-                        <td>{{ d.document_number|default:'—' }}</td>
-                        <td>{% if d.reviewed_by %}{{ d.reviewed_by.username }}{% else %}—{% endif %}</td>
-                        <td>{{ d.reviewed_at|date:'M d, Y H:i' }}</td>
-                        <td class="text-end">
-                          <a class="btn btn-outline-primary btn-sm" href="{{ d.document_file.url }}" target="_blank"><i class="fas fa-eye me-1"></i>View</a>
-                          <a class="btn btn-outline-warning btn-sm" href="{% url 'edit_document_verification' d.id %}"><i class="fas fa-pen me-1"></i>Edit</a>
-                          <form method="post" action="{% url 'remove_document_verification' d.id %}" class="d-inline">
-                            {% csrf_token %}
-                            <button class="btn btn-outline-danger btn-sm"><i class="fas fa-times me-1"></i>Remove</button>
-                          </form>
-                        </td>
-                      </tr>
-                      {% endfor %}
-                    </tbody>
-                  </table>
-                </div>
+            {% endfor %}
+            {% if total_bikes > 2 %}
+              <div class="text-center align-self-center">
+                <span class="badge bg-secondary rounded-pill fw-bold">+{{ total_bikes|add:"-2" }}</span>
               </div>
-              {% endif %}
-
-              {% if rejected_docs %}
-              <div class="col-12">
-                <h6 class="fw-bold text-danger"><i class="fas fa-times-circle me-1"></i>Rejected</h6>
-                <div class="table-responsive">
-                  <table class="table table-sm align-middle">
-                    <thead class="table-light">
-                      <tr>
-                        <th>Type</th><th>Number</th><th>Reviewed By</th><th>Reviewed At</th><th class="text-end">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {% for d in rejected_docs %}
-                      <tr>
-                        <td>{{ d.get_document_type_display }}</td>
-                        <td>{{ d.document_number|default:'—' }}</td>
-                        <td>{% if d.reviewed_by %}{{ d.reviewed_by.username }}{% else %}—{% endif %}</td>
-                        <td>{{ d.reviewed_at|date:'M d, Y H:i' }}</td>
-                        <td class="text-end">
-                          <a class="btn btn-outline-primary btn-sm" href="{{ d.document_file.url }}" target="_blank"><i class="fas fa-eye me-1"></i>View</a>
-                          <a class="btn btn-warning btn-sm" href="{% url 'verify_document' d.id %}"><i class="fas fa-rotate-left me-1"></i>Re-review</a>
-                        </td>
-                      </tr>
-                      {% endfor %}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-              {% endif %}
-            </div>
-          {% endif %}
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="card text-center h-100 border-0 shadow-lg rounded-4 overflow-hidden">
+        <div class="card-header bg-gradient-info text-white border-0 py-2">
+          <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white bg-opacity-25 me-2" style="width: 32px; height: 32px;">
+            <i class="fas fa-hashtag text-white fa-sm"></i>
+          </div>
+          <span class="fw-bold fs-6 text-uppercase">Fleet Size</span>
+        </div>
+        <div class="card-body bg-light py-3 d-flex align-items-center justify-content-center" style="min-height: 80px;">
+          <div>
+            <div class="fs-3 fw-bold text-info">{{ total_bikes }}</div>
+            <div class="small text-muted fw-medium">Total Bikes</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="card text-center h-100 border-0 shadow-lg rounded-4 overflow-hidden">
+        <div class="card-header bg-gradient-warning text-white border-0 py-2">
+          <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white bg-opacity-25 me-2" style="width: 32px; height: 32px;">
+            <i class="fas fa-calendar-check text-white fa-sm"></i>
+          </div>
+          <span class="fw-bold fs-6 text-uppercase">Bookings</span>
+        </div>
+        <div class="card-body bg-light py-3 d-flex align-items-center justify-content-center" style="min-height: 80px;">
+          <div>
+            <div class="fs-3 fw-bold text-warning">{{ completed_bookings }}</div>
+            <div class="small text-muted fw-medium">Completed Rents</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="card text-center h-100 border-0 shadow-lg rounded-4 overflow-hidden">
+        <div class="card-header bg-gradient-secondary text-white border-0 py-2">
+          <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white bg-opacity-25 me-2" style="width: 32px; height: 32px;">
+            <i class="fas fa-star text-white fa-sm"></i>
+          </div>
+          <span class="fw-bold fs-6 text-uppercase">Rating</span>
+        </div>
+        <div class="card-body bg-light py-3 d-flex align-items-center justify-content-center" style="min-height: 80px;">
+          <div>
+            {% if average_rating %}
+              <div class="fs-4 fw-bold text-warning">{{ average_rating|floatformat:1 }} <i class="fas fa-star"></i></div>
+              <div class="small text-muted fw-medium">Average Score</div>
+            {% else %}
+              <div class="fs-4 fw-bold text-muted">—</div>
+              <div class="small text-muted fw-medium">No Reviews Yet</div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="card text-center h-100 border-0 shadow-lg rounded-4 overflow-hidden">
+        <div class="card-header bg-gradient-danger text-white border-0 py-2">
+          <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white bg-opacity-25 me-2" style="width: 32px; height: 32px;">
+            <i class="fas fa-money-bill-wave text-white fa-sm"></i>
+          </div>
+          <span class="fw-bold fs-6 text-uppercase">Withdrawals</span>
+        </div>
+        <div class="card-body bg-light py-3 d-flex align-items-center justify-content-center" style="min-height: 80px;">
+          <div>
+            <div class="fs-3 fw-bold text-danger">{{ pending_withdrawals }}</div>
+            <div class="small text-muted fw-medium">Pending Requests</div>
+          </div>
         </div>
       </div>
     </div>
   </div>
+
+  <!-- Additional Info Card -->
+  <div class="row g-3 mb-4">
+    <div class="col-12">
+      <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+        <div class="card-header bg-gradient-dark text-white border-0 py-3">
+          <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white bg-opacity-25 me-2" style="width: 32px; height: 32px;">
+            <i class="fas fa-id-card text-white fa-sm"></i>
+          </div>
+          <span class="fw-bold fs-5">Contact & Profile Information</span>
+          {% if provider.is_verified_provider %}
+            <span class="badge bg-success ms-auto rounded-pill"><i class="fas fa-check-circle me-1"></i>VERIFIED PROVIDER</span>
+          {% else %}
+            <span class="badge bg-warning text-dark ms-auto rounded-pill"><i class="fas fa-clock me-1"></i>PENDING VERIFICATION</span>
+          {% endif %}
+        </div>
+        <div class="card-body bg-light p-4">
+          <div class="row align-items-center">
+            <div class="col-md-8">
+              <div class="d-flex align-items-center">
+                <img src="{% if provider.profile_image %}{{ provider.profile_image.url }}{% else %}https://api.dicebear.com/7.x/avataaars/svg?seed={{ provider.username }}{% endif %}"
+                     alt="{{ provider.username }}" class="rounded-circle me-3 border" style="width: 80px; height: 80px; object-fit: cover;" />
+                <div>
+                  <h5 class="fw-bold mb-1 text-dark">{{ provider.username }}</h5>
+                  <p class="mb-1 text-muted"><i class="fas fa-envelope me-2"></i>{{ provider.email }}</p>
+                  <p class="mb-0 text-muted"><i class="fas fa-phone me-2"></i>{{ provider.mobile_number|default:'Phone not provided' }}</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4 text-end">
+              <div class="d-flex flex-column gap-2">
+                {% if provider.is_verified_provider %}
+                  <button class="btn btn-outline-danger btn-sm rounded-pill" disabled>
+                    <i class="fas fa-user-slash me-1"></i>Provider is Verified
+                  </button>
+                {% else %}
+                  <button class="btn btn-success btn-sm rounded-pill" disabled>
+                    <i class="fas fa-user-check me-1"></i>Verification Pending
+                  </button>
+                {% endif %}
+                <a href="{% url 'review_documents' %}?provider={{ provider.id }}" class="btn btn-primary btn-sm rounded-pill">
+                  <i class="fas fa-file-alt me-1"></i>Review Documents ({{ total_docs }})
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
 </div>
 {% endblock %}

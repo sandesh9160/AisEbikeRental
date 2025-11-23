@@ -1,1 +1,1 @@
-# Package initializer for core.management.commands
+# This file makes Python treat the commands directory as a package

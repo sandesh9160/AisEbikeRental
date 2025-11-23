@@ -1,0 +1,561 @@
+{% extends 'core/base.html' %}
+{% block navbar %}{% endblock %}
+
+{% block content %}
+<form id="withdrawal-logout-form" method="post" action="{% url 'logout' %}" style="display:none;">
+  {% csrf_token %}
+</form>
+
+<!-- Sidebar Toggle Button -->
+<button class="dashboard-sidebar-toggle d-lg-none" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+<!-- Sidebar and overlay -->
+<div id="sidebar" class="sidebar bg-dark text-white">
+  <div class="sidebar-header d-flex align-items-center justify-content-between px-3 py-3">
+    <span class="fw-bold fs-4"><i class="fas fa-charging-station me-2"></i>Provider</span>
+    <button class="btn btn-sm btn-outline-light d-md-none" id="sidebarCloseBtn"><i class="fas fa-times"></i></button>
+  </div>
+  <nav class="nav flex-column px-2">
+    <a class="nav-link text-white sidebar-link" href="{% url 'vehicle_provider_dashboard' %}"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a>
+    <a class="nav-link text-white sidebar-link" href="#earnings-section"><i class="fas fa-wallet me-2"></i>Earnings</a>
+    <a class="nav-link text-white sidebar-link active" href="{% url 'request_withdrawal' %}"><i class="fas fa-money-bill-wave me-2"></i>Request Withdrawal</a>
+    <a class="nav-link text-white sidebar-link" href="{% url 'withdrawal_history' %}"><i class="fas fa-history me-2"></i>Withdrawal History</a>
+    <a class="nav-link text-white sidebar-link" href="{% url 'upload_documents' %}"><i class="fas fa-file-upload me-2"></i>Upload Documents</a>
+    <a class="nav-link text-white sidebar-link" href="{% url 'view_documents' %}"><i class="fas fa-file-alt me-2"></i>View Documents</a>
+    <a class="nav-link text-white sidebar-link" href="{% url 'add_ebike' %}"><i class="fas fa-plus me-2"></i>Add E-bike</a>
+    <a class="nav-link text-white sidebar-link" href="#" onclick="event.preventDefault(); document.getElementById('withdrawal-logout-form').submit(); if (typeof closeSidebar === 'function') closeSidebar();"><i class="fas fa-sign-out-alt me-2"></i>Logout</a>
+  </nav>
+  <div class="sidebar-profile text-center mt-auto mb-4 px-3">
+    <img id="sidebarProfileImage" src="{% if request.user.profile_image %}{{ request.user.profile_image.url }}{% else %}https://api.dicebear.com/7.x/avataars/svg?seed={{ request.user.username }}{% endif %}"
+         alt="Profile" class="rounded-circle mb-2 open-profile-modal" style="width:60px; height:60px; object-fit:cover; cursor:pointer;">
+    <div id="sidebarUsername" class="fw-semibold">{{ request.user.username }}</div>
+    <div id="sidebarEmail" class="text-muted small">{{ request.user.email }}</div>
+    <div id="sidebarMobile" class="text-muted small">{{ request.user.mobile_number }}</div>
+  </div>
+</div>
+<div id="sidebarOverlay" class="sidebar-overlay d-md-none"></div>
+
+<!-- Main content with sidebar offset -->
+<div class="main-content-with-sidebar">
+  <div class="container-xxl py-4">
+    {% if messages %}
+      <div class="mb-3">
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} mb-2" role="alert">
+            <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %} me-2"></i>
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <!-- Enhanced Header -->
+    <div class="row g-3 mb-4">
+      <div class="col-12">
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+          <div class="card-header bg-gradient-primary text-white border-0 py-4">
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white bg-opacity-25 me-3" style="width: 60px; height: 60px;">
+              <i class="fas fa-money-bill-wave text-white fa-2x"></i>
+            </div>
+            <div class="d-inline-block">
+              <h1 class="h3 mb-1">🏦 Request Withdrawal</h1>
+              <p class="mb-0 opacity-75">Securely withdraw your earnings to bank account or UPI</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Balance Overview Cards -->
+    <div class="row g-3 mb-4">
+      <div class="col-lg-3 col-md-6 col-12">
+        <div class="card text-center h-100 border-0 shadow-lg rounded-4 overflow-hidden position-relative">
+          <div class="card-header bg-gradient-success text-white border-0 py-3 position-relative overflow-hidden">
+            <div class="position-absolute top-0 end-0 opacity-25" style="transform: rotate(15deg) translate(20px, -20px);">
+              <i class="fas fa-chart-line fa-3x"></i>
+            </div>
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white bg-opacity-25 me-2" style="width: 40px; height: 40px; z-index: 2; position: relative;">
+              <i class="fas fa-chart-line text-white"></i>
+            </div>
+            <span class="fw-bold fs-6">Total Revenue</span>
+          </div>
+          <div class="card-body bg-light py-4 d-flex flex-column align-items-center justify-content-center">
+            <div class="fs-2 fw-bold text-success mb-1">{{ total_earnings|floatformat:2 }}</div>
+            <div class="small text-muted fw-medium">Earning Generated</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-md-6 col-12">
+        <div class="card text-center h-100 border-0 shadow-lg rounded-4 overflow-hidden position-relative">
+          <div class="card-header bg-gradient-warning text-white border-0 py-3 position-relative overflow-hidden">
+            <div class="position-absolute top-0 end-0 opacity-25" style="transform: rotate(15deg) translate(20px, -20px);">
+              <i class="fas fa-minus-circle fa-3x"></i>
+            </div>
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white bg-opacity-25 me-2" style="width: 40px; height: 40px; z-index: 2; position: relative;">
+              <i class="fas fa-minus-circle text-white"></i>
+            </div>
+            <span class="fw-bold fs-6">Platform Fee (10%)</span>
+          </div>
+          <div class="card-body bg-light py-4 d-flex flex-column align-items-center justify-content-center">
+            <div class="fs-2 fw-bold text-warning mb-1">{{ platform_charges|floatformat:2 }}</div>
+            <div class="small text-muted fw-medium">Platform Charge</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-md-6 col-12">
+        <div class="card text-center h-100 border-0 shadow-lg rounded-4 overflow-hidden position-relative">
+          <div class="card-header bg-gradient-info text-white border-0 py-3 position-relative overflow-hidden">
+            <div class="position-absolute top-0 end-0 opacity-25" style="transform: rotate(15deg) translate(20px, -20px);">
+              <i class="fas fa-wallet fa-3x"></i>
+            </div>
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white bg-opacity-25 me-2" style="width: 40px; height: 40px; z-index: 2; position: relative;">
+              <i class="fas fa-wallet text-white"></i>
+            </div>
+            <span class="fw-bold fs-6">Available Balance</span>
+          </div>
+          <div class="card-body bg-light py-4 d-flex flex-column align-items-center justify-content-center">
+            <div class="fs-2 fw-bold text-info mb-1">{{ available_balance|floatformat:2 }}</div>
+            <div class="small text-muted fw-medium">Ready for Transfer</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-md-6 col-12">
+        <div class="card text-center h-100 border-0 shadow-lg rounded-4 overflow-hidden position-relative">
+          <div class="card-header bg-gradient-danger text-white border-0 py-3 position-relative overflow-hidden">
+            <div class="position-absolute top-0 end-0 opacity-25" style="transform: rotate(15deg) translate(20px, -20px);">
+              <i class="fas fa-shield-alt fa-3x"></i>
+            </div>
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white bg-opacity-25 me-2" style="width: 40px; height: 40px; z-index: 2; position: relative;">
+              <i class="fas fa-shield-alt text-white"></i>
+            </div>
+            <span class="fw-bold fs-6">Reserve Amount</span>
+          </div>
+          <div class="card-body bg-light py-4 d-flex flex-column align-items-center justify-content-center">
+            <div class="fs-2 fw-bold text-danger mb-1">{{ minimum_reserve|floatformat:2 }}</div>
+            <div class="small text-muted fw-medium">Minimum Required</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Withdrawal Eligibility Status -->
+    <div class="row g-3 mb-4">
+      <div class="col-12">
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+          <div class="card-body bg-light p-4">
+            <div class="row align-items-center">
+              <div class="col-md-6">
+                <div class="d-flex align-items-center">
+                  {% if can_withdraw %}
+                    <div class="me-3">
+                      <i class="fas fa-check-circle fa-2x text-success"></i>
+                    </div>
+                    <div>
+                      <h5 class="text-success mb-1">Withdrawal Eligible</h5>
+                      <p class="text-muted mb-0">You can withdraw up to ₹{{ withdrawable_balance|floatformat:2 }}</p>
+                    </div>
+                  {% else %}
+                    <div class="me-3">
+                      <i class="fas fa-exclamation-triangle fa-2x text-warning"></i>
+                    </div>
+                    <div>
+                      <h5 class="text-warning mb-1">Withdrawal Not Available</h5>
+                      <p class="text-muted mb-0">Increase your earnings to meet minimum requirements</p>
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="col-md-6 text-end">
+                <div class="fs-4 fw-bold text-primary">₹{{ withdrawable_balance|floatformat:2 }}</div>
+                <div class="small text-muted">Maximum Withdrawable</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Withdrawal Form -->
+    {% if can_withdraw %}
+    <div class="row g-3 mb-4">
+      <div class="col-12">
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+          <div class="card-header bg-gradient-primary text-white border-0 py-3">
+            <h5 class="mb-0"><i class="fas fa-paper-plane me-2"></i>Submit Withdrawal Request</h5>
+          </div>
+          <div class="card-body p-4 p-md-5">
+            <form method="post" id="withdrawalForm" class="needs-validation" novalidate>
+              {% csrf_token %}
+
+              <!-- Transfer Method Selection -->
+              <div class="mb-4">
+                <h6 class="fw-bold text-primary mb-3">
+                  <i class="fas fa-exchange-alt me-2"></i>Choose Transfer Method
+                </h6>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <div class="card h-100 border-2 payment-method-card selected" id="bankCard" onclick="selectTransferMethod('bank')" style="cursor: pointer; border-color: #2c3e50;">
+                      <div class="card-body text-center p-4">
+                        <div class="mb-3">
+                          <i class="fas fa-university fa-3x" style="color: #2c3e50;"></i>
+                        </div>
+                        <h6 class="fw-bold text-primary">Bank Transfer</h6>
+                        <p class="text-muted small mb-0">Transfer to bank account</p>
+                        <div class="form-check mt-3">
+                          <input class="form-check-input" type="radio" name="transfer_type" id="transfer_bank" value="bank" checked style="display: none;">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="card h-100 border payment-method-card" id="upiCard" onclick="selectTransferMethod('upi')" style="cursor: pointer;">
+                      <div class="card-body text-center p-4">
+                        <div class="mb-3">
+                          <i class="fas fa-mobile-alt fa-3x text-secondary"></i>
+                        </div>
+                        <h6 class="fw-bold text-secondary">UPI Transfer</h6>
+                        <p class="text-muted small mb-0">Transfer to UPI ID</p>
+                        <div class="form-check mt-3">
+                          <input class="form-check-input" type="radio" name="transfer_type" id="transfer_upi" value="upi" style="display: none;">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Amount Input -->
+              <div class="mb-4">
+                <h6 class="fw-bold text-primary mb-3">
+                  <i class="fas fa-rupee-sign me-2"></i>Withdrawal Amount
+                </h6>
+                <div class="row g-3">
+                  <div class="col-md-8">
+                    <div class="input-group input-group-lg">
+                      <span class="input-group-text bg-primary text-white">
+                        <i class="fas fa-rupee-sign"></i>
+                      </span>
+                      {{ form.amount }}
+                      <span class="input-group-text">.00</span>
+                    </div>
+                    <small class="text-muted mt-1">Minimum: ₹{{ effective_min_withdrawal|floatformat:2 }} | Maximum: ₹{{ withdrawable_balance|floatformat:2 }}</small>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="bg-light rounded p-3">
+                      <div class="small text-muted mb-1">Available to Withdraw</div>
+                      <div class="fs-5 fw-bold text-success">₹{{ withdrawable_balance|floatformat:2 }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Bank Transfer Fields -->
+              <div id="bankTransferSection">
+                <h6 class="fw-bold text-primary mb-3">
+                  <i class="fas fa-university me-2"></i>Bank Account Details
+                </h6>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <div class="form-floating">
+                      {{ form.account_holder_name }}
+                      <label for="{{ form.account_holder_name.id_for_label }}">
+                        <i class="fas fa-user me-1"></i>Account Holder Name
+                      </label>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-floating">
+                      {{ form.account_number }}
+                      <label for="{{ form.account_number.id_for_label }}">
+                        <i class="fas fa-credit-card me-1"></i>Account Number
+                      </label>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-floating">
+                      {{ form.ifsc_code }}
+                      <label for="{{ form.ifsc_code.id_for_label }}">
+                        <i class="fas fa-code me-1"></i>IFSC Code
+                      </label>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-floating">
+                      {{ form.bank_name }}
+                      <label for="{{ form.bank_name.id_for_label }}">
+                        <i class="fas fa-building me-1"></i>Bank Name
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- UPI Fields -->
+              <div id="upiTransferSection" style="display: none;">
+                <h6 class="fw-bold text-primary mb-3">
+                  <i class="fas fa-mobile-alt me-2"></i>UPI Details
+                </h6>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <div class="form-floating">
+                      {{ form.upi_id }}
+                      <label for="{{ form.upi_id.id_for_label }}">
+                        <i class="fas fa-at me-1"></i>UPI ID
+                      </label>
+                    </div>
+                    <small class="text-muted">Example: name@paytm, name@phonepe</small>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Submit Section -->
+              <div class="mt-5 pt-4 border-top">
+                <div class="row g-3 align-items-center">
+                  <div class="col-md-8">
+                    <div class="bg-light rounded p-3">
+                      <h6 class="mb-2 text-primary">Withdrawal Summary</h6>
+                      <div class="row g-2">
+                        <div class="col-6">
+                          <div class="small text-muted">Request Amount</div>
+                          <div class="fw-bold" id="summaryAmount">₹0.00</div>
+                        </div>
+                        <div class="col-6">
+                          <div class="small text-muted">Processing Fee</div>
+                          <div class="fw-bold text-warning">₹0.00</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-4 text-center">
+                    <button type="submit" class="btn btn-primary btn-lg w-100 mb-2">
+                      <i class="fas fa-paper-plane me-2"></i>Submit Request
+                    </button>
+                    <a href="{% url 'vehicle_provider_dashboard' %}" class="btn btn-outline-secondary w-100">
+                      <i class="fas fa-times me-1"></i>Cancel
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <!-- Insufficient Balance Message -->
+    <div class="row g-3 mb-4">
+      <div class="col-12">
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+          <div class="card-body text-center py-5">
+            <div class="mb-4">
+              <i class="fas fa-exclamation-triangle fa-4x text-warning"></i>
+            </div>
+            <h4 class="text-warning mb-3">Insufficient Balance</h4>
+            <p class="text-muted mb-4">You need to earn more to meet the minimum withdrawal requirements.</p>
+            <div class="row g-3 justify-content-center">
+              <div class="col-md-4">
+                <div class="bg-light rounded p-3">
+                  <div class="text-muted small mb-1">Current Balance</div>
+                  <div class="fs-5 fw-bold">{{ available_balance|floatformat:2 }}</div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="bg-light rounded p-3">
+                  <div class="text-muted small mb-1">Minimum Required</div>
+                  <div class="fs-5 fw-bold">{{ minimum_reserve|floatformat:2 }}</div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="bg-light rounded p-3">
+                  <div class="text-muted small mb-1">Need Additional</div>
+                  <div class="fs-5 fw-bold text-danger">{{ additional_needed|floatformat:2 }}</div>
+                </div>
+              </div>
+            </div>
+            <div class="mt-4">
+              <a href="{% url 'vehicle_provider_dashboard' %}" class="btn btn-primary btn-lg">
+                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+
+<style>
+/* Modern form styling */
+.form-floating {
+  position: relative;
+}
+
+.form-floating > .form-control {
+  height: calc(3.5rem + 2px);
+  padding: 1rem 0.75rem;
+}
+
+.form-floating > label {
+  position: absolute;
+  top: 0;
+  left: 0.75rem;
+  height: 100%;
+  padding: 1rem 0.75rem;
+  pointer-events: none;
+  border: 1px solid transparent;
+  transform-origin: 0 0;
+  transition: opacity .1s ease-in-out, transform .1s ease-in-out;
+  font-size: 0.875rem;
+}
+
+.form-floating > .form-control:focus ~ label,
+.form-floating > .form-control:not(:placeholder-shown) ~ label {
+  opacity: .65;
+  transform: scale(.85) translateY(-0.5rem) translateX(0.15rem);
+}
+
+.payment-method-card.selected {
+  border-color: #007bff !important;
+  box-shadow: 0 0 15px rgba(0, 123, 255, 0.3) !important;
+}
+
+.payment-method-card.selected .fa-university,
+.payment-method-card.selected .fa-mobile-alt,
+.payment-method-card.selected h6 {
+  color: #007bff !important;
+}
+
+.input-group-lg > .form-control {
+  font-size: 1.25rem;
+  padding: 0.75rem 1rem;
+}
+</style>
+
+<script>
+let selectedMethod = 'bank';
+
+function selectTransferMethod(method) {
+  selectedMethod = method;
+
+  // Update radio buttons
+  document.getElementById('transfer_bank').checked = (method === 'bank');
+  document.getElementById('transfer_upi').checked = (method === 'upi');
+
+  // Update card styling
+  document.getElementById('bankCard').classList.toggle('selected', method === 'bank');
+  document.getElementById('upiCard').classList.toggle('selected', method === 'upi');
+
+  // Toggle required attributes and show/hide sections
+  toggleTransferFields();
+}
+
+function toggleTransferFields() {
+  const bankSection = document.getElementById('bankTransferSection');
+  const upiSection = document.getElementById('upiTransferSection');
+
+  const bankFields = ['account_holder_name', 'account_number', 'ifsc_code', 'bank_name'];
+  const upiFields = ['upi_id'];
+
+  if (selectedMethod === 'bank') {
+    bankSection.style.display = 'block';
+    upiSection.style.display = 'none';
+
+    // Make bank fields required
+    bankFields.forEach(fieldName => {
+      const field = document.getElementById('id_' + fieldName);
+      if (field) field.required = true;
+    });
+
+    // Make UPI fields not required
+    upiFields.forEach(fieldName => {
+      const field = document.getElementById('id_' + fieldName);
+      if (field) field.required = false;
+    });
+
+  } else {
+    bankSection.style.display = 'none';
+    upiSection.style.display = 'block';
+
+    // Make bank fields not required
+    bankFields.forEach(fieldName => {
+      const field = document.getElementById('id_' + fieldName);
+      if (field) field.required = false;
+    });
+
+    // Make UPI fields required
+    upiFields.forEach(fieldName => {
+      const field = document.getElementById('id_' + fieldName);
+      if (field) field.required = true;
+    });
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialize payment method selection
+  selectTransferMethod('bank');
+  setupAmountValidation();
+
+  // Update summary on amount change
+  document.getElementById('id_amount').addEventListener('input', updateSummary);
+});
+
+function setupAmountValidation() {
+  const amountField = document.getElementById('id_amount');
+  const withdrawableBalance = parseFloat('{{ withdrawable_balance|default:0 }}');
+  const minAmount = parseFloat('{{ effective_min_withdrawal|default:200 }}');
+
+  if (amountField) {
+    // Set max attribute
+    amountField.max = withdrawableBalance;
+
+    // Add input validation
+    amountField.addEventListener('input', function() {
+      const value = parseFloat(this.value) || 0;
+
+      if (value < minAmount && value > 0) {
+        amountField.setCustomValidity(`Minimum withdrawal amount is ₹${minAmount}`);
+        amountField.classList.add('is-invalid');
+      } else if (value > withdrawableBalance) {
+        amountField.setCustomValidity(`Maximum withdrawable amount is ₹${withdrawableBalance.toFixed(2)}`);
+        amountField.classList.add('is-invalid');
+      } else {
+        amountField.setCustomValidity('');
+        amountField.classList.remove('is-invalid');
+        amountField.classList.add('is-valid');
+      }
+    });
+
+    // Prevent form submission if amount is invalid
+    const form = document.getElementById('withdrawalForm');
+    form.addEventListener('submit', function(e) {
+      const value = parseFloat(amountField.value) || 0;
+
+      if (value < minAmount && value > 0) {
+        e.preventDefault();
+        amountField.focus();
+        alert(`Minimum withdrawal amount is ₹${minAmount}`);
+        return false;
+      }
+
+      if (value > withdrawableBalance) {
+        e.preventDefault();
+        amountField.focus();
+        alert(`Maximum withdrawable amount is ₹${withdrawableBalance.toFixed(2)}`);
+        return false;
+      }
+    });
+  }
+}
+
+function updateSummary() {
+  const amount = parseFloat(document.getElementById('id_amount').value) || 0;
+  document.getElementById('summaryAmount').textContent = `₹${amount.toFixed(2)}`;
+}
+</script>
+
+{% endblock %}

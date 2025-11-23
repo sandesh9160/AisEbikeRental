@@ -11,6 +11,5 @@ urlpatterns = [
     path('payment/<int:booking_id>/cancel/', views.payment_cancel, name='payment_cancel'),
     path('download-receipt/<int:booking_id>/', views.download_receipt, name='download_receipt'),
     path('receipt/<int:booking_id>/', views.view_receipt, name='view_receipt'),
-    path('mark-notification-read/<int:notification_id>/', views.mark_notification_read, name='mark_notification_read'),
-]
 
+]

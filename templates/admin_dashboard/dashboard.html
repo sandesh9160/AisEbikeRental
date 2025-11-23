@@ -284,6 +284,9 @@
 <button class="dashboard-sidebar-toggle d-lg-none" id="sidebarToggle" onclick="handleSidebarToggle()"><i class="fas fa-bars"></i></button>
 <!-- Sidebar and overlay -->
 <div id="sidebar" class="dashboard-sidebar bg-dark text-white">
+  <form id="dashboard-logout-form" method="post" action="{% url 'logout' %}" style="display:none;">
+    {% csrf_token %}
+  </form>
   <div class="sidebar-header d-flex align-items-center justify-content-between px-3 py-3">
     <span class="fw-bold fs-4"><i class="fas fa-user-shield me-2"></i>Admin</span>
     <button class="btn btn-sm btn-outline-light d-md-none" id="sidebarCloseBtn" onclick="closeAdminSidebar()"><i class="fas fa-times"></i></button>
@@ -299,6 +302,12 @@
       {% endif %}
     </a>
     <a class="nav-link text-white sidebar-link" href="#earnings" onclick="if(window.innerWidth<992) closeAdminSidebar()"><i class="fas fa-wallet me-2"></i>Earnings</a>
+    <a class="nav-link text-white sidebar-link" href="{% url 'admin_withdrawal_list' %}" onclick="if(window.innerWidth<992) closeAdminSidebar()">
+      <i class="fas fa-money-bill-wave me-2"></i>Withdrawals
+      {% if total_pending_withdrawals > 0 %}
+        <span class="badge bg-warning ms-2 align-middle">{{ total_pending_withdrawals }}</span>
+      {% endif %}
+    </a>
     <a class="nav-link text-white sidebar-link" href="{% url 'review_documents' %}" onclick="if(window.innerWidth<992) closeAdminSidebar()">
       <i class="fas fa-file-alt me-2"></i>Document Verification
       {% if pending_documents|length > 0 %}
@@ -307,7 +316,7 @@
     </a>
     <a class="nav-link text-white sidebar-link" href="{% url 'admin_feedback_list' %}" onclick="if(window.innerWidth<992) closeAdminSidebar()"><i class="fas fa-envelope me-2"></i>Contact Messages</a>
     <a class="nav-link text-white sidebar-link" href="#analysis-section" onclick="if(window.innerWidth<992) closeAdminSidebar()"><i class="bi bi-bar-chart-fill me-2"></i>Analysis</a>
-    <a class="nav-link text-white sidebar-link" href="{% url 'logout' %}" onclick="if(window.innerWidth<992) closeAdminSidebar()"><i class="fas fa-sign-out-alt me-2"></i>Logout</a>
+    <a class="nav-link text-white sidebar-link" href="#" onclick="event.preventDefault(); document.getElementById('dashboard-logout-form').submit(); if(window.innerWidth<992) closeAdminSidebar();"><i class="fas fa-sign-out-alt me-2"></i>Logout</a>
   </nav>
   <div class="sidebar-profile text-center mt-auto mb-4 px-3">
     <img id="sidebarProfileImage" src="{% if request.user.profile_image %}{{ request.user.profile_image.url }}{% else %}https://api.dicebear.com/7.x/avataaars/svg?seed={{ request.user.username }}{% endif %}"
@@ -753,6 +762,7 @@
                   <th>Profile</th>
                   <th>Username</th>
                   <th>Email</th>
+                  <th>Contact</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -765,7 +775,11 @@
                   </td>
                   <td>{{ rider.username }}</td>
                   <td>{{ rider.email }}</td>
+                  <td>{{ rider.mobile_number|default:'-' }}</td>
                   <td>
+                    <a href="{% url 'admin_rider_detail' rider.id %}" class="btn btn-outline-primary btn-sm me-1">
+                      <i class="bi bi-eye"></i> View
+                    </a>
                     <a
                       href="{% url 'delete_user' rider.id %}"
                       class="btn btn-outline-danger btn-sm"
@@ -1454,4 +1468,3 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 </script>
-

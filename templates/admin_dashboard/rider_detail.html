@@ -1,0 +1,320 @@
+{% extends 'core/base.html' %}
+{% block title %}Rider Details - {{ rider.username }}{% endblock %}
+{% block content %}
+<div class="container-xxl py-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0"><i class="fas fa-user me-2"></i>Rider: {{ rider.username }}</h2>
+    <a href="{% url 'admin_dashboard' %}#riders" class="btn btn-outline-secondary btn-sm"><i class="fas fa-arrow-left me-1"></i>Back</a>
+  </div>
+
+  <!-- Statistics Row -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-2">
+      <div class="card text-center h-100 border-0 shadow-lg rounded-4 overflow-hidden">
+        <div class="card-header bg-gradient-primary text-white border-0 py-2">
+          <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white bg-opacity-25 me-2" style="width: 32px; height: 32px;">
+            <i class="fas fa-wallet text-white fa-sm"></i>
+          </div>
+          <span class="fw-bold fs-6 text-uppercase">Spending</span>
+        </div>
+        <div class="card-body bg-light py-3 d-flex align-items-center justify-content-center" style="min-height: 80px;">
+          <div>
+            <div class="fs-3 fw-bold text-primary">₹{{ total_spent|floatformat:0 }}</div>
+            <div class="small text-muted fw-medium">Total Spent</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="card text-center h-100 border-0 shadow-lg rounded-4 overflow-hidden">
+        <div class="card-header bg-gradient-success text-white border-0 py-2">
+          <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white bg-opacity-25 me-2" style="width: 32px; height: 32px;">
+            <i class="fas fa-calendar-check text-white fa-sm"></i>
+          </div>
+          <span class="fw-bold fs-6 text-uppercase">Bookings</span>
+        </div>
+        <div class="card-body bg-light py-3 d-flex align-items-center justify-content-center" style="min-height: 80px;">
+          <div>
+            <div class="fs-3 fw-bold text-success">{{ approved_booking_count }}</div>
+            <div class="small text-muted fw-medium">Completed Rents</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="card text-center h-100 border-0 shadow-lg rounded-4 overflow-hidden">
+        <div class="card-header bg-gradient-warning text-white border-0 py-2">
+          <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white bg-opacity-25 me-2" style="width: 32px; height: 32px;">
+            <i class="fas fa-star text-white fa-sm"></i>
+          </div>
+          <span class="fw-bold fs-6 text-uppercase">Rating</span>
+        </div>
+        <div class="card-body bg-light py-3 d-flex align-items-center justify-content-center" style="min-height: 80px;">
+          <div>
+            {% if average_rating %}
+              <div class="fs-4 fw-bold text-warning">{{ average_rating|floatformat:1 }} <i class="fas fa-star"></i></div>
+              <div class="small text-muted fw-medium">Average Score</div>
+            {% else %}
+              <div class="fs-4 fw-bold text-muted">—</div>
+              <div class="small text-muted fw-medium">No Ratings Yet</div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="card text-center h-100 border-0 shadow-lg rounded-4 overflow-hidden">
+        <div class="card-header bg-gradient-info text-white border-0 py-2">
+          <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white bg-opacity-25 me-2" style="width: 32px; height: 32px;">
+            <i class="fas fa-clock text-white fa-sm"></i>
+          </div>
+          <span class="fw-bold fs-6 text-uppercase">Duration</span>
+        </div>
+        <div class="card-body bg-light py-3 d-flex align-items-center justify-content-center" style="min-height: 80px;">
+          <div>
+            {% if average_booking_duration %}
+              <div class="fs-3 fw-bold text-info">{{ average_booking_duration|floatformat:1 }}</div>
+              <div class="small text-muted fw-medium">Avg Days/Rent</div>
+            {% else %}
+              <div class="fs-4 fw-bold text-muted">—</div>
+              <div class="small text-muted fw-medium">No Rentals Yet</div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="card text-center h-100 border-0 shadow-lg rounded-4 overflow-hidden">
+        <div class="card-header bg-gradient-danger text-white border-0 py-2">
+          <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white bg-opacity-25 me-2" style="width: 32px; height: 32px;">
+            <i class="fas fa-heart text-white fa-sm"></i>
+          </div>
+          <span class="fw-bold fs-6 text-uppercase">Favorites</span>
+        </div>
+        <div class="card-body bg-light py-3 d-flex align-items-center justify-content-center" style="min-height: 80px;">
+          <div>
+            <div class="fs-3 fw-bold text-danger">{{ total_favorites }}</div>
+            <div class="small text-muted fw-medium">Saved Bikes</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Additional Info Card -->
+  <div class="row g-3 mb-4">
+    <div class="col-12">
+      <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+        <div class="card-header bg-gradient-dark text-white border-0 py-3">
+          <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white bg-opacity-25 me-2" style="width: 32px; height: 32px;">
+            <i class="fas fa-id-card text-white fa-sm"></i>
+          </div>
+          <span class="fw-bold fs-5">Contact & Profile Information</span>
+        </div>
+        <div class="card-body bg-light p-4">
+          <div class="row align-items-center">
+            <div class="col-md-8">
+              <div class="d-flex align-items-center">
+                <img src="{% if rider.profile_image %}{{ rider.profile_image.url }}{% else %}https://api.dicebear.com/7.x/avataaars/svg?seed={{ rider.username }}{% endif %}"
+                     alt="{{ rider.username }}" class="rounded-circle me-3 border" style="width: 80px; height: 80px; object-fit: cover;" />
+                <div>
+                  <h5 class="fw-bold mb-1 text-dark">{{ rider.username }}</h5>
+                  <p class="mb-1 text-muted"><i class="fas fa-envelope me-2"></i>{{ rider.email }}</p>
+                  <p class="mb-0 text-muted"><i class="fas fa-phone me-2"></i>{{ rider.mobile_number|default:'Phone not provided' }}</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4 text-end">
+              <div class="d-flex flex-column gap-2">
+                <a href="{% url 'admin_dashboard' %}#riders" class="btn btn-primary btn-sm rounded-pill">
+                  <i class="fas fa-arrow-left me-1"></i>Back to Users List
+                </a>
+                <button class="btn btn-danger btn-sm rounded-pill" onclick="deleteRider()">
+                  <i class="fas fa-user-times me-1"></i>Delete Rider
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-md-12">
+      <div class="card h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0"><i class="fas fa-calendar-check me-2"></i>Bookings ({{ total_bookings }})</h5>
+            <div class="small text-muted">
+              Pending {{ pending_bookings|length }} · Approved {{ approved_bookings|length }} · Rejected {{ rejected_bookings|length }} · Cancelled {{ cancelled_bookings|length }}
+            </div>
+          </div>
+
+          {% if total_bookings == 0 %}
+            <div class="text-center text-muted py-5">
+              <i class="fas fa-calendar-times fa-2x mb-2"></i>
+              <div>No bookings yet.</div>
+            </div>
+          {% else %}
+            <div class="row g-3">
+              {% if pending_bookings %}
+              <div class="col-12">
+                <h6 class="fw-bold text-warning"><i class="fas fa-hourglass-half me-1"></i>Pending</h6>
+                <div class="table-responsive">
+                  <table class="table table-sm align-middle">
+                    <thead class="table-light">
+                      <tr>
+                        <th>E-bike</th><th>Start Date</th><th>End Date</th><th>Amount</th><th class="text-end">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for booking in pending_bookings %}
+                      <tr>
+                        <td>{{ booking.ebike.name }}</td>
+                        <td>{{ booking.start_date|date:'M d, Y' }}<br><small class="text-muted">{{ booking.start_time }}</small></td>
+                        <td>{{ booking.end_date|date:'M d, Y' }}<br><small class="text-muted">{{ booking.end_time }}</small></td>
+                        <td>₹{{ booking.total_price }}</td>
+                        <td class="text-end">
+                          <a class="btn btn-success btn-sm" href="{% url 'approve_booking' booking.id %}"><i class="fas fa-check me-1"></i>Approve</a>
+                          <a class="btn btn-danger btn-sm" href="{% url 'reject_booking' booking.id %}"><i class="fas fa-times me-1"></i>Reject</a>
+                        </td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              {% endif %}
+
+              {% if approved_bookings %}
+              <div class="col-12">
+                <h6 class="fw-bold text-success"><i class="fas fa-check-circle me-1"></i>Approved</h6>
+                <div class="table-responsive">
+                  <table class="table table-sm align-middle">
+                    <thead class="table-light">
+                      <tr>
+                        <th>E-bike</th><th>Start Date</th><th>End Date</th><th>Amount</th><th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for booking in approved_bookings %}
+                      <tr>
+                        <td>{{ booking.ebike.name }}</td>
+                        <td>{{ booking.start_date|date:'M d, Y' }}<br><small class="text-muted">{{ booking.start_time }}</small></td>
+                        <td>{{ booking.end_date|date:'M d, Y' }}<br><small class="text-muted">{{ booking.end_time }}</small></td>
+                        <td>₹{{ booking.total_price }}</td>
+                        <td><span class="badge bg-success">Active</span></td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              {% endif %}
+
+              {% if rejected_bookings %}
+              <div class="col-12">
+                <h6 class="fw-bold text-danger"><i class="fas fa-times-circle me-1"></i>Rejected</h6>
+                <div class="table-responsive">
+                  <table class="table table-sm align-middle">
+                    <thead class="table-light">
+                      <tr>
+                        <th>E-bike</th><th>Start Date</th><th>End Date</th><th>Amount</th><th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for booking in rejected_bookings %}
+                      <tr>
+                        <td>{{ booking.ebike.name }}</td>
+                        <td>{{ booking.start_date|date:'M d, Y' }}</td>
+                        <td>{{ booking.end_date|date:'M d, Y' }}</td>
+                        <td>₹{{ booking.total_price }}</td>
+                        <td><span class="badge bg-danger">Rejected</span></td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              {% endif %}
+
+              {% if cancelled_bookings %}
+              <div class="col-12">
+                <h6 class="fw-bold text-secondary"><i class="fas fa-ban me-1"></i>Cancelled</h6>
+                <div class="table-responsive">
+                  <table class="table table-sm align-middle">
+                    <thead class="table-light">
+                      <tr>
+                        <th>E-bike</th><th>Start Date</th><th>End Date</th><th>Amount</th><th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for booking in cancelled_bookings %}
+                      <tr>
+                        <td>{{ booking.ebike.name }}</td>
+                        <td>{{ booking.start_date|date:'M d, Y' }}</td>
+                        <td>{{ booking.end_date|date:'M d, Y' }}</td>
+                        <td>₹{{ booking.total_price }}</td>
+                        <td><span class="badge bg-secondary">Cancelled</span></td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              {% endif %}
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Additional sections for reviews and favorites -->
+  <div class="row g-3">
+    {% if reviews %}
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h6 class="mb-0"><i class="fas fa-star me-2"></i>Reviews Given ({{ reviews|length }})</h6>
+        </div>
+        <div class="card-body" style="max-height: 300px; overflow-y: auto;">
+          {% for review in reviews %}
+          <div class="border-bottom pb-2 mb-2">
+            <div class="d-flex justify-content-between">
+              <strong>E-bike: {% if review.ebike %}{{ review.ebike.name }}{% else %}General{% endif %}</strong>
+              <div>{% for i in '12345'|make_list %}{% if i <= review.rating %}★{% else %}☆{% endif %}{% endfor %}</div>
+            </div>
+            <p class="mb-1 small text-muted">{{ review.message }}</p>
+            <small class="text-muted">{{ review.created_at|date:'M d, Y' }}</small>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    {% if favorites %}
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h6 class="mb-0"><i class="fas fa-heart me-2"></i>Favorite E-bikes ({{ favorites|length }})</h6>
+        </div>
+        <div class="card-body" style="max-height: 300px; overflow-y: auto;">
+          {% for favorite in favorites %}
+          <div class="d-flex align-items-center border-bottom pb-2 mb-2">
+            <img src="{{ favorite.ebike.image.url }}" alt="{{ favorite.ebike.name }}" class="rounded me-3" style="width:50px;height:50px;object-fit:cover;">
+            <div>
+              <strong>{{ favorite.ebike.name }}</strong><br>
+              <small class="text-muted">by {{ favorite.ebike.provider.username }} • ₹{{ favorite.ebike.price_per_day }}/day</small>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

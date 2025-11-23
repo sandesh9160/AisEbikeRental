@@ -1,266 +1,197 @@
-# 🚲 AIS E-Bikes Rentals Platform
+# AIS E-Bike Rental System
 
-A powerful, scalable, and user-friendly **e-bike rental system** that connects riders with e-bike providers. Built with **Python**, **Django**, **MySQL**, and styled using **Bootstrap**, this platform simplifies short-term vehicle rentals and promotes eco-friendly urban mobility.
+A comprehensive Django-based e-bike rental platform that connects electric bike owners with renters.
 
----
+## Features
 
-## 🎯 Purpose
+### For Riders (Customers)
+- Browse and search available e-bikes
+- Book e-bikes with online payment via Razorpay
+- View booking history and manage reservations
+- Write and view reviews for e-bikes
+- Favorite e-bikes for quick access
+- Profile management with mobile number and profile image
 
-- 🔓 Simplify short-term access to electric bikes.
-- 👨‍👩‍👧‍👦 Serve solo riders and families alike.
-- 💰 Help vehicle owners earn passive income.
-- 🌱 Promote green, sustainable transportation.
+### For Vehicle Providers
+- Register and list e-bikes for rental
+- Upload documents for verification
+- Manage provider dashboard and earnings
+- Handle withdrawal requests
+- Track vehicle registrations and approvals
 
----
+### Admin Features
+- Dashboard for managing bookings, providers, and reviews
+- Document verification system for providers
+- Withdrawal management and approval
+- Notification system
+- Contact message handling
 
-## 🚀 Features
+### System Features
+- User authentication with role-based access (Rider/Provider/Admin)
+- Payment integration with Razorpay
+- Email notifications and password reset
+- Social login options
+- Responsive web interface
+- Document upload and verification system
+- AI-powered chatbot for customer support
+- AI-powered bike search and recommendations using Gemini API
+- Automated availability synchronization
+- Cron job management for expired booking checks
+- Comprehensive admin dashboard with analytics
 
-- 🧑‍💼 User-friendly interfaces for Riders & Providers
-- 🔐 Secure registration and login system
-- 🚴 E-bike listing, booking, and management
-- 📊 Dashboard for Riders, Providers, and Admin
-- ⏱️ Daily rentals & weekly subscription plans
-- 🔍 Booking history & availability tracking
-- 📝 Vehicle registration with document verification
-- 💸 Automated earnings and platform fee tracking
+## Technology Stack
 
-### ✨ What's New (Sep 2025)
-- 🔧 Admin Provider Details page: view provider profile, document status (Pending/Approved/Rejected), and quick actions (Verify/Unverify, Edit, Remove).
-- 🗂️ Review Documents page: modern UI with sticky section navigation (Pending/Approved/Rejected), compact tables, smooth scrolling, and elegant empty states.
-- 🖼️ Sidebar profile pop-up (AJAX): update username, email, mobile, and profile photo in-place without page reload on all dashboards (Admin, Rider, Provider).
-- 📊 Admin dashboard clean-up: simplified providers section and improved analytics cards.
+- **Backend**: Django 5.1.7
+- **Database**: SQLite (development) / PostgreSQL (production)
+- **Frontend**: HTML, CSS, JavaScript, Bootstrap
+- **Authentication**: Django Allauth
+- **Payments**: Razorpay
+- **AI**: Google Gemini API (Generative AI)
+- **Media Management**: Django's FileField system
+- **Email**: SMTP (Gmail)
 
----
+## Project Structure
 
-## 📸 Screenshots
+```
+ais_ebike_rental/
+├── ais_ebike_rental/          # Main Django project settings
+├── core/                      # Core application (models, views, forms)
+├── riders/                    # Rider dashboard and booking management
+├── vehicle_providers/         # Provider management and earnings
+├── admin_dashboard/           # Admin interface and management
+├── templates/                 # HTML templates
+├── static/                    # CSS, JavaScript, images
+├── media/                     # User uploaded files
+└── requirements.txt           # Python dependencies
+```
 
-### Home Page
-![Home Page](./homepage.png)
+## Installation
 
-### Login Page
-![Login Page](./loginpage.png)
-
-### Signup Page
-![Signup Page](./signuppage.png)
-
-### Available E-Bikes
-![Available E-Bikes](./available_ebikes.png)
-
-### Rider Dashboard
-![Rider Dashboard 1](./riderdashboard_1.png)
-![Rider Dashboard 2](./riderdashboard_2.png)
-![Rider Dashboard 3](./riderdashboard_3.png)
-
-### Book E-Bike
-![Book E-Bike](./book_ebike.png)
-
-### Payment Page
-![Payment Page](./payementpage.png)
-
-### Payment Confirmation
-![Payment Confirmation](./payement_conformpage.png)
-
-### Receipt
-![Receipt](./recipt.png)
-
-### Provider Dashboard
-![Provider Dashboard 1](./providerdashboard_1.png)
-![Provider Dashboard 2](./providerdashboard_2.png)
-
-### Add E-Bike Page
-![Add E-Bike Page](./add_ebikepage.png)
-
-### Admin Dashboard
-![Admin Dashboard 1](./admin_dashboard1.png)
-![Admin Dashboard 2](./admin_dashboard2.png)
-![Admin Dashboard 3](./admin_dashboard3.png)
-![Admin Dashboard 4](./admin_dashboard4.png)
-
-### Review Documents (Modern UI)
-![Review Documents](./screenshots/review_documents_modern.png)
-
-### Provider Details (New)
-![Provider Details](./screenshots/provider_detail.png)
-
----
-
-## 🎥 Demo GIFs
-
-> You can drop your recordings into the `screenshots/` folder with the names below and they will render automatically.
-
-- Admin → Provider Details flow
-  
-  ![Provider Detail Flow](./screenshots/provider_detail_flow.gif)
-
-- Review Documents: sticky section navigation
-  
-  ![Review Documents Sticky Nav](./screenshots/review_documents_sticky_nav.gif)
-
-- Profile update via AJAX modal (Admin/Rider/Provider)
-  
-  ![Profile Modal Update](./screenshots/profile_modal_update.gif)
-
----
-
-## 🧩 Tech Stack
-
-| Layer         | Technology           |
-|---------------|---------------------|
-| Frontend      | HTML, CSS, Bootstrap |
-| Backend       | Python, Django       |
-| Database      | MySQL               |
-| Auth & Admin  | Django Admin Panel  |
-
----
-
-## 🏗️ Project Modules
-
-### 🔸 `core/`
-- Home, About, Authentication (Login/Signup), Profile Management, Notifications
-
-### 🔸 `riders/`
-- Rider registration, login, dashboard, booking system, payment
-
-### 🔸 `vehicle_providers/`
-- Vehicle owner dashboard, bike upload, earnings tracker, vehicle registration
-
-### 🔸 `admin_dashboard/`
-- Admin dashboard for managing users, bookings, and vehicles
-- Provider details view (`provider_detail`) for per-provider insights and actions
-
----
-
-## 🧭 Application Flow
-
-Home → Register/Login → Browse E-Bikes → Book or Upload → Dashboard → Manage & Track
-
----
-
-## 🛠️ Local Setup Instructions
-
-### ✅ Prerequisites
-
+### Prerequisites
 - Python 3.8+
-- MySQL 5.7+
-- Git
-- pip (Python package installer)
+- pip
 
----
+### Setup Steps
 
-### 📦 Installation
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/sandesh9160/AisEbikeRental.git
+   cd AisEbikeRental
+   ```
 
-```bash
-git clone https://github.com/sandesh9160/AisEbikeRental.git
-cd AisEbikeRental
-python -m venv venv
-# On Windows:
-venv\Scripts\activate
-# On Mac/Linux:
-source venv/bin/activate
-pip install -r requirements.txt
-```
+2. **Create virtual environment**
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows use: venv\Scripts\activate
+   ```
 
----
+3. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-### 🗃️ Database Setup
+4. **Environment Configuration**
+   Create a `.env` file in the project root:
+   ```
+   SECRET_KEY=your-django-secret-key
+   DEBUG=True
+   DATABASE_URL=sqlite:///db.sqlite3
+   EMAIL_HOST_USER=your-email@gmail.com
+   EMAIL_HOST_PASSWORD=your-app-password
+   RAZORPAY_KEY_ID=your-razorpay-key-id
+   RAZORPAY_KEY_SECRET=your-razorpay-key-secret
+   RAZORPAY_WEBHOOK_SECRET=your-razorpay-webhook-secret
+   GEMINI_API_KEY=your-google-gemini-api-key
+   CONTACT_RECEIVER_EMAIL=admin-email@example.com
+   ```
 
-In MySQL:
-```sql
-CREATE DATABASE ais_ebikes_db;
-CREATE USER 'ais_ebikes_user'@'localhost' IDENTIFIED BY 'your_password';
-GRANT ALL PRIVILEGES ON ais_ebikes_db.* TO 'ais_ebikes_user'@'localhost';
-FLUSH PRIVILEGES;
-```
+5. **Database Setup**
+   ```bash
+   python manage.py migrate
+   ```
 
----
+6. **Create superuser**
+   ```bash
+   python manage.py createsuperuser
+   ```
 
-### 🔐 Environment Configuration
+7. **Collect static files**
+   ```bash
+   python manage.py collectstatic
+   ```
 
-Create a `.env` file in the project root:
-```
-DEBUG=True
-SECRET_KEY=your_secret_key
-DATABASE_NAME=ais_ebikes_db
-DATABASE_USER=ais_ebikes_user
-DATABASE_PASSWORD=your_password
-DATABASE_HOST=localhost
-DATABASE_PORT=3306
-```
-Update `settings.py` to read from `.env`.
+8. **Run development server**
+   ```bash
+   python manage.py runserver
+   ```
 
----
+## Models
 
-### 🔄 Migrate & Run
+### Core Models
+- **User**: Extended Django User with role flags (rider/provider)
+- **EBike**: Electric bike listings with pricing and availability
+- **Booking**: Rental reservations with payment tracking
+- **Review**: User feedback for e-bikes
+- **Notification**: In-app notifications
+- **ContactMessage**: Contact form submissions
+- **Withdrawal**: Provider earnings withdrawal requests
 
-```bash
-python manage.py makemigrations
-python manage.py migrate
-python manage.py createsuperuser  # Create admin account
-python manage.py collectstatic    # Collect static files
-python manage.py runserver
-```
+### Additional Models
+- **ProviderDocument**: Document uploads for verification
+- **VehicleRegistration**: Vehicle registration management
+- **Favorite**: User favorite e-bikes
 
-📍 Open: http://localhost:8000
+## URLs and Views
 
----
+### Core URLs
+- `/`: Home page with featured e-bikes
+- `/login/`: User authentication
+- `/signup/`: User registration
+- `/ebikes/`: E-bike listings
+- `/contact/`: Contact form
+- `/profile/`: User profile management
 
-## 📂 Project Structure
+### App-specific URLs
+- `/rider/`: Rider dashboard and bookings
+- `/provider/`: Provider management
+- `/admin/`: Administrative dashboard
 
-```
-admin_dashboard/         # Admin-specific views and models
-ais_ebike_rental/        # Project settings and configuration
-core/                    # Core app: home, auth, profile, notifications
-riders/                  # Rider-specific features
-vehicle_providers/       # Vehicle provider features
-media/                   # Uploaded images and documents
-screenshots/             # Project screenshots for documentation
-templates/               # HTML templates for all apps
-  └─ admin_dashboard/
-      ├─ dashboard.html               # Admin dashboard
-      ├─ review_documents.html        # Review documents center (modern UI)
-      └─ provider_detail.html         # Provider details (new)
-requirements.txt         # Python dependencies
-manage.py                # Django management script
-db.sqlite3               # SQLite database (default, for development)
-```
+## Payment Integration
 
----
+The system uses Razorpay for payment processing:
+- Secure online payments for bookings
+- Webhook integration for payment confirmations
+- Order and payment ID tracking
 
-## 🙌 Contributing
+## Deployment
 
-Pull requests are welcome! For major changes, please open an issue first to discuss what you would like to change.
+### Production Setup
+1. Set `DEBUG=False`
+2. Configure PostgreSQL database
+3. Set up proper email backend
+4. Configure static file serving (nginx/Apache)
+5. Set up media file serving
+6. Configure environment variables
+7. Use gunicorn for application server
 
----
+### Static Files
+- Use WhiteNoise for static file serving in production
+- Collect static files with `python manage.py collectstatic`
 
-## 📄 License
+## Contributing
 
-[MIT](LICENSE)
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Commit your changes
+6. Push to your fork
+7. Create a Pull Request
 
----
+## License
 
-## 🌐 Live Demo
+This project is for educational purposes. Please check local laws and regulations regarding rental services in your area.
 
-*No live deployment yet. Run locally as described above.*
+## Support
 
----
-
-## ✨ Credits
-
-Developed by Sandesh Kenchugundi and contributors.
-
----
-
-For more details, see the [GitHub repository](https://github.com/sandesh9160/AisEbikeRental). 
-
----
-
-## 🧭 Admin Guide (Quick Links)
-
-- Provider Details: Admin Dashboard → Providers table → View
-- Review Documents: Admin Dashboard → Document Verification or /admin-dashboard/review-documents/
-- Edit Verification: From Provider Details (Approved section) → Edit; or Review Documents list.
-
-## 💡 Tips
-
-- Profile updates open in a modal (no page reload). On save, the sidebar name, email, mobile, and avatar update in-place.
-- On the Review Documents page, use the sticky navigation to jump between Pending/Approved/Rejected sections.
+For questions or issues, please use the contact form within the application or create an issue in the repository.

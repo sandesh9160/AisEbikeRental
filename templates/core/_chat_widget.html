@@ -1,0 +1,353 @@
+<!-- ⭐ AIS Ultra-Modern Compact Chat Widget (2025 Clean Edition) -->
+<div id="ais-chat-widget" class="ais-chat-widget">
+
+    <!-- Floating button -->
+    <div id="chat-toggle" class="chat-toggle-btn">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+            <rect x="3" y="3" width="18" height="18" rx="6" fill="white" opacity="0.9"/>
+            <circle cx="12" cy="8" r="1.4" fill="#2a5298"/>
+            <circle cx="9" cy="12" r="1.4" fill="#1e3c72"/>
+            <circle cx="15" cy="12" r="1.4" fill="#1e3c72"/>
+            <line x1="10" y1="16" x2="14" y2="16" stroke="#2a5298" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+    </div>
+
+    <!-- Chat window -->
+    <div id="chat-window" class="chat-window">
+
+        <!-- Header -->
+        <div class="chat-header">
+            <div class="left">
+                <div class="avatar">🤖</div>
+                <div>
+                    <h4>AIS Assistant</h4>
+                    <span class="status"><span class="dot"></span> Online</span>
+                </div>
+            </div>
+            <button id="chat-close" class="close-btn">✕</button>
+        </div>
+
+        <!-- Messages -->
+        <div id="chat-messages" class="messages">
+            <!-- Role-based questions will be loaded here -->
+        </div>
+
+        <!-- Input -->
+        <div class="chat-input-box">
+            <input id="message-input" type="text" placeholder="Type a message..."/>
+            <button onclick="sendMessage()" class="send-btn">➤</button>
+        </div>
+    </div>
+</div>
+
+<style>
+/* ROOT */
+.ais-chat-widget {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 99999;
+    font-family: "Inter", sans-serif;
+}
+
+/* FLOATING BUTTON */
+.chat-toggle-btn {
+    width: 56px;
+    height: 56px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    box-shadow: 0 8px 25px rgba(30, 60, 114, 0.45);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: 0.25s ease;
+}
+.chat-toggle-btn:hover {
+    transform: scale(1.07);
+}
+
+/* CHAT WINDOW */
+.chat-window {
+    width: 330px;
+    height: 480px;
+    border-radius: 16px;
+    overflow: hidden;
+    background: rgba(255,255,255,0.65);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.18);
+    position: absolute;
+    bottom: 70px;
+    right: 0;
+    display: none;
+    flex-direction: column;
+    animation: popIn 0.35s ease;
+}
+
+@keyframes popIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* HEADER */
+.chat-header {
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    padding: 12px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+}
+
+.chat-header .left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.avatar {
+    width: 36px;
+    height: 36px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.chat-header h4 {
+    margin: 0;
+    font-size: 14.5px;
+    font-weight: 600;
+}
+
+.status {
+    font-size: 11px;
+    opacity: 0.9;
+}
+.status .dot {
+    width: 7px;
+    height: 7px;
+    background: #4fd1c5;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+/* CLOSE BUTTON */
+.close-btn {
+    background: rgba(255,255,255,0.25);
+    border: none;
+    padding: 5px 9px;
+    font-size: 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: white;
+    transition: 0.2s;
+}
+.close-btn:hover {
+    background: rgba(255,255,255,0.45);
+}
+
+/* MESSAGES */
+.messages {
+    flex: 1;
+    padding: 14px;
+    overflow-y: auto;
+}
+
+.msg {
+    margin-bottom: 10px;
+    animation: fadeUp 0.28s ease;
+}
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.bubble {
+    max-width: 75%;
+    padding: 10px 14px;
+    border-radius: 14px;
+    font-size: 13.5px;
+    background: white;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+}
+
+.msg.ai .bubble {
+    background: #f4f6f9;
+}
+
+.msg.user {
+    text-align: right;
+}
+.msg.user .bubble {
+    margin-left: auto;
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    color: white;
+}
+
+/* INPUT BOX */
+.chat-input-box {
+    display: flex;
+    padding: 12px;
+    border-top: 1px solid #e5e7eb;
+    background: rgba(255,255,255,0.85);
+}
+
+.chat-input-box input {
+    flex: 1;
+    border: none;
+    padding: 11px;
+    border-radius: 12px;
+    font-size: 13px;
+    background: #f1f5f9;
+    outline: none;
+}
+
+.send-btn {
+    margin-left: 8px;
+    padding: 10px 14px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    color: white;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.send-btn:hover {
+    transform: scale(1.07);
+}
+</style>
+
+<script>
+/* Compact chat widget script with Enter-key support and simple send-lock */
+let isSending = false;
+let initialQuestionsLoaded = false;
+
+// Load initial role-based questions
+function loadInitialQuestions() {
+    if (initialQuestionsLoaded) return;
+
+    fetch("/chatbot/initial-questions/", {
+        method: "GET",
+        headers: { "X-CSRFToken": getCookie("csrftoken") }
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data && data.questions) {
+            // Clear existing messages
+            const messagesBox = document.getElementById("chat-messages");
+            messagesBox.innerHTML = '';
+
+            // Add role-based questions
+            data.questions.forEach(question => {
+                addMessage(escapeHtml(question), "ai");
+            });
+            initialQuestionsLoaded = true;
+        }
+    })
+    .catch(() => {
+        // Fallback to default messages
+        const messagesBox = document.getElementById("chat-messages");
+        if (messagesBox.children.length === 0) {
+            addMessage("👋 Welcome to AIS E-Bike Rental! How can I help you today?", "ai");
+        }
+    });
+}
+
+// Open / close
+document.getElementById("chat-toggle").onclick = () => {
+    document.getElementById("chat-window").style.display = "flex";
+    // Load initial questions when chat opens
+    loadInitialQuestions();
+    // focus input when opened
+    setTimeout(() => {
+        const inp = document.getElementById("message-input");
+        if (inp) inp.focus();
+    }, 150);
+};
+
+document.getElementById("chat-close").onclick = () => {
+    document.getElementById("chat-window").style.display = "none";
+};
+
+// Add message to UI
+function addMessage(msg, type="ai") {
+    const box = document.getElementById("chat-messages");
+    const div = document.createElement("div");
+    div.className = "msg " + type;
+    div.innerHTML = `<div class="bubble">${msg}</div>`;
+    box.appendChild(div);
+    box.scrollTop = box.scrollHeight;
+}
+
+// Send message to backend
+function sendMessage() {
+    if (isSending) return;           // prevent double sends
+    const input = document.getElementById("message-input");
+    if (!input) return;
+    const text = input.value.trim();
+    if (!text) return;
+
+    // show user message
+    addMessage(escapeHtml(text), "user");
+    input.value = "";
+    input.focus();
+
+    // POST to backend
+    isSending = true;
+    fetch("/chatbot/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-CSRFToken": getCookie("csrftoken") },
+        body: JSON.stringify({ message: text })
+    })
+    .then(r => r.json())
+    .then(d => {
+        // handle different shapes safely
+        const reply = (d && (d.response || d.reply || d.message)) ? (d.response || d.reply || d.message) : "Sorry — no response.";
+        addMessage(escapeHtml(reply), "ai");
+    })
+    .catch(() => {
+        addMessage("⚠️ Something went wrong. Please try again.", "ai");
+    })
+    .finally(() => {
+        isSending = false;
+    });
+}
+
+// Enter key handling: send on Enter, allow Shift+Enter for newline (if you switch to textarea later)
+const inputEl = document.getElementById("message-input");
+if (inputEl) {
+    inputEl.addEventListener("keydown", function (e) {
+        // Modern: e.key === 'Enter'
+        // Legacy: e.keyCode === 13
+        const isEnter = (e.key === "Enter") || (e.keyCode === 13);
+        if (isEnter && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+}
+
+// Small helper to read cookie
+function getCookie(name){
+    let v=null;
+    if (!document.cookie) return null;
+    document.cookie.split(";").forEach(c=>{
+        c=c.trim();
+        if(c.startsWith(name+"=")) v=c.substring(name.length+1);
+    });
+    return v;
+}
+
+// Simple escape for HTML injection safety in messages
+function escapeHtml(unsafe) {
+    return unsafe
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+}
+</script>

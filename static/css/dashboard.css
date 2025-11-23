@@ -207,6 +207,25 @@
 
 /* Responsive tweaks for small mobile screens */
 @media (max-width: 575.98px) {
+/* Medium screens (tablets) - additional enhancements */
+@media (min-width: 768px) and (max-width: 991.98px) {
+  /* Adjust card layouts for tablets */
+  .summary-card { margin-bottom: 1.5rem; }
+  .ebike-card, .booking-card, .provider-ebike-card, .provider-booking-card { margin-bottom: 1.25rem; }
+
+  /* Sidebar slightly narrower on tablets */
+  .sidebar, .dashboard-sidebar { width: 220px; }
+  .main-content-with-sidebar { margin-left: 220px; }
+
+  /* Table adjustments for tablets */
+  .modern-table th, .modern-table td { padding: 0.75rem; font-size: 0.95rem; }
+  .table-responsive { font-size: 0.9rem; }
+
+  /* Button spacing */
+  .btn { margin-right: 0.5rem; }
+  .d-grid .btn { margin-right: 0; }
+}
+
   /* Sidebar toggle spacing already handled; reduce general paddings */
   .summary-card .card-body { padding: 0.75rem !important; }
   .summary-card h6 { font-size: 0.9rem; }

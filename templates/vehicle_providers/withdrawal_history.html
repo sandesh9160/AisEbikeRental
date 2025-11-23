@@ -1,0 +1,114 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4 class="mb-0"><i class="fas fa-history me-2"></i>Withdrawal History</h4>
+                        <small class="opacity-75">View all your withdrawal requests</small>
+                    </div>
+                    <a href="{% url 'vehicle_provider_dashboard' %}" class="btn btn-light btn-sm">
+                        <i class="fas fa-arrow-left me-1"></i> Back to Dashboard
+                    </a>
+                </div>
+                
+                <div class="card-body p-4">
+                    {% if withdrawals %}
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Request ID</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Account Details</th>
+                                    <th>Requested Date</th>
+                                    <th>Processed Date</th>
+                                    <th>Transaction ID</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for withdrawal in withdrawals %}
+                                <tr>
+                                    <td><strong>#{{ withdrawal.id }}</strong></td>
+                                    <td class="fw-bold text-success">₹{{ withdrawal.amount }}</td>
+                                    <td>
+                                        {% if withdrawal.status == 'pending' %}
+                                            <span class="badge bg-warning text-dark">Pending</span>
+                                        {% elif withdrawal.status == 'approved' %}
+                                            <span class="badge bg-info">Approved</span>
+                                        {% elif withdrawal.status == 'completed' %}
+                                            <span class="badge bg-success">Completed</span>
+                                        {% elif withdrawal.status == 'rejected' %}
+                                            <span class="badge bg-danger">Rejected</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <small>
+                                            <strong>{{ withdrawal.account_holder_name }}</strong><br>
+                                            {% if withdrawal.upi_id %}
+                                                <span class="text-muted">UPI: {{ withdrawal.upi_id }}</span>
+                                            {% else %}
+                                                <span class="text-muted">{{ withdrawal.account_number }}</span><br>
+                                                <span class="text-muted">{{ withdrawal.bank_name }} - {{ withdrawal.ifsc_code }}</span>
+                                            {% endif %}
+                                        </small>
+                                    </td>
+                                    <td>{{ withdrawal.created_at|date:"M d, Y H:i" }}</td>
+                                    <td>
+                                        {% if withdrawal.processed_at %}
+                                            {{ withdrawal.processed_at|date:"M d, Y H:i" }}
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if withdrawal.transaction_id %}
+                                            <code class="small">{{ withdrawal.transaction_id }}</code>
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if withdrawal.status == 'completed' %}
+                                            <a href="{% url 'download_withdrawal_receipt' withdrawal.id %}" class="btn btn-sm btn-primary" title="Download Receipt">
+                                                <i class="fas fa-download"></i> Receipt
+                                            </a>
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% if withdrawal.admin_notes %}
+                                <tr>
+                                    <td colspan="8" class="bg-light">
+                                        <small class="text-muted">
+                                            <strong>Admin Notes:</strong> {{ withdrawal.admin_notes }}
+                                        </small>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No withdrawal requests yet</h5>
+                        <p class="text-muted">Your withdrawal history will appear here once you make a request.</p>
+                        <a href="{% url 'request_withdrawal' %}" class="btn btn-primary">
+                            <i class="fas fa-money-bill-wave me-1"></i> Request Withdrawal
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

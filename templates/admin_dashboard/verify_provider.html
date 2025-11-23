@@ -2,96 +2,213 @@
 {% block navbar %}{% endblock %}
 {% block title %}Verify Provider - Admin{% endblock %}
 {% block content %}
-<button class="dashboard-sidebar-toggle d-lg-none" id="sidebarToggle"><i class="fas fa-bars"></i></button>
-<div id="sidebar" class="dashboard-sidebar bg-dark text-white">
-  <div class="sidebar-header d-flex align-items-center justify-content-between px-3 py-3">
-    <span class="fw-bold fs-4"><i class="fas fa-user-shield me-2"></i>Admin</span>
-    <button class="btn btn-sm btn-outline-light d-md-none" id="sidebarCloseBtn" onclick="closeAdminSidebar()"><i class="fas fa-times"></i></button>
-  </div>
-  <nav class="nav flex-column px-2">
-    <a class="nav-link text-white sidebar-link" href="{% url 'admin_dashboard' %}"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a>
-    <a class="nav-link text-white sidebar-link" href="{% url 'admin_feedback_list' %}"><i class="fas fa-envelope me-2"></i>Contact Messages</a>
-  </nav>
-</div>
-<div id="sidebarOverlay" class="sidebar-overlay d-md-none"></div>
+<style>
+  .provider-surface {
+    min-height: 100vh;
+    background: radial-gradient(circle at top, #eef4ff 0%, #f7f9fc 55%, #eff4fb 100%);
+    padding-bottom: 3rem;
+  }
+  .provider-hero {
+    background: linear-gradient(135deg, #16a085 0%, #2f80ed 100%);
+    color: #fff;
+    border-radius: 0 0 32px 32px;
+    padding: 3rem 0 2rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 32px 80px -44px rgba(47, 128, 237, .6);
+  }
+  .provider-hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 140"><circle cx="30" cy="30" r="4" fill="rgba(255,255,255,0.18)"/><circle cx="120" cy="40" r="6" fill="rgba(255,255,255,0.12)"/><circle cx="70" cy="90" r="5" fill="rgba(255,255,255,0.16)"/></svg>');
+    background-size: cover;
+  }
+  .provider-hero .content { position: relative; z-index: 1; }
+  .hero-heading {
+    font-weight: 700;
+    font-size: clamp(1.9rem, 3vw, 2.7rem);
+  }
+  .hero-text { opacity: .85; }
+  .provider-card {
+    background: rgba(255,255,255,0.92);
+    border-radius: 26px;
+    border: 1px solid rgba(255,255,255,0.6);
+    box-shadow: 0 40px 90px -48px rgba(15, 23, 42, .55);
+  }
+  .profile-avatar {
+    width: 86px;
+    height: 86px;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 18px 40px -28px rgba(0,0,0,.45);
+  }
+  .profile-stats {
+    display: flex;
+    gap: 1.4rem;
+    flex-wrap: wrap;
+  }
+  .stats-chip {
+    background: rgba(47, 128, 237, .12);
+    color: #2f80ed;
+    border-radius: 999px;
+    padding: .45rem 1rem;
+    font-weight: 600;
+    font-size: .78rem;
+    letter-spacing: .35px;
+  }
+  .notes-card textarea {
+    border-radius: 18px;
+    border: 1px solid rgba(99,112,148,.22);
+    padding: .75rem 1rem;
+    min-height: 140px;
+  }
+  .notes-card textarea:focus {
+    border-color: #2f80ed;
+    box-shadow: 0 0 0 .2rem rgba(47,128,237,.18);
+  }
+  .notes-actions .btn {
+    border-radius: 16px;
+    padding: .75rem 1.4rem;
+    font-weight: 600;
+    letter-spacing: .35px;
+    box-shadow: 0 22px 42px -32px rgba(15, 23, 42, .4);
+  }
+  .notes-actions .btn-success { background: linear-gradient(135deg,#27ae60,#38ef7d); border:none; }
+  .notes-actions .btn-warning { background: linear-gradient(135deg,#f6d365,#fda085); border:none; color:#50311f; }
+  .documents-card {
+    border-radius: 24px;
+    background: rgba(255,255,255,0.92);
+    border: 1px solid rgba(255,255,255,0.55);
+    box-shadow: 0 32px 80px -48px rgba(15,23,42,.55);
+  }
+  .documents-table thead {
+    background: linear-gradient(135deg,#edf2ff,#f4f7ff);
+    border-bottom: 1px solid rgba(47, 128, 237, .14);
+  }
+  .documents-table thead th {
+    border: none;
+    font-size: .78rem;
+    text-transform: uppercase;
+    letter-spacing: .4px;
+    color: #5b6f92;
+    padding: 1rem .9rem;
+  }
+  .documents-table tbody td {
+    padding: 1rem .9rem;
+    border-top: 1px solid rgba(143,155,179,.12);
+    vertical-align: middle;
+  }
+  .status-pill {
+    border-radius: 999px;
+    padding: .35rem .9rem;
+    font-weight: 600;
+    font-size: .75rem;
+    letter-spacing: .35px;
+  }
+  .status-pill.approved { background: rgba(46,213,115,.12); color:#2ecc71; }
+  .status-pill.rejected { background: rgba(255,107,129,.12); color:#e74c3c; }
+  .status-pill.pending { background: rgba(255,193,7,.16); color:#d88700; }
+</style>
 
-<div class="main-content-with-sidebar">
-  <div class="container-xxl py-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <h3 class="mb-0"><i class="fas fa-user-check me-2"></i>Verify Provider</h3>
-      <a href="{% url 'admin_dashboard' %}#providers-status" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-1"></i>Back</a>
-    </div>
-
-    <div class="card card-glass mb-4">
-      <div class="card-header header-gradient-teal text-white d-flex align-items-center">
-        <img src="{% if provider.profile_image %}{{ provider.profile_image.url }}{% else %}https://api.dicebear.com/7.x/avataaars/svg?seed={{ provider.username }}{% endif %}"
-             alt="{{ provider.username }}" class="rounded-circle me-2" style="width:42px;height:42px;object-fit:cover;border:2px solid #fff;">
-        <div>
-          <div class="fw-bold">{{ provider.username }}</div>
-          <small class="text-white-50">{{ provider.email }}</small>
+<div class="provider-surface">
+  <section class="provider-hero">
+    <div class="container-xxl content">
+      <div class="row align-items-center g-4">
+        <div class="col-lg-8">
+          <h1 class="hero-heading"><i class="fas fa-user-check me-2"></i>Provider Verification</h1>
+          <p class="hero-text mb-0">Confirm identity, review credentials, and ensure every provider meets platform standards.</p>
+        </div>
+        <div class="col-lg-4 d-flex justify-content-lg-end gap-2 flex-wrap">
+          <a href="{% url 'admin_dashboard' %}#providers-status" class="btn btn-outline-light btn-sm"><i class="fas fa-arrow-left me-2"></i>Back to providers</a>
         </div>
       </div>
-      <div class="card-body">
-        <div class="row g-3">
-          <div class="col-md-6">
-            <div class="mb-2"><strong>Joined:</strong> {{ provider.date_joined|date:"M d, Y H:i" }}</div>
-            <div class="mb-2"><strong>Mobile:</strong> {{ provider.mobile_number }}</div>
-            <div class="mb-2"><strong>Verified:</strong> {% if provider.is_verified_provider %}<span class="badge bg-success">Yes</span>{% else %}<span class="badge bg-warning text-dark">No</span>{% endif %}</div>
+    </div>
+  </section>
+
+  <div class="container-xxl position-relative" style="margin-top:-48px;">
+    <div class="row g-4">
+      <div class="col-lg-5">
+        <div class="provider-card p-4 h-100">
+          <div class="d-flex align-items-center gap-3 mb-4">
+            <div class="profile-avatar">
+              <img src="{% if provider.profile_image %}{{ provider.profile_image.url }}{% else %}https://api.dicebear.com/7.x/avataaars/svg?seed={{ provider.username }}{% endif %}" alt="{{ provider.username }}" class="w-100 h-100 object-fit-cover">
+            </div>
+            <div>
+              <h4 class="fw-bold text-dark mb-1">{{ provider.username }}</h4>
+              <p class="text-muted mb-0"><i class="fas fa-envelope me-1"></i>{{ provider.email }}</p>
+            </div>
           </div>
-          <div class="col-md-6">
-            <form method="post" class="d-flex flex-column gap-2">
+
+          <div class="profile-stats mb-4">
+            <span class="stats-chip"><i class="fas fa-calendar-day me-1"></i>Joined {{ provider.date_joined|date:"M d, Y" }}</span>
+            <span class="stats-chip"><i class="fas fa-phone me-1"></i>{{ provider.mobile_number|default:'No mobile' }}</span>
+            {% if provider.is_verified_provider %}
+              <span class="stats-chip" style="background:rgba(46, 213, 115, .15); color:#27ae60;"><i class="fas fa-shield-check me-1"></i>Verified</span>
+            {% else %}
+              <span class="stats-chip" style="background:rgba(255, 193, 7, .16); color:#d88700;"><i class="fas fa-clock me-1"></i>Pending verification</span>
+            {% endif %}
+          </div>
+
+          <div class="notes-card">
+            <form method="post" class="d-flex flex-column gap-3">
               {% csrf_token %}
-              <label class="form-label fw-semibold" for="id_verification_notes">Admin Notes</label>
-              <textarea class="form-control" id="id_verification_notes" name="verification_notes" rows="4" placeholder="Add verification notes...">{{ provider.verification_notes }}</textarea>
-              <div class="d-flex gap-2 mt-2">
+              <div>
+                <label class="form-label fw-semibold text-muted text-uppercase small" for="id_verification_notes"><i class="fas fa-comment-dots me-2"></i>Admin notes</label>
+                <textarea class="form-control" id="id_verification_notes" name="verification_notes" placeholder="Add context for your decision...">{{ provider.verification_notes }}</textarea>
+              </div>
+              <div class="notes-actions d-flex gap-2">
                 {% if not provider.is_verified_provider %}
-                <button type="submit" name="action" value="verify" class="btn btn-success"><i class="fas fa-check me-1"></i>Verify</button>
+                  <button type="submit" name="action" value="verify" class="btn btn-success flex-grow-1"><i class="fas fa-check me-2"></i>Verify provider</button>
                 {% else %}
-                <button type="submit" name="action" value="reject" class="btn btn-warning"><i class="fas fa-user-times me-1"></i>Unverify</button>
+                  <button type="submit" name="action" value="reject" class="btn btn-warning flex-grow-1"><i class="fas fa-user-times me-2"></i>Unverify provider</button>
                 {% endif %}
               </div>
             </form>
           </div>
         </div>
       </div>
-    </div>
 
-    <div class="card card-glass">
-      <div class="card-header header-gradient-blue text-white">
-        <i class="fas fa-file-alt me-2"></i>Provider Documents
-      </div>
-      <div class="card-body p-0">
-        <div class="table-responsive">
-          <table class="table table-hover align-middle modern-table mb-0">
-            <thead>
-              <tr>
-                <th>Type</th>
-                <th>Number</th>
-                <th>Status</th>
-                <th>Uploaded</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for doc in provider_documents %}
-              <tr>
-                <td>{{ doc.get_document_type_display }}</td>
-                <td>{{ doc.document_number|default:'—' }}</td>
-                <td>
-                  <span class="badge {% if doc.status == 'approved' %}bg-success{% elif doc.status == 'rejected' %}bg-danger{% else %}bg-warning text-dark{% endif %}">{{ doc.status|title }}</span>
-                </td>
-                <td><small class="text-muted">{{ doc.uploaded_at|date:"M d, Y H:i" }}</small></td>
-                <td class="text-end">
-                  <a href="{% url 'verify_document' doc.id %}" class="btn btn-sm btn-outline-primary">Review</a>
-                </td>
-              </tr>
-              {% empty %}
-              <tr>
-                <td colspan="5" class="text-center text-muted">No documents uploaded.</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+      <div class="col-lg-7">
+        <div class="documents-card p-4">
+          <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+            <h4 class="fw-bold text-dark mb-0"><i class="fas fa-file-alt me-2"></i>Verification documents</h4>
+            <span class="stats-chip"><i class="fas fa-folder-open me-1"></i>{{ provider_documents|length }} file{{ provider_documents|length|pluralize }}</span>
+          </div>
+          <div class="table-responsive rounded-4 border border-light-subtle">
+            <table class="table documents-table mb-0">
+              <thead>
+                <tr>
+                  <th>Type</th>
+                  <th>Number</th>
+                  <th>Status</th>
+                  <th>Uploaded</th>
+                  <th class="text-end">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for doc in provider_documents %}
+                <tr>
+                  <td class="fw-semibold text-dark"><i class="fas fa-file me-2 text-primary"></i>{{ doc.get_document_type_display }}</td>
+                  <td>{{ doc.document_number|default:'—' }}</td>
+                  <td>
+                    <span class="status-pill {% if doc.status == 'approved' %}approved{% elif doc.status == 'rejected' %}rejected{% else %}pending{% endif %}">
+                      {{ doc.status|title }}
+                    </span>
+                  </td>
+                  <td><small class="text-muted"><i class="fas fa-calendar-alt me-1"></i>{{ doc.uploaded_at|date:"M d, Y H:i" }}</small></td>
+                  <td class="text-end">
+                    <a href="{% url 'verify_document' doc.id %}" class="btn btn-sm btn-outline-primary"><i class="fas fa-search me-1"></i>Review</a>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="5" class="text-center text-muted py-4"><i class="fas fa-info-circle me-1"></i>No documents uploaded yet.</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
@@ -100,15 +217,16 @@
 
 <script>
 function closeAdminSidebar(){
-  document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('sidebarOverlay').classList.remove('show');
+  document.getElementById('sidebar')?.classList.remove('open');
+  document.getElementById('sidebarOverlay')?.classList.remove('show');
 }
 const sidebar = document.getElementById('sidebar');
 const sidebarOverlay = document.getElementById('sidebarOverlay');
 const sidebarToggle = document.getElementById('sidebarToggle');
 if (sidebarToggle) sidebarToggle.onclick = function(){
-  if (window.innerWidth < 992) { sidebar.classList.add('open'); sidebarOverlay.classList.add('show'); }
-  else { sidebar.classList.toggle('collapsed'); document.querySelector('.main-content-with-sidebar').classList.toggle('collapsed'); }
+  if (!sidebar) return;
+  if (window.innerWidth < 992) { sidebar.classList.add('open'); sidebarOverlay?.classList.add('show'); }
+  else { sidebar.classList.toggle('collapsed'); document.querySelector('.main-content-with-sidebar')?.classList.toggle('collapsed'); }
 };
 if (sidebarOverlay) sidebarOverlay.onclick = closeAdminSidebar;
 </script>

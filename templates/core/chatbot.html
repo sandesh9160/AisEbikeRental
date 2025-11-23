@@ -1,0 +1,430 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Chat Widget Container - Fixed position -->
+<div id="chat-widget" class="chat-widget">
+    <!-- Chat Toggle Button -->
+    <div id="chat-toggle" class="chat-toggle">
+        <i class="fas fa-comments"></i>
+        <span class="chat-notification" id="chat-notification">1</span>
+    </div>
+
+    <!-- Chat Window -->
+    <div id="chat-window" class="chat-window">
+        <!-- Chat Header -->
+        <div class="chat-header">
+            <div class="d-flex align-items-center">
+                <div class="me-2">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div>
+                    <div class="fw-bold">AIS Assistant</div>
+                    <small class="text-muted">Online</small>
+                </div>
+            </div>
+            <button id="chat-close" class="chat-close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <!-- Chat Messages -->
+        <div class="chat-messages" id="chat-messages">
+            <div class="message-wrapper assistant-message">
+                <div class="message-content">
+                    <div class="message-text">
+                        👋 Hi! How can we help you today?
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Input -->
+        <div class="chat-input-area">
+            <div class="text-muted small mb-1">Type your message...</div>
+            <div class="d-flex">
+                <input type="text" id="message-input" class="form-control"
+                       placeholder="Ask about bikes, bookings..."
+                       onkeypress="handleKeyPress(event)">
+                <button id="send-btn" class="btn btn-primary ms-2">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Chat Widget Styles */
+.chat-widget {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 9999;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Chat Toggle Button */
+.chat-toggle {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(45deg, #007bff, #6610f2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(0, 123, 255, 0.3);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.chat-toggle:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 25px rgba(0, 123, 255, 0.4);
+}
+
+.chat-notification {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #dc3545;
+    color: white;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    display: none; /* Hidden by default */
+}
+
+/* Chat Window */
+.chat-window {
+    position: absolute;
+    bottom: 80px;
+    right: 0;
+    width: 350px;
+    height: 500px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.chat-window.show {
+    display: flex;
+}
+
+/* Chat Header */
+.chat-header {
+    background: linear-gradient(45deg, #007bff, #6610f2);
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 12px 12px 0 0;
+}
+
+.chat-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+}
+
+.chat-close:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Chat Messages */
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
+    background: #f8f9fa;
+}
+
+.message-wrapper {
+    margin-bottom: 12px;
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.message-content {
+    max-width: 280px;
+    word-wrap: break-word;
+}
+
+.message-text {
+    padding: 10px 15px;
+    border-radius: 18px;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.assistant-message {
+    text-align: left;
+}
+
+.assistant-message .message-content {
+    background: linear-gradient(45deg, #28a745, #20c997);
+    color: white;
+    margin-right: 40px;
+}
+
+.user-message {
+    text-align: right;
+}
+
+.user-message .message-content {
+    background: linear-gradient(45deg, #007bff, #6610f2);
+    color: white;
+    margin-left: auto;
+}
+
+/* Chat Input */
+.chat-input-area {
+    padding: 15px;
+    background: white;
+    border-top: 1px solid #e9ecef;
+    border-radius: 0 0 12px 12px;
+}
+
+.chat-input-area input {
+    border-radius: 20px;
+    border: 1px solid #ced4da;
+    padding: 8px 15px;
+    font-size: 14px;
+}
+
+.chat-input-area .btn {
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Typing Indicator */
+.typing-indicator {
+    display: none;
+    font-style: italic;
+    color: #6c757d;
+    padding: 0.5rem 1rem;
+    animation: blink 1.5s infinite;
+}
+
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0.5; }
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .chat-window {
+        width: calc(100vw - 40px);
+        height: 400px;
+        right: -10px;
+    }
+
+    .chat-messages {
+        padding: 10px;
+    }
+
+    .message-content {
+        max-width: 250px;
+    }
+
+    .chat-toggle {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .chat-window {
+        height: 350px;
+    }
+}
+</style>
+
+<script>
+let isSending = false;
+let chatOpen = false;
+
+// Chat Widget Functions
+function toggleChat() {
+    const chatWindow = document.getElementById('chat-window');
+    const chatToggle = document.getElementById('chat-toggle');
+    const messageInput = document.getElementById('message-input');
+
+    if (chatOpen) {
+        chatWindow.classList.remove('show');
+        chatOpen = false;
+    } else {
+        chatWindow.classList.add('show');
+        chatOpen = true;
+        // Focus on input
+        setTimeout(() => messageInput.focus(), 300);
+    }
+}
+
+function addMessage(content, type = 'assistant', timestamp = null) {
+    const messagesDiv = document.getElementById('chat-messages');
+
+    // Remove typing indicator if exists
+    const typing = document.querySelector('.typing-indicator');
+    if (typing) typing.remove();
+
+    const messageWrapper = document.createElement('div');
+    messageWrapper.className = `message-wrapper ${type}-message`;
+
+    const messageContent = document.createElement('div');
+    messageContent.className = 'message-content';
+
+    const messageText = document.createElement('div');
+    messageText.className = 'message-text';
+    messageText.innerHTML = content;
+
+    messageContent.appendChild(messageText);
+    messageWrapper.appendChild(messageContent);
+    messagesDiv.appendChild(messageWrapper);
+
+    // Scroll to bottom
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+}
+
+function showTyping() {
+    const messagesDiv = document.getElementById('chat-messages');
+    const typingDiv = document.createElement('div');
+    typingDiv.className = 'typing-indicator';
+    typingDiv.innerHTML = '<em>AIS is typing...</em>';
+    messagesDiv.appendChild(typingDiv);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+}
+
+function hideTyping() {
+    const typing = document.querySelector('.typing-indicator');
+    if (typing) typing.remove();
+}
+
+function sendMessage() {
+    if (isSending) return;
+
+    const messageInput = document.getElementById('message-input');
+    const message = messageInput.value.trim();
+
+    if (!message) return;
+
+    // Add user message to chat
+    addMessage(message, 'user');
+
+    // Clear input
+    messageInput.value = '';
+
+    // Disable send button
+    const sendBtn = document.getElementById('send-btn');
+    sendBtn.disabled = true;
+    sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+    isSending = true;
+    showTyping();
+
+    // Send to server
+    fetch('/chatbot/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({
+            message: message,
+            context: 'general'
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        hideTyping();
+        if (data.error) {
+            addMessage('Sorry, I encountered an error: ' + data.error, 'assistant');
+        } else {
+            addMessage(data.response, 'assistant');
+        }
+    })
+    .catch(error => {
+        hideTyping();
+        addMessage('Sorry, I\'m having trouble connecting. Please try again.', 'assistant');
+        console.error('Error:', error);
+    })
+    .finally(() => {
+        isSending = false;
+        sendBtn.disabled = false;
+        sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i>';
+    });
+}
+
+function handleKeyPress(event) {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        sendMessage();
+    }
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+    // Chat toggle functionality
+    document.getElementById('chat-toggle').addEventListener('click', toggleChat);
+    document.getElementById('chat-close').addEventListener('click', toggleChat);
+
+    // Initialize with welcome message (already in HTML)
+    // Add some example questions after a moment
+    setTimeout(() => {
+        addMessage('💡 Try asking: "What bikes do you have?" or "How much is booking for 2 days?"');
+    }, 1000);
+});
+</script>

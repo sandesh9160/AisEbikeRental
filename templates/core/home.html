@@ -17,31 +17,31 @@
     --shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
     --transition: all 0.3s ease;
   }
-  
+
   /* Base Styles */
   body {
     overflow-x: hidden;
   }
-  
+
   .section {
     padding: 5rem 0;
     position: relative;
   }
-  
+
   .section-title {
     font-weight: 800;
     color: var(--dark);
     margin-bottom: 1rem;
     line-height: 1.2;
   }
-  
+
   .section-subtitle {
     color: var(--gray);
     font-size: 1.1rem;
     max-width: 700px;
     margin: 0 auto 3rem;
   }
-  
+
   /* Hero Section */
   .hero-section {
     background: var(--gradient);
@@ -50,7 +50,7 @@
     position: relative;
     overflow: hidden;
   }
-  
+
   .hero-section::before {
     content: '';
     position: absolute;
@@ -62,26 +62,26 @@
     opacity: 0.5;
     z-index: 0;
   }
-  
+
   .hero-content {
     position: relative;
     z-index: 2;
   }
-  
+
   .hero-title {
     font-size: 3.5rem;
     font-weight: 800;
     margin-bottom: 1.5rem;
     line-height: 1.2;
   }
-  
+
   .hero-subtitle {
     font-size: 1.25rem;
     margin-bottom: 2.5rem;
     opacity: 0.9;
     max-width: 600px;
   }
-  
+
   .hero-image {
     position: relative;
     z-index: 1;
@@ -94,23 +94,23 @@
     border: 8px solid white;
     box-shadow: 0 30px 60px -15px rgba(0,0,0,0.1);
   }
-  
+
   @keyframes pulse {
     0% { transform: perspective(1000px) rotateY(-5deg) rotateX(2deg) translateY(0); }
     100% { transform: perspective(1000px) rotateY(-5deg) rotateX(2deg) translateY(-10px); }
   }
-  
+
   .hero-image:hover {
     transform: perspective(1000px) rotateY(0) rotateX(0) scale(1.02);
     filter: drop-shadow(0 30px 40px rgba(0,0,0,0.2));
   }
-  
+
   @keyframes float {
     0% { transform: translateY(0px); }
     50% { transform: translateY(-15px); }
     100% { transform: translateY(0px); }
   }
-  
+
   /* Value Proposition Cards */
   .value-card {
     background: white;
@@ -123,20 +123,20 @@
     position: relative;
     overflow: hidden;
   }
-  
+
   .value-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 15px 35px rgba(0,0,0,0.1);
   }
-  
+
   .value-card.primary {
     border-top: 4px solid var(--primary);
   }
-  
+
   .value-card.success {
     border-top: 4px solid var(--success);
   }
-  
+
   .card-icon {
     width: 80px;
     height: 80px;
@@ -147,17 +147,17 @@
     margin: 0 auto 1.5rem;
     font-size: 2rem;
   }
-  
+
   .card-icon.primary {
     background: var(--primary-light);
     color: var(--primary);
   }
-  
+
   .card-icon.success {
     background: var(--success-light);
     color: var(--success);
   }
-  
+
   /* How It Works */
   .step-card {
     text-align: center;
@@ -165,7 +165,7 @@
     position: relative;
     z-index: 1;
   }
-  
+
   .step-number {
     width: 60px;
     height: 60px;
@@ -181,7 +181,7 @@
     position: relative;
     z-index: 1;
   }
-  
+
   .step-number::after {
     content: '';
     position: absolute;
@@ -193,11 +193,134 @@
     opacity: 0.2;
     transform: scale(1.5);
   }
-  
+
   /* Testimonials & Reviews */
   .testimonial-section {
     position: relative;
     overflow: hidden;
+  }
+
+  /* Review Cards */
+  .review-card {
+    background: white;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.03);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .review-card::before {
+    content: '"';
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-family: Georgia, serif;
+    font-size: 80px;
+    color: rgba(74, 107, 255, 0.1);
+    line-height: 1;
+    z-index: 0;
+  }
+
+  .review-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+  }
+
+  .review-card .review-rating .badge {
+    font-weight: 500;
+    padding: 0.4rem 0.8rem;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    transition: all 0.3s ease;
+  }
+
+  .review-card .review-rating .badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05);
+  }
+
+  /* Star Rating */
+  .star-rating {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    margin-bottom: 1rem;
+  }
+
+  .star-rating input {
+    display: none;
+  }
+
+  .star-rating label {
+    color: #ddd;
+    font-size: 1.5rem;
+    padding: 0 2px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .star-rating input:not(:checked) ~ label:hover,
+  .star-rating input:not(:checked) ~ label:hover ~ label {
+    color: #ffd700;
+  }
+
+  .star-rating input:checked ~ label {
+    color: #ffd700;
+  }
+
+  /* Floating Button */
+  .btn-floating {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    transition: all 0.3s ease;
+    border: none;
+  }
+
+  .btn-floating:hover {
+    transform: translateY(-5px) scale(1.1);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Animation */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .fade-in-up {
+    animation: fadeInUp 0.6s ease forwards;
+  }
+
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    .review-card {
+      margin-bottom: 1.5rem;
+    }
+
+    .btn-floating {
+      width: 50px;
+      height: 50px;
+      font-size: 1.2rem;
+      bottom: 20px;
+      right: 20px;
+    }
   }
 
   .testimonial-card {
@@ -326,159 +449,38 @@
   .rating-input label:hover ~ input:checked ~ label {
     color: #ffd700;
   }
-  
+
   /* Responsive Adjustments */
   @media (max-width: 991.98px) {
     .hero-title {
       font-size: 2.5rem;
     }
-    
+
     .hero-subtitle, .section-subtitle {
       font-size: 1.1rem;
     }
-    
+
     .section {
       padding: 4rem 0;
     }
-    
+
     .value-card, .testimonial-card {
       margin-bottom: 1.5rem;
     }
   }
-  
+
   @media (max-width: 767.98px) {
     .hero-section {
       text-align: center;
       padding: 6rem 0 4rem;
     }
-    
+
     .hero-title {
       font-size: 2.2rem;
     }
-    
+
     .hero-buttons {
       justify-content: center;
-    }
-  }
-  :root {
-    --primary: #4a6bff;
-    --secondary: #6c63ff;
-    --accent: #ff6b6b;
-    --light: #f8f9ff;
-    --dark: #2d3748;
-    --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
-    --shadow: 0 10px 30px rgba(74, 107, 255, 0.1);
-  }
-
-  .hero-section {
-    background: var(--gradient);
-    color: white;
-    padding: 8rem 0 6rem;
-    position: relative;
-  }
-
-  .hero-title {
-    font-size: 3.5rem;
-    font-weight: 800;
-    margin-bottom: 1.5rem;
-    line-height: 1.2;
-  }
-
-  .hero-subtitle {
-    font-size: 1.25rem;
-    margin-bottom: 2.5rem;
-    opacity: 0.9;
-  }
-
-  .hero-image {
-    animation: float 6s ease-in-out infinite;
-  }
-
-  @keyframes float {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-15px); }
-    100% { transform: translateY(0px); }
-  }
-
-  .feature-card {
-    background: white;
-    border-radius: 12px;
-    padding: 2rem;
-    height: 100%;
-    box-shadow: var(--shadow);
-    transition: all 0.3s ease;
-  }
-
-  .feature-card:hover {
-    transform: translateY(-5px);
-  }
-
-  .feature-icon {
-    width: 70px;
-    height: 70px;
-    background: var(--gradient);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 1.5rem;
-    color: white;
-    font-size: 1.5rem;
-  }
-
-  .step-card {
-    text-align: center;
-    padding: 2rem;
-  }
-
-  .step-number {
-    width: 60px;
-    height: 60px;
-    background: var(--gradient);
-    color: white;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin: 0 auto 1.5rem;
-  }
-
-  .testimonial-card {
-    background: white;
-    border-radius: 12px;
-    padding: 2rem;
-    box-shadow: var(--shadow);
-    height: 100%;
-  }
-
-  .testimonial-img {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin: 0 auto 1.5rem;
-    display: block;
-  }
-
-  .rating {
-    color: #ffc107;
-    margin-bottom: 1rem;
-  }
-
-  @media (max-width: 991.98px) {
-    .hero-title { font-size: 2.5rem; }
-    .hero-subtitle { font-size: 1.1rem; }
-    .hero-image {
-      transform: none !important;
-      animation: float 6s ease-in-out infinite;
-      max-width: 100%;
-      height: auto;
-    }
-    @keyframes pulse {
-      0% { transform: translateY(0); }
-      100% { transform: translateY(-10px); }
     }
   }
 </style>
@@ -498,8 +500,8 @@
         </div>
       </div>
       <div class="col-lg-6 mt-4 mt-lg-0">
-        <img src="https://images.timesdrive.in/photo/msid-152417121/152417121.jpg" 
-             alt="Premium E-Bike" 
+        <img src="https://images.timesdrive.in/photo/msid-152417121/152417121.jpg"
+             alt="Premium E-Bike"
              class="img-fluid rounded-4 hero-image">
       </div>
     </div>
@@ -514,7 +516,7 @@
       <h2 class="section-title">Your Journey, Your Way</h2>
       <p class="section-subtitle">Whether you're looking to ride or earn, we've got you covered with flexible options for everyone.</p>
     </div>
-    
+
     <div class="row g-4">
       <div class="col-lg-6">
         <div class="value-card primary">
@@ -536,7 +538,7 @@
           </div>
         </div>
       </div>
-      
+
       <div class="col-lg-6">
         <div class="value-card success">
           <div class="card-icon success">
@@ -569,7 +571,7 @@
       <h2 class="fw-bold">Revolutionize Your Ride</h2>
       <p class="text-muted">Experience the future of urban mobility</p>
     </div>
-    
+
     <div class="row g-4">
       <div class="col-md-4">
         <div class="feature-card">
@@ -580,7 +582,7 @@
           <p class="text-muted text-center">Zero emissions, maximum efficiency. Help reduce your carbon footprint.</p>
         </div>
       </div>
-      
+
       <div class="col-md-4">
         <div class="feature-card">
           <div class="feature-icon">
@@ -590,7 +592,7 @@
           <p class="text-muted text-center">Competitive pricing with flexible rental options for every budget.</p>
         </div>
       </div>
-      
+
       <div class="col-md-4">
         <div class="feature-card">
           <div class="feature-icon">
@@ -611,7 +613,7 @@
       <span class="text-primary fw-bold">HOW IT WORKS</span>
       <h2 class="fw-bold">Rent in 3 Easy Steps</h2>
     </div>
-    
+
     <div class="row g-4">
       <div class="col-md-4">
         <div class="step-card">
@@ -620,7 +622,7 @@
           <p class="text-muted text-center">Sign up and verify your identity to get started.</p>
         </div>
       </div>
-      
+
       <div class="col-md-4">
         <div class="step-card">
           <div class="step-number">2</div>
@@ -628,7 +630,7 @@
           <p class="text-muted text-center">Choose your e-bike and make a reservation.</p>
         </div>
       </div>
-      
+
       <div class="col-md-4">
         <div class="step-card">
           <div class="step-number">3</div>
@@ -637,59 +639,141 @@
         </div>
       </div>
     </div>
+  </section>
+
+
+
+<!-- Testimonials Section -->
+<section class="py-5 my-5 bg-light" id="testimonials">
+  <div class="container">
+    <div class="text-center mb-5">
+      <span class="text-primary fw-bold">TESTIMONIALS</span>
+      <h2 class="fw-bold">What Our Riders Say</h2>
+      <p class="text-muted">Hear from our community of happy e-bike enthusiasts</p>
+    </div>
+
+    <div class="row g-4">
+      {% for testimonial in testimonials %}
+      <div class="{% if testimonial.is_highlighted %}col-md-12 col-lg-6{% else %}col-12 col-md-6 col-lg-4 col-xl-3{% endif %}">
+        <div class="review-card{% if testimonial.is_highlighted %} featured-review{% endif %} p-4 rounded-4 h-100" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:1 }}00">
+          <div class="d-flex align-items-center mb-3">
+            {% if testimonial.profile_image %}
+            <img src="{{ testimonial.profile_image.url }}" alt="{{ testimonial.name }}" class="rounded-circle me-3" width="60" height="60">
+            {% else %}
+            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed={{ testimonial.name|slugify }}" alt="{{ testimonial.name }}" class="rounded-circle me-3" width="60" height="60">
+            {% endif %}
+            <div>
+              <h5 class="{% if testimonial.is_highlighted %}mb-0 fw-bold{% else %}mb-0 fw-semibold{% endif %}">{{ testimonial.name }}</h5>
+              <div class="d-flex text-warning mb-1">
+                {% if testimonial.rating >= 1 %}<i class="fas fa-star"></i>{% endif %}
+                {% if testimonial.rating >= 2 %}<i class="fas fa-star"></i>{% endif %}
+                {% if testimonial.rating >= 3 %}<i class="fas fa-star"></i>{% endif %}
+                {% if testimonial.rating >= 4 %}<i class="fas fa-star"></i>{% endif %}
+                {% if testimonial.rating >= 5 %}<i class="fas fa-star"></i>{% endif %}
+              </div>
+              <small class="text-muted">{{ testimonial.created_at|date:"M d, Y" }}</small>
+            </div>
+          </div>
+
+          {% if testimonial.is_highlighted %}
+          <p class="mb-3">{{ testimonial.message }}</p>
+          <div class="review-highlights">
+            {% if testimonial.rating_highlight_1 %}
+            <div class="highlight-item">
+              <i class="fas fa-check-circle text-success me-2"></i>
+              <span>{{ testimonial.rating_highlight_1 }}</span>
+            </div>
+            {% endif %}
+            {% if testimonial.rating_highlight_2 %}
+            <div class="highlight-item">
+              <i class="fas fa-check-circle text-success me-2"></i>
+              <span>{{ testimonial.rating_highlight_2 }}</span>
+            </div>
+            {% endif %}
+            {% if testimonial.rating_highlight_3 %}
+            <div class="highlight-item">
+              <i class="fas fa-check-circle text-success me-2"></i>
+              <span>{{ testimonial.rating_highlight_3 }}</span>
+            </div>
+            {% endif %}
+          </div>
+          {% else %}
+          <p class="mb-0">{{ testimonial.message }}</p>
+          <div class="review-rating mt-3">
+            {% if testimonial.rating_highlight_1 %}
+            <span class="badge bg-primary bg-opacity-10 text-primary">
+              <i class="fas fa-battery-full me-1"></i>{{ testimonial.rating_highlight_1 }}
+            </span>
+            {% endif %}
+            {% if testimonial.rating_highlight_2 %}
+            <span class="badge bg-primary bg-opacity-10 text-primary ms-2">
+              <i class="fas fa-tachometer-alt me-1"></i>{{ testimonial.rating_highlight_2 }}
+            </span>
+            {% endif %}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+
+      {% if not testimonials %}
+      <div class="col-12">
+        <div class="text-center py-5">
+          <i class="fas fa-comment-dots fa-3x mb-3 text-muted"></i>
+          <h4 class="fw-bold text-muted">No testimonials yet</h4>
+          <p class="text-muted mb-4">Testimonials will appear here once added by admin.</p>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="text-center mt-5">
+      <button class="btn btn-outline-primary btn-lg" data-bs-toggle="modal" data-bs-target="#writeReviewModal">
+        <i class="fas fa-edit me-2"></i>Write a Review
+      </button>
+    </div>
   </div>
 </section>
 
-<!-- Testimonials -->
-<section class="testimonial-section py-5 my-5">
-  <div class="container">
-    <div class="text-center mb-5">
-      <span class="text-primary fw-bold">CUSTOMER REVIEWS</span>
-      <h2 class="fw-bold">What Our Riders Are Saying</h2>
-      <p class="text-muted">Join thousands of satisfied riders who've transformed their commute</p>
-    </div>
-    
-    <div class="row g-4">
-      <div class="col-lg-4 col-md-6">
-        <div class="testimonial-card">
-          <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=200&h=200&q=80" 
-               class="testimonial-img" 
-               alt="Alex Johnson">
-          <div class="rating">
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-          </div>
-          <p class="testimonial-text">The e-bike rental process was incredibly smooth. The bike was in perfect condition and the staff was very helpful. Will definitely rent again!</p>
-          <div class="testimonial-author">Alex Johnson</div>
-          <div class="testimonial-role">Regular Commuter</div>
-        </div>
+<!-- Write Review Modal -->
+<div class="modal fade" id="writeReviewModal" tabindex="-1" aria-labelledby="writeReviewModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="writeReviewModalLabel">Write a Review</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      
-      <div class="col-lg-4 col-md-6">
-        <div class="testimonial-card">
-          <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=200&h=200&q=80" 
-               class="testimonial-img" 
-               alt="Michael Chen">
-          <div class="rating">
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star-half-alt"></i>
+      <div class="modal-body">
+        <form id="reviewForm">
+          <div class="mb-3">
+            <label for="reviewerName" class="form-label">Your Name</label>
+            <input type="text" class="form-control" id="reviewerName" required>
           </div>
-          <p class="testimonial-text">I was skeptical at first, but the e-bike made my daily commute so much easier. The battery life is impressive and the app is very user-friendly.</p>
-          <div class="testimonial-author">Michael Chen</div>
-          <div class="testimonial-role">First-time User</div>
-        </div>
-      </div>
-      
+          <div class="mb-3">
+            <label class="form-label">Rating</label>
+            <div class="star-rating">
+              <input type="radio" id="star5" name="rating" value="5" required>
+              <label for="star5" title="5 stars"><i class="fas fa-star"></i></label>
+              <input type="radio" id="star4" name="rating" value="4">
+              <label for="star4" title="4 stars"><i class="fas fa-star"></i></label>
+              <input type="radio" id="star3" name="rating" value="3">
+              <label for="star3" title="3 stars"><i class="fas fa-star"></i></label>
+              <input type="radio" id="star2" name="rating" value="2">
+              <label for="star2" title="2 stars"><i class="fas fa-star"></i></label>
+              <input type="radio" id="star1" name="rating" value="1">
+              <label for="star1" title="1 star"><i class="fas fa-star"></i></label>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="reviewText" class="form-label">Your Review</label>
+            <textarea class="form-control" id="reviewText" rows="4" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Submit Review</button>
+        </form>
       </div>
     </div>
   </div>
-</section>
+</div>
 
 <!-- FAQ Section -->
 <section class="py-5 my-5" id="faq">
@@ -699,7 +783,7 @@
       <h2 class="fw-bold">Frequently Asked Questions</h2>
       <p class="text-muted">Find answers to common questions about our e-bike rental service</p>
     </div>
-    
+
     <div class="row justify-content-center">
       <div class="col-lg-8">
         <div class="accordion" id="faqAccordion">
@@ -716,7 +800,7 @@
               </div>
             </div>
           </div>
-          
+
           <!-- FAQ Item 2 -->
           <div class="accordion-item border-0 shadow-sm mb-3 rounded-3 overflow-hidden">
             <h3 class="accordion-header" id="headingTwo">
@@ -730,7 +814,7 @@
               </div>
             </div>
           </div>
-          
+
           <!-- FAQ Item 3 -->
           <div class="accordion-item border-0 shadow-sm mb-3 rounded-3 overflow-hidden">
             <h3 class="accordion-header" id="headingThree">
@@ -744,7 +828,7 @@
               </div>
             </div>
           </div>
-          
+
           <!-- FAQ Item 4 -->
           <div class="accordion-item border-0 shadow-sm mb-3 rounded-3 overflow-hidden">
             <h3 class="accordion-header" id="headingFour">
@@ -758,7 +842,7 @@
               </div>
             </div>
           </div>
-          
+
           <!-- FAQ Item 5 -->
           <div class="accordion-item border-0 shadow-sm mb-3 rounded-3 overflow-hidden">
             <h3 class="accordion-header" id="headingFive">
@@ -775,64 +859,63 @@
         </div>
       </div>
     </div>
-  </div>
+  </section>
 </section>
 
 <!-- Submit Review Section -->
 <section class="py-5 bg-light">
   <div class="container">
     <div class="row justify-content-center">
-      <div class="col-lg-8">
-        <div class="card shadow-sm">
-          <div class="card-body p-4">
-            <h3 class="text-center mb-4">Share Your Experience</h3>
-            <p class="text-center text-muted mb-4">We'd love to hear your feedback about our service</p>
-            
-            <form method="post" action="{% url 'submit_review' %}" id="reviewForm" class="needs-validation" novalidate>
-              {% csrf_token %}
-              {% if not user.is_authenticated %}
-              <div class="mb-3">
-                <label for="name" class="form-label">Your Name</label>
-                <input type="text" class="form-control" name="name" id="name" placeholder="Your name (optional if logged in)">
+    <div class="col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-body p-4">
+          <h3 class="text-center mb-4">Share Your Experience</h3>
+          <p class="text-center text-muted mb-4">We'd love to hear your feedback about our service</p>
+
+          <form method="post" action="{% url 'submit_review' %}" id="reviewForm" class="needs-validation" novalidate>
+            {% csrf_token %}
+            {% if not user.is_authenticated %}
+            <div class="mb-3">
+              <label for="name" class="form-label">Your Name</label>
+              <input type="text" class="form-control" name="name" id="name" placeholder="Your name (optional if logged in)">
+            </div>
+            {% endif %}
+
+            <div class="mb-4">
+              <label class="form-label d-block">Your Rating</label>
+              <div class="rating-input mb-2">
+                <input type="radio" id="star5" name="rating" value="5" required>
+                <label for="star5" title="5 stars">★</label>
+                <input type="radio" id="star4" name="rating" value="4">
+                <label for="star4" title="4 stars">★</label>
+                <input type="radio" id="star3" name="rating" value="3">
+                <label for="star3" title="3 stars">★</label>
+                <input type="radio" id="star2" name="rating" value="2">
+                <label for="star2" title="2 stars">★</label>
+                <input type="radio" id="star1" name="rating" value="1">
+                <label for="star1" title="1 star">★</label>
               </div>
-              {% endif %}
-              
-              <div class="mb-4">
-                <label class="form-label d-block">Your Rating</label>
-                <div class="rating-input mb-2">
-                  <input type="radio" id="star5" name="rating" value="5" required>
-                  <label for="star5" title="5 stars">★</label>
-                  <input type="radio" id="star4" name="rating" value="4">
-                  <label for="star4" title="4 stars">★</label>
-                  <input type="radio" id="star3" name="rating" value="3">
-                  <label for="star3" title="3 stars">★</label>
-                  <input type="radio" id="star2" name="rating" value="2">
-                  <label for="star2" title="2 stars">★</label>
-                  <input type="radio" id="star1" name="rating" value="1">
-                  <label for="star1" title="1 star">★</label>
-                </div>
-                <div id="ratingError" class="invalid-feedback">Please select a rating</div>
-              </div>
-              
-              <div class="mb-4">
-                <label for="message" class="form-label">Your Review</label>
-                <textarea class="form-control" name="message" id="message" rows="4" placeholder="Share your experience..." required></textarea>
-                <div class="invalid-feedback">Please enter your review message.</div>
-              </div>
-              
-              <div class="d-grid">
-                <button type="submit" class="btn btn-primary btn-lg">
-                  <span class="spinner-border spinner-border-sm d-none" id="submitSpinner" role="status" aria-hidden="true"></span>
-                  <span id="submitText">Submit Review</span>
-                </button>
-              </div>
-            </form>
-          </div>
+              <div id="ratingError" class="invalid-feedback">Please select a rating</div>
+            </div>
+
+            <div class="mb-4">
+              <label for="message" class="form-label">Your Review</label>
+              <textarea class="form-control" name="message" id="message" rows="4" placeholder="Share your experience..." required></textarea>
+              <div class="invalid-feedback">Please enter your review message.</div>
+            </div>
+
+            <div class="d-grid">
+              <button type="submit" class="btn btn-primary btn-lg">
+                <span class="spinner-border spinner-border-sm d-none" id="submitSpinner" role="status" aria-hidden="true"></span>
+                <span id="submitText">Submit Review</span>
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
+    </div>
   </div>
-</section>
 </section>
 
 <!-- CTA Section -->

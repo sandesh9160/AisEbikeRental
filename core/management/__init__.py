@@ -1,1 +1,1 @@
-# Package initializer for core.management
+# This file makes Python treat the directory as a package

@@ -1,0 +1,164 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}My Favorites - AIS E-Bike Rental{% endblock %}
+
+{% block content %}
+<style>
+  body {
+    background: linear-gradient(to right, #dbe9f4, #f4f8ff);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  .section-title {
+    font-size: 2.2rem;
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 2.5rem;
+    background: linear-gradient(90deg, #1e3c72, #2a5298);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .card {
+    background: rgba(255, 255, 255, 0.85);
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    backdrop-filter: blur(6px);
+    overflow: hidden;
+    position: relative;
+  }
+
+  .card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  }
+
+  .card img {
+    height: 220px;
+    object-fit: cover;
+    border-radius: 20px 20px 0 0;
+  }
+
+  .favorite-btn {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: #ff4757;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .favorite-btn i {
+    color: white;
+    font-size: 1.2rem;
+  }
+
+  .empty-favorites {
+    text-align: center;
+    padding: 4rem 2rem;
+  }
+
+  .empty-favorites i {
+    font-size: 5rem;
+    color: #ddd;
+    margin-bottom: 1rem;
+  }
+</style>
+
+<h1 class="section-title"><i class="fas fa-heart me-2"></i>My Favorite E-Bikes</h1>
+
+{% if favorite_ebikes %}
+  <div class="mb-3 text-center">
+    <p class="text-muted">You have <strong>{{ favorites_count }}</strong> favorite bike{{ favorites_count|pluralize }}</p>
+  </div>
+  <div class="row">
+    {% for ebike in favorite_ebikes %}
+      <div class="col-12 col-md-6 col-lg-4 col-xl-3 mb-4 d-flex align-items-stretch">
+        <div class="card shadow">
+          <img src="{{ ebike.image.url }}" class="card-img-top" alt="{{ ebike.name }}">
+          <button class="favorite-btn active" onclick="toggleFavorite({{ ebike.id }}, this)" title="Remove from favorites">
+            <i class="fas fa-heart"></i>
+          </button>
+          <span class="price-badge" style="position: absolute; top: 12px; right: 12px; background: linear-gradient(135deg, #2a5298, #1e3c72); color: #fff; padding: 6px 14px; border-radius: 25px; font-size: 0.85rem; font-weight: 600;">
+            ₹{{ ebike.price_per_day }} <small>/day</small>
+          </span>
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title"><i class="fas fa-battery-full me-2"></i>{{ ebike.name }}</h5>
+            <p class="card-text">{{ ebike.description|truncatewords:20 }}</p>
+            <p class="card-text"><i class="fas fa-calendar-day me-2"></i>₹{{ ebike.price_per_day }} per day</p>
+            <p class="card-text"><i class="fas fa-calendar-week me-2"></i>₹{{ ebike.price_per_week }} per week</p>
+            <p class="card-text"><i class="fas fa-user-tie me-2"></i>{{ ebike.provider }}</p>
+            <a href="{% url 'book_ebike' ebike.id %}" class="btn btn-primary mt-auto w-100">
+              <i class="fas fa-calendar-check me-2"></i>Book Now
+            </a>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="empty-favorites">
+    <i class="fas fa-heart"></i>
+    <h3>No Favorites Yet</h3>
+    <p class="text-muted">Start adding bikes to your favorites by clicking the heart icon on any bike!</p>
+    <a href="{% url 'ebikes' %}" class="btn btn-primary mt-3">
+      <i class="fas fa-bolt me-2"></i>Browse E-Bikes
+    </a>
+  </div>
+{% endif %}
+
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function toggleFavorite(ebikeId, buttonElement) {
+    const csrftoken = getCookie('csrftoken');
+    fetch(`/favorites/toggle/${ebikeId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrftoken,
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            if (!data.is_favorite) {
+                // Removed from favorites - reload page
+                window.location.reload();
+            }
+        } else {
+            alert('Error: ' + (data.error || 'Failed to update favorite'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred. Please try again.');
+    });
+}
+</script>
+{% endblock %}
